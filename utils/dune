@@ -1,0 +1,10 @@
+(env
+ (dev
+  (flags
+   (:standard -w -3-9-32-39 -warn-error -26-27))))
+
+(executable
+ (name mylint)
+ (public_name mylinter)
+ (libraries base compiler-libs.common)
+ (package mylinter))

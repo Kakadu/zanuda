@@ -1,0 +1,9 @@
+(library
+ (name testlib1)
+ (package testsuite)
+ (lint
+  (action
+   (run mylinter %{input-file}))))
+
+(cram
+ (deps %{workspace_root}/utils/mylint.exe))

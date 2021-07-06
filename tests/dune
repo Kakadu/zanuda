@@ -1,0 +1,10 @@
+(cram
+ (applies_to :whole_subtree))
+
+; (subdir
+;  lib
+;  (cram
+;   (alias runtest-lib)))
+
+; (cram
+;  (deps %{workspace_root}/utils/mylint.exe))
