@@ -73,5 +73,5 @@ let () =
   Clflags.error_style := Some Misc.Error_style.Contextual;
   let filename = Caml.Sys.argv.(1) in
   load_file filename;
-  Caml.exit 1
+  Caml.exit 0
 ;;
