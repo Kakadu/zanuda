@@ -1,12 +1,25 @@
 open Base
 
-module Quirks = struct
+module Level = struct
+  type t =
+    | Allow
+    | Warn
+    | Deny
+    | Deprecated
+end
+
+module Groups = struct
+  type t = Style
+  (* Correctness Perf Restriction  Deprecated Pedantic Complexity Suspicious Cargo Nursery *)
+end
+
+module Lints = struct
   type t = string
 
-  let found_quirks : (Location.t * t) Queue.t = Queue.create ()
-  let clear () = Queue.clear found_quirks
-  let is_empty () = Queue.is_empty found_quirks
-  let add ~loc s = Queue.enqueue found_quirks (loc, s)
+  let found_Lints : (Location.t * t) Queue.t = Queue.create ()
+  let clear () = Queue.clear found_Lints
+  let is_empty () = Queue.is_empty found_Lints
+  let add ~loc s = Queue.enqueue found_Lints (loc, s)
   let addf ?(loc = Location.none) fmt = Caml.Format.kasprintf (add ~loc) fmt
   let snake_case ~loc name = addf ~loc "Type name `%s` should be in snake case" name
 
@@ -15,37 +28,53 @@ module Quirks = struct
   ;;
 
   let report () =
-    let printer = Location.batch_mode_printer in
-    Queue.iter found_quirks ~f:(fun (loc, s) ->
+    (* let printer = Location.batch_mode_printer in *)
+    Queue.iter found_Lints ~f:(fun (loc, s) ->
         (* Format.printf "%s\n%!" s; *)
         let r =
-          let main = Location.mkloc (fun ppf -> Format.fprintf ppf "%s" s) loc in
+          let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
           Location.{ sub = []; main; kind = Report_alert "asdf" }
         in
-        Location.print_report Format.std_formatter r)
+        Location.print_report Caml.Format.std_formatter r)
   ;;
 end
 
-let on_structure stru =
-  let is_camel_case s = String.(lowercase s <> s) in
-  let open Parsetree in
-  let open Ast_iterator in
-  let o =
-    { Ast_iterator.default_iterator with
+module Casing = struct
+  let is_camel_case s = String.(lowercase s <> s)
+
+  open Ast_iterator
+
+  let l fallback =
+    { fallback with
       type_declaration =
         (fun self tdecl ->
           let open Parsetree in
           let tname = tdecl.ptype_name.txt in
-          if is_camel_case tname then Quirks.snake_case ~loc:tdecl.ptype_loc tname;
-          default_iterator.type_declaration self tdecl)
-    ; case =
+          if is_camel_case tname then Lints.snake_case ~loc:tdecl.ptype_loc tname;
+          fallback.type_declaration self tdecl)
+    }
+  ;;
+end
+
+module GuardInsteadOfIf = struct
+  open Parsetree
+  open Ast_iterator
+
+  let l fallback =
+    { fallback with
+      case =
         (fun self case ->
           match case.pc_rhs.pexp_desc with
           | Pexp_ifthenelse (_, _, _) ->
-            Quirks.guard_insteadof_if ~loc:case.pc_rhs.pexp_loc
-          | _ -> default_iterator.case self case)
+            Lints.guard_insteadof_if ~loc:case.pc_rhs.pexp_loc
+          | _ -> fallback.case self case)
     }
-  in
+  ;;
+end
+
+let on_structure stru =
+  let open Ast_iterator in
+  let o = GuardInsteadOfIf.l (Casing.l Ast_iterator.default_iterator) in
   o.structure o stru
 ;;
 
@@ -62,8 +91,8 @@ let load_file filename =
   let parsetree = with_info Compile_common.parse_impl in
   (* Caml.print_endline @@ Pprintast.string_of_structure parsetree; *)
   on_structure parsetree;
-  Quirks.report ();
-  Quirks.clear ();
+  Lints.report ();
+  Lints.clear ();
   (* let tstr, _coe = with_info (fun info -> Compile_common.typecheck_impl info parsetree) in *)
   (* Format.printf "%a\n%!" Printtyped.implementation tstr; *)
   ()
