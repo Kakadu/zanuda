@@ -10,7 +10,7 @@ homepage: "https://github.com/Kakadu/mylinter"
 bug-reports: "https://github.com/Kakadu/mylinter/issues"
 depends: [
   "dune" {>= "2.8"}
-  "base" {> "v0.14.1"}
+  "base" {>= "v0.14.1"}
   "odoc" {with-doc}
 ]
 build: [

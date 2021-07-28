@@ -17,5 +17,5 @@
  (synopsis "An attempt to create a linter")
  (description "Inspired by https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml")
  (depends
-  (base (> v0.14.1)))
+  (base (>= v0.14.1)))
 )
