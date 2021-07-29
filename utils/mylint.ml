@@ -1,5 +1,18 @@
 open Base
 
+module Options = struct
+  type t =
+    { mutable outfile : string option
+    ; mutable infile : string
+    }
+
+  let opts = { outfile = None; infile = "" }
+  let set_out_file s = opts.outfile <- Some s
+  let outfile () = opts.outfile
+  let infile () = opts.infile
+  let set_in_file s = opts.infile <- s
+end
+
 module Level = struct
   type t =
     | Allow
@@ -28,23 +41,35 @@ module Lints = struct
   ;;
 
   let report () =
-    (* let printer = Location.batch_mode_printer in *)
-    Queue.iter found_Lints ~f:(fun (loc, s) ->
-        (* Format.printf "%s\n%!" s; *)
-        let r =
-          let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
-          Location.{ sub = []; main; kind = Report_alert "asdf" }
-        in
-        Location.print_report Caml.Format.std_formatter r)
+    let dest =
+      match Options.outfile () with
+      | Some s ->
+        print_endline "opening out file";
+        [ Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s ]
+      | None -> []
+    in
+    Base.Exn.protect
+      ~f:(fun () ->
+        Queue.iter found_Lints ~f:(fun (loc, s) ->
+            let r =
+              let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
+              Location.{ sub = []; main; kind = Report_alert "asdf" }
+            in
+            Location.print_report Caml.Format.std_formatter r;
+            List.iter
+              ~f:(fun out ->
+                Location.print_report (Format.formatter_of_out_channel out) r)
+              dest))
+      ~finally:(fun () -> List.iter ~f:Caml.close_out dest)
   ;;
 end
 
-module Casing = struct
+module Casing : LINT.S = struct
   let is_camel_case s = String.(lowercase s <> s)
 
   open Ast_iterator
 
-  let l fallback =
+  let stru _ fallback =
     { fallback with
       type_declaration =
         (fun self tdecl ->
@@ -56,11 +81,11 @@ module Casing = struct
   ;;
 end
 
-module GuardInsteadOfIf = struct
+module GuardInsteadOfIf : LINT.S = struct
   open Parsetree
   open Ast_iterator
 
-  let l fallback =
+  let stru _ fallback =
     { fallback with
       case =
         (fun self case ->
@@ -72,11 +97,45 @@ module GuardInsteadOfIf = struct
   ;;
 end
 
-let on_structure stru =
-  let open Ast_iterator in
-  let o = GuardInsteadOfIf.l (Casing.l Ast_iterator.default_iterator) in
-  o.structure o stru
+module ParsetreeHasDocs : LINT.S = struct
+  open Parsetree
+  open Ast_iterator
+
+  let ends_with ~suffix s = String.equal (String.suffix s (String.length suffix)) suffix
+  let is_mli s = ends_with ~suffix:".mli" s
+
+  let stru { Compile_common.source_file; _ } fallback =
+    if is_mli source_file
+    then
+      { fallback with
+        type_kind =
+          (fun self -> function
+            | Ptype_variant cds -> List.iter cds ~f:(fun _ -> ())
+            (* match case.pc_rhs.pexp_desc with
+            | Pexp_ifthenelse (_, _, _) ->
+              Lints.guard_insteadof_if ~loc:case.pc_rhs.pexp_loc *)
+            | tk -> fallback.type_kind self tk)
+      }
+    else fallback
+  ;;
+  (* TODO: ocamlc lib/ast.mli -stop-after typing -dsource -dparsetree   *)
+end
+
+let all_linters = [ GuardInsteadOfIf.stru; Casing.stru ]
+
+let build_iterator info ~f =
+  let compose lint fallback = lint info fallback in
+  let o =
+    List.fold_left
+      ~f:(fun acc lint -> compose lint acc)
+      ~init:Ast_iterator.default_iterator
+      all_linters
+  in
+  f o
 ;;
+
+let on_structure = build_iterator ~f:(fun o -> o.Ast_iterator.structure o)
+let on_signature = build_iterator ~f:(fun o -> o.Ast_iterator.signature o)
 
 let load_file filename =
   let with_info f =
@@ -88,9 +147,19 @@ let load_file filename =
       ~dump_ext:"asdf"
       f
   in
-  let parsetree = with_info Compile_common.parse_impl in
+  let () =
+    with_info (fun info ->
+        if String.equal (String.suffix info.source_file 3) ".ml"
+        then (
+          let parsetree = Compile_common.parse_impl info in
+          on_structure info parsetree)
+        else if String.equal (String.suffix info.source_file 4) ".mli"
+        then (
+          let parsetree = Compile_common.parse_intf info in
+          on_signature info parsetree)
+        else ())
+  in
   (* Caml.print_endline @@ Pprintast.string_of_structure parsetree; *)
-  on_structure parsetree;
   Lints.report ();
   Lints.clear ();
   (* let tstr, _coe = with_info (fun info -> Compile_common.typecheck_impl info parsetree) in *)
@@ -99,6 +168,10 @@ let load_file filename =
 ;;
 
 let () =
+  Arg.parse
+    [ "-o", Arg.String Options.set_out_file, "Set Markdown output file" ]
+    Options.set_in_file
+    "usage";
   Clflags.error_style := Some Misc.Error_style.Contextual;
   let filename = Caml.Sys.argv.(1) in
   load_file filename;

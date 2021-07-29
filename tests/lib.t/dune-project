@@ -2,3 +2,13 @@
 
 (package
  (name testsuite))
+(package
+ (name testsuite2))
+(package
+ (name testsuite3))
+(package
+ (name testsuite4))
+(package
+ (name testsuite5))
+(package
+ (name testsuite6))

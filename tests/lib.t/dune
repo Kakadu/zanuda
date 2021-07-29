@@ -1,9 +1,19 @@
 (library
  (name testlib1)
  (package testsuite)
+ (modules Lib)
  (lint
   (action
-   (run mylinter %{input-file}))))
+   (run mylinter %{input-file} -o /tmp/out.md))))
+
+(library
+ (name testlib2)
+ (package testsuite2)
+ (modules )
+ (modules_without_implementation Parsetree)
+ (lint
+  (action
+   (run mylinter %{input-file} -o /tmp/out.md))))
 
 (cram
  (deps %{workspace_root}/utils/mylint.exe))
