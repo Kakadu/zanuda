@@ -4,10 +4,12 @@ open Caml.Format
 module Options = struct
   type t =
     { mutable outfile : string option
+    ; mutable outrdjson : string option
+          (* Spec: https://github.com/reviewdog/reviewdog/tree/master/proto/rdf#rdjson *)
     ; mutable infile : string
     }
 
-  let opts = { outfile = None; infile = "" }
+  let opts = { outfile = None; outrdjson = None; infile = "" }
   let set_out_file s = opts.outfile <- Some s
   let outfile () = opts.outfile
   let infile () = opts.infile
