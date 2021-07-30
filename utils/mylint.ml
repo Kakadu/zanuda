@@ -63,14 +63,20 @@ module Casing : LINT.S = struct
 
   open Ast_iterator
 
+  let msg ppf name = fprintf ppf "Type name `%s` should be in snake case" name
+
   let report_txt name ~loc ppf =
-    let s = asprintf "Type name `%s` should be in snake case" name in
-    let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
+    let main = Location.mkloc (fun ppf -> msg ppf name) loc in
     let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
     Location.print_report ppf r
   ;;
 
-  let report_md = report_txt
+  let report_md name ~loc ppf =
+    fprintf ppf "* %a\n%!" msg name;
+    fprintf ppf "  ```\n%!";
+    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt name ~loc ppf) ();
+    fprintf ppf "  ```\n%!"
+  ;;
 
   let stru _ fallback =
     { fallback with
@@ -80,7 +86,6 @@ module Casing : LINT.S = struct
           let tname = tdecl.ptype_name.txt in
           let loc = tdecl.ptype_loc in
           if is_camel_case tname then Lints.add ~loc (report_txt tname, report_md tname);
-          (* Lints.snake_case ~loc:tdecl.ptype_loc tname; *)
           fallback.type_declaration self tdecl)
     }
   ;;
@@ -90,14 +95,20 @@ module GuardInsteadOfIf : LINT.S = struct
   open Parsetree
   open Ast_iterator
 
+  let msg = "Prefer guard instead of if-then-else in case construction"
+
   let report_txt ~loc ppf =
-    let s = "Prefer guard instead of if-then-else in case construction" in
-    let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
+    let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" msg) loc in
     let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
     Location.print_report ppf r
   ;;
 
-  let report_md = report_txt
+  let report_md ~loc ppf =
+    fprintf ppf "* %s\n%!" msg;
+    fprintf ppf "  ```\n%!";
+    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt ~loc ppf) ();
+    fprintf ppf "  ```\n%!"
+  ;;
 
   let stru _ fallback =
     { fallback with
@@ -119,15 +130,22 @@ module ParsetreeHasDocs : LINT.S = struct
   let ends_with ~suffix s = String.equal (String.suffix s (String.length suffix)) suffix
   let is_mli s = ends_with ~suffix:".mli" s
   let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
+  let msg = "Constructor has no documentation attribute"
 
   let report_txt ~loc ppf =
-    let s = "Constructor has no documentation attribute" in
-    let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
-    let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
+    let r =
+      let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" msg) loc in
+      Location.{ sub = []; main; kind = Report_alert "zanuda-linter" }
+    in
     Location.print_report ppf r
   ;;
 
-  let report_md = report_txt
+  let report_md ~loc ppf =
+    fprintf ppf "* %s\n%!" msg;
+    fprintf ppf "  ```\n%!";
+    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt ~loc ppf) ();
+    fprintf ppf "  ```\n%!"
+  ;;
 
   let stru { Compile_common.source_file; _ } fallback =
     if is_mli source_file
