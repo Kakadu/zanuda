@@ -1,7 +1,7 @@
 (lang dune 2.8)
 
 (package
- (name testsuite))
+ (name testsuite1))
 (package
  (name testsuite2))
 (package

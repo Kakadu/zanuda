@@ -1,6 +1,6 @@
 (library
  (name testlib1)
- (package testsuite)
+ (package testsuite1)
  (modules Lib)
  (lint
   (action
@@ -9,7 +9,7 @@
 (library
  (name testlib2)
  (package testsuite2)
- (modules )
+ (modules Lib2 Parsetree)
  (modules_without_implementation Parsetree)
  (lint
   (action

@@ -1,4 +1,5 @@
 open Base
+open Caml.Format
 
 module Options = struct
   type t =
@@ -28,38 +29,31 @@ end
 
 module Lints = struct
   type t = string
+  type single_printer = loc:Warnings.loc -> Format.formatter -> unit
 
-  let found_Lints : (Location.t * t) Queue.t = Queue.create ()
+  let found_Lints : (Location.t * (single_printer * single_printer)) Queue.t =
+    Queue.create ()
+  ;;
+
   let clear () = Queue.clear found_Lints
   let is_empty () = Queue.is_empty found_Lints
-  let add ~loc s = Queue.enqueue found_Lints (loc, s)
-  let addf ?(loc = Location.none) fmt = Caml.Format.kasprintf (add ~loc) fmt
-  let snake_case ~loc name = addf ~loc "Type name `%s` should be in snake case" name
-
-  let guard_insteadof_if ~loc =
-    addf ~loc "Prefer guard instead of if-then-else in case construction"
-  ;;
+  let add ~loc (txt, md) = Queue.enqueue found_Lints (loc, (txt, md))
 
   let report () =
     let dest =
       match Options.outfile () with
-      | Some s ->
-        print_endline "opening out file";
-        [ Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s ]
+      | Some s -> [ Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s ]
       | None -> []
     in
     Base.Exn.protect
       ~f:(fun () ->
-        Queue.iter found_Lints ~f:(fun (loc, s) ->
-            let r =
-              let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
-              Location.{ sub = []; main; kind = Report_alert "asdf" }
-            in
-            Location.print_report Caml.Format.std_formatter r;
-            List.iter
-              ~f:(fun out ->
-                Location.print_report (Format.formatter_of_out_channel out) r)
-              dest))
+        Queue.iter found_Lints ~f:(fun (loc, (ftxt, fmd)) ->
+            ftxt ~loc Format.std_formatter;
+            if not (List.is_empty dest)
+            then
+              List.iter
+                ~f:(fun out -> fmd ~loc (Format.formatter_of_out_channel out))
+                dest))
       ~finally:(fun () -> List.iter ~f:Caml.close_out dest)
   ;;
 end
@@ -69,13 +63,24 @@ module Casing : LINT.S = struct
 
   open Ast_iterator
 
+  let report_txt name ~loc ppf =
+    let s = asprintf "Type name `%s` should be in snake case" name in
+    let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
+    let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
+    Location.print_report ppf r
+  ;;
+
+  let report_md = report_txt
+
   let stru _ fallback =
     { fallback with
       type_declaration =
         (fun self tdecl ->
           let open Parsetree in
           let tname = tdecl.ptype_name.txt in
-          if is_camel_case tname then Lints.snake_case ~loc:tdecl.ptype_loc tname;
+          let loc = tdecl.ptype_loc in
+          if is_camel_case tname then Lints.add ~loc (report_txt tname, report_md tname);
+          (* Lints.snake_case ~loc:tdecl.ptype_loc tname; *)
           fallback.type_declaration self tdecl)
     }
   ;;
@@ -85,13 +90,23 @@ module GuardInsteadOfIf : LINT.S = struct
   open Parsetree
   open Ast_iterator
 
+  let report_txt ~loc ppf =
+    let s = "Prefer guard instead of if-then-else in case construction" in
+    let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
+    let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
+    Location.print_report ppf r
+  ;;
+
+  let report_md = report_txt
+
   let stru _ fallback =
     { fallback with
       case =
         (fun self case ->
           match case.pc_rhs.pexp_desc with
           | Pexp_ifthenelse (_, _, _) ->
-            Lints.guard_insteadof_if ~loc:case.pc_rhs.pexp_loc
+            let loc = case.pc_rhs.pexp_loc in
+            Lints.add ~loc (report_txt, report_md)
           | _ -> fallback.case self case)
     }
   ;;
@@ -103,6 +118,16 @@ module ParsetreeHasDocs : LINT.S = struct
 
   let ends_with ~suffix s = String.equal (String.suffix s (String.length suffix)) suffix
   let is_mli s = ends_with ~suffix:".mli" s
+  let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
+
+  let report_txt ~loc ppf =
+    let s = "Constructor has no documentation attribute" in
+    let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" s) loc in
+    let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
+    Location.print_report ppf r
+  ;;
+
+  let report_md = report_txt
 
   let stru { Compile_common.source_file; _ } fallback =
     if is_mli source_file
@@ -110,18 +135,17 @@ module ParsetreeHasDocs : LINT.S = struct
       { fallback with
         type_kind =
           (fun self -> function
-            | Ptype_variant cds -> List.iter cds ~f:(fun _ -> ())
-            (* match case.pc_rhs.pexp_desc with
-            | Pexp_ifthenelse (_, _, _) ->
-              Lints.guard_insteadof_if ~loc:case.pc_rhs.pexp_loc *)
+            | Ptype_variant cds ->
+              List.iter cds ~f:(fun cd ->
+                  if not (List.exists cd.pcd_attributes ~f:is_doc_attribute)
+                  then Lints.add ~loc:cd.pcd_loc (report_txt, report_md))
             | tk -> fallback.type_kind self tk)
       }
     else fallback
   ;;
-  (* TODO: ocamlc lib/ast.mli -stop-after typing -dsource -dparsetree   *)
 end
 
-let all_linters = [ GuardInsteadOfIf.stru; Casing.stru ]
+let all_linters = [ GuardInsteadOfIf.stru; Casing.stru; ParsetreeHasDocs.stru ]
 
 let build_iterator info ~f =
   let compose lint fallback = lint info fallback in
