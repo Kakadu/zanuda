@@ -48,8 +48,8 @@ module Lints = struct
     let mdfile =
       match Options.outfile () with
       | Some s ->
+        Format.printf "Opening file '%s'...\n%!" s;
         let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
-        (* By some reason on CI Open_creat is not enough to create a file *)
         let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
         [ Format.formatter_of_out_channel ch, ch ]
       | None -> []
@@ -57,6 +57,7 @@ module Lints = struct
     let golint_files =
       match Options.out_golint () with
       | Some s ->
+        Format.printf "Opening file '%s'...\n%!" s;
         let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
         (* By some reason on CI Open_creat is not enough to create a file *)
         let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
@@ -65,16 +66,25 @@ module Lints = struct
     in
     Base.Exn.protect
       ~f:(fun () ->
+        Format.printf "Total lints found: %d\n%!" (Queue.length found_Lints);
         Queue.iter found_Lints ~f:(fun (_loc, (module M : LINT.REPORTER)) ->
-            M.txt Format.std_formatter;
+            M.txt Format.std_formatter ();
             let () =
               if not (List.is_empty mdfile)
-              then List.iter ~f:(fun (ppf, _) -> M.md ppf) mdfile
+              then
+                List.iter
+                  ~f:(fun (ppf, ch) ->
+                    Format.printf "printing to md file...\n%!";
+                    Format.fprintf ppf "%a%!" M.md ();
+                    Caml.flush ch)
+                  mdfile
             in
             if not (List.is_empty golint_files)
             then (
               let () = print_endline "printing in golint format" in
-              List.iter ~f:(fun (ppf, _) -> M.golint ppf) golint_files)))
+              List.iter golint_files ~f:(fun (ppf, _) ->
+                  print_endline "Trying to print something as golint ";
+                  Format.fprintf ppf "%a%!" M.golint ()))))
       ~finally:(fun () ->
         let f (ppf, ch) =
           Format.pp_print_flush ppf ();
@@ -109,11 +119,11 @@ module Casing : LINT.S = struct
 
   let report ~loc name =
     let module M = struct
-      let md = report_md name ~loc
-      let txt = report_txt name ~loc
-      let rdjson = report_rdjson name ~loc
+      let md ppf () = report_md name ~loc ppf
+      let txt ppf () = report_txt name ~loc ppf
+      let rdjson ppf () = report_rdjson name ~loc ppf
 
-      let golint ppf =
+      let golint ppf () =
         (* Format.printf
           "golinting casing to %s\n"
           (Options.out_golint () |> Option.value ~default:"wtf"); *)
@@ -132,13 +142,18 @@ module Casing : LINT.S = struct
   ;;
 
   let stru _ fallback =
+    print_endline "Using a casing linter";
     { fallback with
       type_declaration =
         (fun self tdecl ->
           let open Parsetree in
           let tname = tdecl.ptype_name.txt in
           let loc = tdecl.ptype_loc in
-          if is_camel_case tname then Lints.add ~loc (report ~loc tname);
+          if is_camel_case tname
+          then (
+            let () = Format.printf "type name %s is BAD\n%!" tname in
+            Lints.add ~loc (report ~loc tname))
+          else Format.printf "type name %s is fine\n%!" tname;
           fallback.type_declaration self tdecl)
     }
   ;;
@@ -167,11 +182,11 @@ module GuardInsteadOfIf : LINT.S = struct
 
   let report ~loc =
     let module M = struct
-      let md = report_md ~loc
-      let txt = report_txt ~loc
-      let rdjson = report_rdjson ~loc
+      let md ppf () = report_md ~loc ppf
+      let txt ppf () = report_txt ~loc ppf
+      let rdjson ppf () = report_rdjson ~loc ppf
 
-      let golint ppf =
+      let golint ppf () =
         Format.fprintf
           ppf
           "%s:%d:%d: %s\n%!"
@@ -229,11 +244,11 @@ module ParsetreeHasDocs : LINT.S = struct
 
   let report ~loc =
     let module M = struct
-      let md = report_md ~loc
-      let txt = report_txt ~loc
-      let rdjson = report_rdjson ~loc
+      let md ppf () = report_md ~loc ppf
+      let txt ppf () = report_txt ~loc ppf
+      let rdjson ppf () = report_rdjson ~loc ppf
 
-      let golint ppf =
+      let golint ppf () =
         Format.fprintf
           ppf
           "%s:%d:%d: %s\n%!"
@@ -248,8 +263,10 @@ module ParsetreeHasDocs : LINT.S = struct
   ;;
 
   let stru { Compile_common.source_file; _ } fallback =
+    Format.printf "%s %d\n%!" __FILE__ __LINE__;
     if is_mli source_file
-    then
+    then (
+      let () = print_endline "using ParsetreeHasDocs i" in
       { fallback with
         type_kind =
           (fun self -> function
@@ -259,7 +276,7 @@ module ParsetreeHasDocs : LINT.S = struct
                   if not (List.exists cd.pcd_attributes ~f:is_doc_attribute)
                   then Lints.add ~loc (report ~loc))
             | tk -> fallback.type_kind self tk)
-      }
+      })
     else fallback
   ;;
 end
@@ -292,15 +309,18 @@ let load_file filename =
   in
   let () =
     with_info (fun info ->
+        Format.printf "%s %d    %s\n%!" __FILE__ __LINE__ info.source_file;
         if String.equal (String.suffix info.source_file 3) ".ml"
         then (
+          Format.printf "%s %d\n%!" __FILE__ __LINE__;
           let parsetree = Compile_common.parse_impl info in
           on_structure info parsetree)
         else if String.equal (String.suffix info.source_file 4) ".mli"
         then (
+          Format.printf "%s %d\n%!" __FILE__ __LINE__;
           let parsetree = Compile_common.parse_intf info in
           on_signature info parsetree)
-        else ())
+        else Format.printf "%s %d\n%!" __FILE__ __LINE__)
   in
   (* Caml.print_endline @@ Pprintast.string_of_structure parsetree; *)
   Lints.report ();
