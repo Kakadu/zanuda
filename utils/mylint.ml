@@ -10,12 +10,27 @@ module Options = struct
           (* Spec: https://github.com/reviewdog/reviewdog/tree/master/proto/rdf#rdjson *)
     ; mutable infile : string
     ; mutable workspace : string option
+    ; mutable prefix_to_cut : string option
+    ; mutable prefix_to_add : string option
     }
 
-  let opts = { outfile = None; outgolint = None; infile = ""; workspace = None }
+  let opts =
+    { outfile = None
+    ; outgolint = None
+    ; infile = ""
+    ; workspace = None
+    ; prefix_to_cut = None
+    ; prefix_to_add = None
+    }
+  ;;
+
   let set_out_file s = opts.outfile <- Some s
   let set_out_golint s = opts.outgolint <- Some s
   let set_workspace s = opts.workspace <- Some s
+  let set_prefix_to_cut s = opts.prefix_to_cut <- Some s
+  let set_prefix_to_add s = opts.prefix_to_add <- Some s
+  let prefix_to_cut () = opts.prefix_to_cut
+  let prefix_to_add () = opts.prefix_to_add
   let outfile () = opts.outfile
   let out_golint () = opts.outgolint
   let infile () = opts.infile
@@ -74,7 +89,6 @@ module Lints = struct
               then
                 List.iter
                   ~f:(fun (ppf, ch) ->
-                    Format.printf "printing to md file...\n%!";
                     Format.fprintf ppf "%a%!" M.md ();
                     Caml.flush ch)
                   mdfile
@@ -83,7 +97,7 @@ module Lints = struct
             then (
               let () = print_endline "printing in golint format" in
               List.iter golint_files ~f:(fun (ppf, _) ->
-                  print_endline "Trying to print something as golint ";
+                  (* print_endline "Trying to print something as golint "; *)
                   Format.fprintf ppf "%a%!" M.golint ()))))
       ~finally:(fun () ->
         let f (ppf, ch) =
@@ -94,8 +108,6 @@ module Lints = struct
         List.iter ~f golint_files)
   ;;
 end
-
-external realpath : string -> string -> string = "caml_realpath"
 
 module Casing : LINT.S = struct
   let is_camel_case s = String.(lowercase s <> s)
@@ -119,13 +131,7 @@ module Casing : LINT.S = struct
 
   let report_rdjson name ~loc ppf = ()
 
-  external realpath : string -> string -> string = "caml_realpath"
-
   let report ~loc name =
-    let () =
-      let ans = String.make 100 ' ' in
-      printf "realpath: %s\n%!" (realpath name ans)
-    in
     let module M = struct
       let md ppf () = report_md name ~loc ppf
       let txt ppf () = report_txt name ~loc ppf
@@ -257,10 +263,21 @@ module ParsetreeHasDocs : LINT.S = struct
       let rdjson ppf () = report_rdjson ~loc ppf
 
       let golint ppf () =
+        let filepath = Hack.realpath loc.loc_start.pos_fname in
+        let filepath =
+          match Options.prefix_to_cut () with
+          | Some s -> String.drop_prefix filepath (String.length s)
+          | None -> filepath
+        in
+        let filepath =
+          match Options.prefix_to_add () with
+          | Some s -> Format.sprintf "%s%s" s filepath
+          | None -> filepath
+        in
         Format.fprintf
           ppf
           "%s:%d:%d: %s\n%!"
-          loc.loc_start.pos_fname
+          filepath
           loc.loc_start.pos_lnum
           loc.loc_start.pos_cnum
           msg
@@ -271,11 +288,11 @@ module ParsetreeHasDocs : LINT.S = struct
   ;;
 
   let stru { Compile_common.source_file; _ } fallback =
-    Format.printf "%s %d\n%!" __FILE__ __LINE__;
+    (* Format.printf "%s %d\n%!" __FILE__ __LINE__; *)
     if is_mli source_file
-    then (
-      let () = print_endline "using ParsetreeHasDocs i" in
-      { fallback with
+    then
+      { (* let () = print_endline "using ParsetreeHasDocs i" in *)
+        fallback with
         type_kind =
           (fun self -> function
             | Ptype_variant cds ->
@@ -284,7 +301,7 @@ module ParsetreeHasDocs : LINT.S = struct
                   if not (List.exists cd.pcd_attributes ~f:is_doc_attribute)
                   then Lints.add ~loc (report ~loc))
             | tk -> fallback.type_kind self tk)
-      })
+      }
     else fallback
   ;;
 end
@@ -317,15 +334,14 @@ let load_file filename =
   in
   let () =
     with_info (fun info ->
-        Format.printf "%s %d    %s\n%!" __FILE__ __LINE__ info.source_file;
+        (* Format.printf "%s %d    %s\n%!" __FILE__ __LINE__ info.source_file; *)
         if String.equal (String.suffix info.source_file 3) ".ml"
         then (
-          Format.printf "%s %d\n%!" __FILE__ __LINE__;
+          (* Format.printf "%s %d\n%!" __FILE__ __LINE__; *)
           let parsetree = Compile_common.parse_impl info in
           on_structure info parsetree)
         else if String.equal (String.suffix info.source_file 4) ".mli"
         then (
-          Format.printf "%s %d\n%!" __FILE__ __LINE__;
           let parsetree = Compile_common.parse_intf info in
           on_signature info parsetree)
         else Format.printf "%s %d\n%!" __FILE__ __LINE__)
@@ -343,15 +359,18 @@ let () =
     [ "-o", Arg.String Options.set_out_file, "Set Markdown output file"
     ; "-ogolint", Arg.String Options.set_out_golint, "Set output file in golint format"
     ; "-ws", Arg.String Options.set_workspace, "Set dune workspace root"
+    ; ( "-del-prefix"
+      , Arg.String Options.set_prefix_to_cut
+      , "Set prefix to cut from file names" )
+    ; ( "-add-prefix"
+      , Arg.String Options.set_prefix_to_add
+      , "Set prefix to reprend to file names" )
     ]
     Options.set_in_file
     "usage";
   Clflags.error_style := Some Misc.Error_style.Contextual;
   let filename = Caml.Sys.argv.(1) in
-  let () =
-    let ans = String.make 100 ' ' in
-    printf "realpath: %s\n%!" (realpath filename ans)
-  in
+  let () = printf "realpath: %s\n%!" (Hack.realpath filename) in
   load_file filename;
   Caml.exit 0
 ;;
