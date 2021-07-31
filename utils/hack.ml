@@ -6,6 +6,6 @@ let realpath s =
     | prefix -> Str.global_replace (Str.regexp "TESTCASE_ROOT") prefix s
     | exception Not_found -> s
   in
-  Format.printf "s0 = %s\n%!" s0;
+  (* Format.printf "s0 = %s\n%!" s0; *)
   realpath_stub s0
 ;;

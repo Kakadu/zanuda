@@ -37,6 +37,21 @@ module Options = struct
   let set_in_file s = opts.infile <- s
 end
 
+let recover_filepath s =
+  let filepath = s in
+  let filepath =
+    match Options.prefix_to_cut () with
+    | Some s -> String.drop_prefix filepath (String.length s)
+    | None -> filepath
+  in
+  let filepath =
+    match Options.prefix_to_add () with
+    | Some s -> Format.sprintf "%s%s" s filepath
+    | None -> filepath
+  in
+  filepath
+;;
+
 module Level = struct
   type t =
     | Allow
@@ -63,7 +78,7 @@ module Lints = struct
     let mdfile =
       match Options.outfile () with
       | Some s ->
-        Format.printf "Opening file '%s'...\n%!" s;
+        (* Format.printf "Opening file '%s'...\n%!" s; *)
         let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
         let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
         [ Format.formatter_of_out_channel ch, ch ]
@@ -72,7 +87,7 @@ module Lints = struct
     let golint_files =
       match Options.out_golint () with
       | Some s ->
-        Format.printf "Opening file '%s'...\n%!" s;
+        (* Format.printf "Opening file '%s'...\n%!" s; *)
         let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
         (* By some reason on CI Open_creat is not enough to create a file *)
         let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
@@ -81,7 +96,7 @@ module Lints = struct
     in
     Base.Exn.protect
       ~f:(fun () ->
-        Format.printf "Total lints found: %d\n%!" (Queue.length found_Lints);
+        (* Format.printf "Total lints found: %d\n%!" (Queue.length found_Lints); *)
         Queue.iter found_Lints ~f:(fun (_loc, (module M : LINT.REPORTER)) ->
             M.txt Format.std_formatter ();
             let () =
@@ -129,7 +144,7 @@ module Casing : LINT.S = struct
     fprintf ppf "  ```\n%!"
   ;;
 
-  let report_rdjson name ~loc ppf = ()
+  let report_rdjson _name ~loc:_ _ppf = ()
 
   let report ~loc name =
     let module M = struct
@@ -144,9 +159,10 @@ module Casing : LINT.S = struct
         Format.fprintf
           ppf
           "%s:%d:%d: %a\n%!"
-          loc.loc_start.pos_fname
+          (recover_filepath loc.loc_start.pos_fname)
           loc.loc_start.pos_lnum
-          loc.loc_start.pos_cnum
+          (* loc.loc_start.pos_cnum *)
+          0
           msg
           name
       ;;
@@ -156,7 +172,6 @@ module Casing : LINT.S = struct
   ;;
 
   let stru _ fallback =
-    print_endline "Using a casing linter";
     { fallback with
       type_declaration =
         (fun self tdecl ->
@@ -164,9 +179,9 @@ module Casing : LINT.S = struct
           let tname = tdecl.ptype_name.txt in
           let loc = tdecl.ptype_loc in
           if is_camel_case tname
-          then (
-            let () = Format.printf "type name %s is BAD\n%!" tname in
-            Lints.add ~loc (report ~loc tname))
+          then
+            (* let () = Format.printf "type name %s is BAD\n%!" tname in *)
+            Lints.add ~loc (report ~loc tname)
           else Format.printf "type name %s is fine\n%!" tname;
           fallback.type_declaration self tdecl)
     }
@@ -204,9 +219,10 @@ module GuardInsteadOfIf : LINT.S = struct
         Format.fprintf
           ppf
           "%s:%d:%d: %s\n%!"
-          loc.loc_start.pos_fname
+          (recover_filepath loc.loc_start.pos_fname)
           loc.loc_start.pos_lnum
-          loc.loc_start.pos_cnum
+          (* loc.loc_start.pos_cnum *)
+          0
           msg
       ;;
     end
@@ -251,7 +267,7 @@ module ParsetreeHasDocs : LINT.S = struct
     fprintf ppf "  ```\n%!"
   ;;
 
-  let report_rdjson ~loc ppf =
+  let report_rdjson ~loc:_ _ppf =
     (* fprintf ppf "%s,\n%!" (Yojson.to_string (Rdjson.diagnostic ~loc msg)); *)
     ()
   ;;
@@ -263,23 +279,14 @@ module ParsetreeHasDocs : LINT.S = struct
       let rdjson ppf () = report_rdjson ~loc ppf
 
       let golint ppf () =
-        let filepath = Hack.realpath loc.loc_start.pos_fname in
-        let filepath =
-          match Options.prefix_to_cut () with
-          | Some s -> String.drop_prefix filepath (String.length s)
-          | None -> filepath
-        in
-        let filepath =
-          match Options.prefix_to_add () with
-          | Some s -> Format.sprintf "%s%s" s filepath
-          | None -> filepath
-        in
+        let filepath = recover_filepath loc.loc_start.pos_fname in
         Format.fprintf
           ppf
           "%s:%d:%d: %s\n%!"
           filepath
           loc.loc_start.pos_lnum
-          loc.loc_start.pos_cnum
+          (* loc.loc_start.pos_cnum *)
+          0
           msg
       ;;
     end
@@ -370,7 +377,7 @@ let () =
     "usage";
   Clflags.error_style := Some Misc.Error_style.Contextual;
   let filename = Caml.Sys.argv.(1) in
-  let () = printf "realpath: %s\n%!" (Hack.realpath filename) in
+  (* let () = printf "realpath: %s\n%!" (Hack.realpath filename) in *)
   load_file filename;
   Caml.exit 0
 ;;
