@@ -48,6 +48,8 @@ module Lints = struct
     let mdfile =
       match Options.outfile () with
       | Some s ->
+        let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
+        (* By some reason on CI Open_creat is not enough to create a file *)
         let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
         [ Format.formatter_of_out_channel ch, ch ]
       | None -> []
@@ -55,6 +57,8 @@ module Lints = struct
     let golint_files =
       match Options.out_golint () with
       | Some s ->
+        let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
+        (* By some reason on CI Open_creat is not enough to create a file *)
         let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
         [ Format.formatter_of_out_channel ch, ch ]
       | None -> []
