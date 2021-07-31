@@ -1,4 +1,4 @@
-.PHONY: all release watch test
+.PHONY: all release watch test promote install
 
 all:
 	dune build
@@ -11,6 +11,9 @@ watch:
 
 test:
 	dune build @runtest
+
+promote:
+	dune build @runtest --auto-promote
 
 install:
 	dune build @install

@@ -14,11 +14,14 @@
   3 |   | Abs of string * exprA
   4 |   | Var of string
   Alert zanuda-linter: Type name `exprA` should be in snake case
+  printing in golint format
   File "Parsetree.mli", line 2, characters 2-24:
   2 |   | App of exprA * exprA
         ^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Constructor has no documentation attribute
+  printing in golint format
   File "Parsetree.mli", line 3, characters 2-25:
   3 |   | Abs of string * exprA
         ^^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Constructor has no documentation attribute
+  printing in golint format

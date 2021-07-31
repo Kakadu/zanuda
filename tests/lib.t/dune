@@ -13,7 +13,7 @@
  (modules_without_implementation Parsetree)
  (lint
   (action
-   (run mylinter %{input-file} -o /tmp/out.md))))
+   (run mylinter %{input-file} -o /tmp/out.md -ogolint /tmp/out.golint -ws %{workspace_root}))))
 
 (cram
  (deps %{workspace_root}/utils/mylint.exe))
