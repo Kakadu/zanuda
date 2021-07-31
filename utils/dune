@@ -6,9 +6,13 @@
 (executable
  (name mylint)
  (public_name mylinter)
- (modules LINT
+ (modules
+  LINT
   ;Rdjson
   mylint)
  (modules_without_implementation LINT)
  (libraries base compiler-libs.common)
- (package mylinter))
+ (package mylinter)
+ (foreign_stubs
+  (language c)
+  (names stubs)))

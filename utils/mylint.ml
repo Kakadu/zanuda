@@ -95,6 +95,8 @@ module Lints = struct
   ;;
 end
 
+external realpath : string -> string -> string = "caml_realpath"
+
 module Casing : LINT.S = struct
   let is_camel_case s = String.(lowercase s <> s)
 
@@ -117,7 +119,13 @@ module Casing : LINT.S = struct
 
   let report_rdjson name ~loc ppf = ()
 
+  external realpath : string -> string -> string = "caml_realpath"
+
   let report ~loc name =
+    let () =
+      let ans = String.make 100 ' ' in
+      printf "realpath: %s\n%!" (realpath name ans)
+    in
     let module M = struct
       let md ppf () = report_md name ~loc ppf
       let txt ppf () = report_txt name ~loc ppf
@@ -340,6 +348,10 @@ let () =
     "usage";
   Clflags.error_style := Some Misc.Error_style.Contextual;
   let filename = Caml.Sys.argv.(1) in
+  let () =
+    let ans = String.make 100 ' ' in
+    printf "realpath: %s\n%!" (realpath filename ans)
+  in
   load_file filename;
   Caml.exit 0
 ;;
