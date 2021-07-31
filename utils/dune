@@ -6,7 +6,9 @@
 (executable
  (name mylint)
  (public_name mylinter)
- (modules LINT Rdjson mylint)
+ (modules LINT
+  ;Rdjson
+  mylint)
  (modules_without_implementation LINT)
- (libraries base yojson compiler-libs.common)
+ (libraries base compiler-libs.common)
  (package mylinter))
