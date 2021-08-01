@@ -207,13 +207,13 @@ module GuardInsteadOfIf : LINT.S = struct
     fprintf ppf "  ```\n%!"
   ;;
 
-  let report_rdjson ~loc ppf = ()
+  (* let report_rdjson ~loc ppf = () *)
 
   let report ~loc =
     let module M = struct
       let md ppf () = report_md ~loc ppf
       let txt ppf () = report_txt ~loc ppf
-      let rdjson ppf () = report_rdjson ~loc ppf
+      (* let rdjson ppf () = report_rdjson ~loc ppf *)
 
       let golint ppf () =
         Format.fprintf
@@ -250,20 +250,20 @@ module ParsetreeHasDocs : LINT.S = struct
   let ends_with ~suffix s = String.equal (String.suffix s (String.length suffix)) suffix
   let is_mli s = ends_with ~suffix:".mli" s
   let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
-  let msg = "Constructor has no documentation attribute"
+  let msg ppf name = fprintf ppf "Constructor '%s' has no documentation attribute" name
 
-  let report_txt ~loc ppf =
+  let report_txt name ~loc ppf =
     let r =
-      let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" msg) loc in
+      let main = Location.mkloc (fun ppf -> msg ppf name) loc in
       Location.{ sub = []; main; kind = Report_alert "zanuda-linter" }
     in
     Location.print_report ppf r
   ;;
 
-  let report_md ~loc ppf =
-    fprintf ppf "* %s\n%!" msg;
+  let report_md name ~loc ppf =
+    fprintf ppf "* %a\n%!" msg name;
     fprintf ppf "  ```\n%!";
-    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt ~loc ppf) ();
+    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt name ~loc ppf) ();
     fprintf ppf "  ```\n%!"
   ;;
 
@@ -272,22 +272,23 @@ module ParsetreeHasDocs : LINT.S = struct
     ()
   ;;
 
-  let report ~loc =
+  let report name ~loc =
     let module M = struct
-      let md ppf () = report_md ~loc ppf
-      let txt ppf () = report_txt ~loc ppf
-      let rdjson ppf () = report_rdjson ~loc ppf
+      let md ppf () = report_md name ~loc ppf
+      let txt ppf () = report_txt name ~loc ppf
+      (* let rdjson ppf () = report_rdjson ~loc ppf *)
 
       let golint ppf () =
         let filepath = recover_filepath loc.loc_start.pos_fname in
         Format.fprintf
           ppf
-          "%s:%d:%d: %s\n%!"
+          "%s:%d:%d:%a\n%!"
           filepath
           loc.loc_start.pos_lnum
           (* loc.loc_start.pos_cnum *)
           0
           msg
+          name
       ;;
     end
     in
@@ -295,18 +296,16 @@ module ParsetreeHasDocs : LINT.S = struct
   ;;
 
   let stru { Compile_common.source_file; _ } fallback =
-    (* Format.printf "%s %d\n%!" __FILE__ __LINE__; *)
     if is_mli source_file
     then
-      { (* let () = print_endline "using ParsetreeHasDocs i" in *)
-        fallback with
+      { fallback with
         type_kind =
           (fun self -> function
             | Ptype_variant cds ->
               List.iter cds ~f:(fun cd ->
                   let loc = cd.pcd_loc in
                   if not (List.exists cd.pcd_attributes ~f:is_doc_attribute)
-                  then Lints.add ~loc (report ~loc))
+                  then Lints.add ~loc (report cd.pcd_name.txt ~loc))
             | tk -> fallback.type_kind self tk)
       }
     else fallback
