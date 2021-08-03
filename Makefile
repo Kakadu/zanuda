@@ -18,3 +18,7 @@ promote:
 install:
 	dune build @install
 	dune install
+
+clean:
+	dune clean
+

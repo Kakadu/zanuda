@@ -122,22 +122,7 @@ module Lints = struct
         (* Format.printf "Total lints found: %d\n%!" (Queue.length found_Lints); *)
         Queue.iter found_Lints ~f:(fun (_loc, ((module M : LINT.REPORTER) as m)) ->
             M.txt Format.std_formatter ();
-            List.iter all_files ~f:(fun (f, ppf, _) -> f m ppf ())
-            (* let () =
-              if not (List.is_empty mdfile)
-              then
-                List.iter
-                  ~f:(fun (ppf, ch) ->
-                    Format.fprintf ppf "%a%!" M.md ();
-                    Caml.flush ch)
-                  mdfile
-            in
-            if not (List.is_empty golint_files)
-            then (
-              let () = print_endline "printing in golint format" in
-              List.iter golint_files ~f:(fun (ppf, _) ->
-                  (* print_endline "Trying to print something as golint "; *)
-                  Format.fprintf ppf "%a%!" M.golint ())) *)))
+            List.iter all_files ~f:(fun (f, ppf, _) -> f m ppf ())))
       ~finally:(fun () ->
         let f (_, ppf, ch) =
           Format.pp_print_flush ppf ();
@@ -173,7 +158,7 @@ module RDJsonl = struct
         | Some (desc, url) ->
           [ "code", `Assoc [ "value", `String desc; "url", `String url ] ])
     in
-    Format.fprintf ppf "%s\n" (Yojson.to_string j)
+    Format.fprintf ppf "%s\n%!" (Yojson.to_string j)
   ;;
   (* { "message": "Constructor 'XXX' has no documentation attribute",  "location": {    "path": "Lambda/lib/ast.mli",    "range": {      "start": { "line": 12, "column": 13 }, "end": { "line": 12, "column": 15      }    }  },  "severity": "INFO",  "code": {  "value": "RULE1",    "url": "https://example.com/url/to/super-lint/RULE1"  }}*)
 end
@@ -197,8 +182,6 @@ module Casing : LINT.S = struct
     fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt name ~loc ppf) ();
     fprintf ppf "  ```\n%!"
   ;;
-
-  (* let report_rdjson _name ~loc:_ _ppf = () *)
 
   let report ~loc name =
     let module M = struct
@@ -236,10 +219,7 @@ module Casing : LINT.S = struct
           let open Parsetree in
           let tname = tdecl.ptype_name.txt in
           let loc = tdecl.ptype_loc in
-          if is_camel_case tname
-          then
-            (* let () = Format.printf "type name %s is BAD\n%!" tname in *)
-            Lints.add ~loc (report ~loc tname);
+          if is_camel_case tname then Lints.add ~loc (report ~loc tname);
           fallback.type_declaration self tdecl)
     }
   ;;
@@ -426,9 +406,7 @@ let () =
   Arg.parse
     [ "-o", Arg.String Options.set_out_file, "Set Markdown output file"
     ; "-ogolint", Arg.String Options.set_out_golint, "Set output file in golint format"
-    ; ( "-ordjsonl"
-      , Arg.String Options.set_out_rdjsonl
-      , "Set output file in rdjjsonl format" )
+    ; "-ordjsonl", Arg.String Options.set_out_rdjsonl, "Set output file in rdjsonl format"
     ; "-ws", Arg.String Options.set_workspace, "Set dune workspace root"
     ; ( "-del-prefix"
       , Arg.String Options.set_prefix_to_cut
