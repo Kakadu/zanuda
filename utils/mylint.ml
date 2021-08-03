@@ -124,6 +124,12 @@ module Lints = struct
   ;;
 end
 
+module ErrorFormat = struct
+  let pp ppf ~filename ~line ~col:_ msg x =
+    Format.fprintf ppf "%s:%d:%d:%a\n%!" filename line (* col *) 0 msg x
+  ;;
+end
+
 module Casing : LINT.S = struct
   let is_camel_case s = String.(lowercase s <> s)
 
@@ -153,16 +159,11 @@ module Casing : LINT.S = struct
       let rdjson ppf () = report_rdjson name ~loc ppf
 
       let golint ppf () =
-        (* Format.printf
-          "golinting casing to %s\n"
-          (Options.out_golint () |> Option.value ~default:"wtf"); *)
-        Format.fprintf
+        ErrorFormat.pp
           ppf
-          "%s:%d:%d: %a\n%!"
-          (recover_filepath loc.loc_start.pos_fname)
-          loc.loc_start.pos_lnum
-          (* loc.loc_start.pos_cnum *)
-          0
+          ~filename:(recover_filepath loc.loc_start.pos_fname)
+          ~line:loc.loc_start.pos_lnum (* loc.loc_start.pos_cnum *)
+          ~col:0
           msg
           name
       ;;
@@ -207,22 +208,18 @@ module GuardInsteadOfIf : LINT.S = struct
     fprintf ppf "  ```\n%!"
   ;;
 
-  (* let report_rdjson ~loc ppf = () *)
-
   let report ~loc =
     let module M = struct
       let md ppf () = report_md ~loc ppf
       let txt ppf () = report_txt ~loc ppf
-      (* let rdjson ppf () = report_rdjson ~loc ppf *)
 
       let golint ppf () =
-        Format.fprintf
+        ErrorFormat.pp
           ppf
-          "%s:%d:%d: %s\n%!"
-          (recover_filepath loc.loc_start.pos_fname)
-          loc.loc_start.pos_lnum
-          (* loc.loc_start.pos_cnum *)
-          0
+          ~filename:(recover_filepath loc.loc_start.pos_fname)
+          ~line:loc.loc_start.pos_lnum (* loc.loc_start.pos_cnum *)
+          ~col:0
+          pp_print_string
           msg
       ;;
     end
@@ -267,26 +264,17 @@ module ParsetreeHasDocs : LINT.S = struct
     fprintf ppf "  ```\n%!"
   ;;
 
-  let report_rdjson ~loc:_ _ppf =
-    (* fprintf ppf "%s,\n%!" (Yojson.to_string (Rdjson.diagnostic ~loc msg)); *)
-    ()
-  ;;
-
   let report name ~loc =
     let module M = struct
       let md ppf () = report_md name ~loc ppf
       let txt ppf () = report_txt name ~loc ppf
-      (* let rdjson ppf () = report_rdjson ~loc ppf *)
 
       let golint ppf () =
-        let filepath = recover_filepath loc.loc_start.pos_fname in
-        Format.fprintf
+        ErrorFormat.pp
           ppf
-          "%s:%d:%d:%a\n%!"
-          filepath
-          loc.loc_start.pos_lnum
-          (* loc.loc_start.pos_cnum *)
-          0
+          ~filename:(recover_filepath loc.loc_start.pos_fname)
+          ~line:loc.loc_start.pos_lnum (* loc.loc_start.pos_cnum *)
+          ~col:0
           msg
           name
       ;;
