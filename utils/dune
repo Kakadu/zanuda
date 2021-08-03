@@ -8,7 +8,7 @@
  (modules hack)
  (wrapped false)
  (inline_tests)
- (libraries str)
+ (libraries str yojson)
  (preprocess
   (pps ppx_inline_test))
  (foreign_stubs

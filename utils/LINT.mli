@@ -5,7 +5,6 @@ end
 module type REPORTER = sig
   val txt : Format.formatter -> unit -> unit
   val md : Format.formatter -> unit -> unit
-
-  (* val rdjson : Format.formatter -> unit -> unit *)
+  val rdjsonl : Format.formatter -> unit -> unit
   val golint : Format.formatter -> unit -> unit
 end

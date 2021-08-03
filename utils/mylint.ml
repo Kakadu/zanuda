@@ -7,8 +7,10 @@ module Options = struct
   type t =
     { mutable outfile : string option
     ; mutable outgolint : string option
+    ; mutable out_rdjsonl : string option
           (* Spec: https://github.com/reviewdog/reviewdog/tree/master/proto/rdf#rdjson *)
     ; mutable infile : string
+          (* Below options to manage file paths. Not sure are they really required *)
     ; mutable workspace : string option
     ; mutable prefix_to_cut : string option
     ; mutable prefix_to_add : string option
@@ -17,6 +19,7 @@ module Options = struct
   let opts =
     { outfile = None
     ; outgolint = None
+    ; out_rdjsonl = None
     ; infile = ""
     ; workspace = None
     ; prefix_to_cut = None
@@ -26,6 +29,7 @@ module Options = struct
 
   let set_out_file s = opts.outfile <- Some s
   let set_out_golint s = opts.outgolint <- Some s
+  let set_out_rdjsonl s = opts.out_rdjsonl <- Some s
   let set_workspace s = opts.workspace <- Some s
   let set_prefix_to_cut s = opts.prefix_to_cut <- Some s
   let set_prefix_to_add s = opts.prefix_to_add <- Some s
@@ -33,6 +37,7 @@ module Options = struct
   let prefix_to_add () = opts.prefix_to_add
   let outfile () = opts.outfile
   let out_golint () = opts.outgolint
+  let out_rdjsonl () = opts.out_rdjsonl
   let infile () = opts.infile
   let set_in_file s = opts.infile <- s
 end
@@ -81,25 +86,44 @@ module Lints = struct
         (* Format.printf "Opening file '%s'...\n%!" s; *)
         let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
         let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
-        [ Format.formatter_of_out_channel ch, ch ]
+        [ ( (fun (module M : LINT.REPORTER) ppf -> M.md ppf)
+          , Format.formatter_of_out_channel ch
+          , ch )
+        ]
       | None -> []
     in
     let golint_files =
       match Options.out_golint () with
       | Some s ->
-        (* Format.printf "Opening file '%s'...\n%!" s; *)
         let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
         (* By some reason on CI Open_creat is not enough to create a file *)
         let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
-        [ Format.formatter_of_out_channel ch, ch ]
+        [ ( (fun (module M : LINT.REPORTER) ppf -> M.golint ppf)
+          , Format.formatter_of_out_channel ch
+          , ch )
+        ]
       | None -> []
     in
+    let rdjsonl_files =
+      match Options.out_rdjsonl () with
+      | Some s ->
+        let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
+        (* By some reason on CI Open_creat is not enough to create a file *)
+        let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
+        [ ( (fun (module M : LINT.REPORTER) ppf -> M.rdjsonl ppf)
+          , Format.formatter_of_out_channel ch
+          , ch )
+        ]
+      | None -> []
+    in
+    let all_files = List.concat [ rdjsonl_files; golint_files; mdfile ] in
     Base.Exn.protect
       ~f:(fun () ->
         (* Format.printf "Total lints found: %d\n%!" (Queue.length found_Lints); *)
-        Queue.iter found_Lints ~f:(fun (_loc, (module M : LINT.REPORTER)) ->
+        Queue.iter found_Lints ~f:(fun (_loc, ((module M : LINT.REPORTER) as m)) ->
             M.txt Format.std_formatter ();
-            let () =
+            List.iter all_files ~f:(fun (f, ppf, _) -> f m ppf ())
+            (* let () =
               if not (List.is_empty mdfile)
               then
                 List.iter
@@ -113,14 +137,13 @@ module Lints = struct
               let () = print_endline "printing in golint format" in
               List.iter golint_files ~f:(fun (ppf, _) ->
                   (* print_endline "Trying to print something as golint "; *)
-                  Format.fprintf ppf "%a%!" M.golint ()))))
+                  Format.fprintf ppf "%a%!" M.golint ())) *)))
       ~finally:(fun () ->
-        let f (ppf, ch) =
+        let f (_, ppf, ch) =
           Format.pp_print_flush ppf ();
           Caml.close_out ch
         in
-        List.iter ~f mdfile;
-        List.iter ~f golint_files)
+        List.iter ~f all_files)
   ;;
 end
 
@@ -128,6 +151,31 @@ module ErrorFormat = struct
   let pp ppf ~filename ~line ~col:_ msg x =
     Format.fprintf ppf "%s:%d:%d:%a\n%!" filename line (* col *) 0 msg x
   ;;
+end
+
+module RDJsonl = struct
+  let pp ppf ~filename ~line ?code msg x =
+    let location file ~line ~col =
+      `Assoc
+        [ "path", `String file
+        ; "range", `Assoc [ "start", `Assoc [ "line", `Int line; "column", `Int col ] ]
+        ]
+    in
+    let j =
+      `Assoc
+        ([ "message", `String (asprintf "%a" msg x)
+         ; "location", location filename ~line ~col:1
+         ; "severity", `String "INFO"
+         ]
+        @
+        match code with
+        | None -> []
+        | Some (desc, url) ->
+          [ "code", `Assoc [ "value", `String desc; "url", `String url ] ])
+    in
+    Format.fprintf ppf "%s\n" (Yojson.to_string j)
+  ;;
+  (* { "message": "Constructor 'XXX' has no documentation attribute",  "location": {    "path": "Lambda/lib/ast.mli",    "range": {      "start": { "line": 12, "column": 13 }, "end": { "line": 12, "column": 15      }    }  },  "severity": "INFO",  "code": {  "value": "RULE1",    "url": "https://example.com/url/to/super-lint/RULE1"  }}*)
 end
 
 module Casing : LINT.S = struct
@@ -150,13 +198,22 @@ module Casing : LINT.S = struct
     fprintf ppf "  ```\n%!"
   ;;
 
-  let report_rdjson _name ~loc:_ _ppf = ()
+  (* let report_rdjson _name ~loc:_ _ppf = () *)
 
   let report ~loc name =
     let module M = struct
       let md ppf () = report_md name ~loc ppf
       let txt ppf () = report_txt name ~loc ppf
-      let rdjson ppf () = report_rdjson name ~loc ppf
+      (* let rdjson ppf () = report_rdjson name ~loc ppf *)
+
+      let rdjsonl ppf () =
+        RDJsonl.pp
+          ppf
+          ~filename:(recover_filepath loc.loc_start.pos_fname)
+          ~line:loc.loc_start.pos_lnum
+          msg
+          name
+      ;;
 
       let golint ppf () =
         ErrorFormat.pp
@@ -182,8 +239,7 @@ module Casing : LINT.S = struct
           if is_camel_case tname
           then
             (* let () = Format.printf "type name %s is BAD\n%!" tname in *)
-            Lints.add ~loc (report ~loc tname)
-          else Format.printf "type name %s is fine\n%!" tname;
+            Lints.add ~loc (report ~loc tname);
           fallback.type_declaration self tdecl)
     }
   ;;
@@ -219,6 +275,15 @@ module GuardInsteadOfIf : LINT.S = struct
           ~filename:(recover_filepath loc.loc_start.pos_fname)
           ~line:loc.loc_start.pos_lnum (* loc.loc_start.pos_cnum *)
           ~col:0
+          pp_print_string
+          msg
+      ;;
+
+      let rdjsonl ppf () =
+        RDJsonl.pp
+          ppf
+          ~filename:(recover_filepath loc.loc_start.pos_fname)
+          ~line:loc.loc_start.pos_lnum
           pp_print_string
           msg
       ;;
@@ -275,6 +340,15 @@ module ParsetreeHasDocs : LINT.S = struct
           ~filename:(recover_filepath loc.loc_start.pos_fname)
           ~line:loc.loc_start.pos_lnum (* loc.loc_start.pos_cnum *)
           ~col:0
+          msg
+          name
+      ;;
+
+      let rdjsonl ppf () =
+        RDJsonl.pp
+          ppf
+          ~filename:(recover_filepath loc.loc_start.pos_fname)
+          ~line:loc.loc_start.pos_lnum
           msg
           name
       ;;
@@ -352,6 +426,9 @@ let () =
   Arg.parse
     [ "-o", Arg.String Options.set_out_file, "Set Markdown output file"
     ; "-ogolint", Arg.String Options.set_out_golint, "Set output file in golint format"
+    ; ( "-ordjsonl"
+      , Arg.String Options.set_out_rdjsonl
+      , "Set output file in rdjjsonl format" )
     ; "-ws", Arg.String Options.set_workspace, "Set dune workspace root"
     ; ( "-del-prefix"
       , Arg.String Options.set_prefix_to_cut
@@ -364,7 +441,6 @@ let () =
     "usage";
   Clflags.error_style := Some Misc.Error_style.Contextual;
   let filename = Caml.Sys.argv.(1) in
-  (* let () = printf "realpath: %s\n%!" (Hack.realpath filename) in *)
   load_file filename;
   Caml.exit 0
 ;;
