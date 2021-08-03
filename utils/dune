@@ -15,10 +15,7 @@
 (executable
  (name mylint)
  (public_name mylinter)
- (modules
-  LINT
-  ;Rdjson
-  mylint)
+ (modules Config LINT CollectedLints UntypedLints mylint)
  (modules_without_implementation LINT)
  (libraries base compiler-libs.common hack)
  (package mylinter))
