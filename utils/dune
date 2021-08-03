@@ -10,10 +10,7 @@
  (inline_tests)
  (libraries str yojson)
  (preprocess
-  (pps ppx_inline_test))
- (foreign_stubs
-  (language c)
-  (names stubs)))
+  (pps ppx_inline_test)))
 
 (executable
  (name mylint)

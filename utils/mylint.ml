@@ -285,12 +285,12 @@ module GuardInsteadOfIf : LINT.S = struct
   ;;
 end
 
+let ends_with ~suffix s = String.equal (String.suffix s (String.length suffix)) suffix
+
 module ParsetreeHasDocs : LINT.S = struct
   open Parsetree
   open Ast_iterator
 
-  let ends_with ~suffix s = String.equal (String.suffix s (String.length suffix)) suffix
-  let is_mli s = ends_with ~suffix:".mli" s
   let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
   let msg ppf name = fprintf ppf "Constructor '%s' has no documentation attribute" name
 
@@ -337,8 +337,10 @@ module ParsetreeHasDocs : LINT.S = struct
     (module M : LINT.REPORTER)
   ;;
 
+  let is_mli s = ends_with ~suffix:".mli" s
+
   let stru { Compile_common.source_file; _ } fallback =
-    if is_mli source_file
+    if ends_with ~suffix:"arsetree.mli" source_file
     then
       { fallback with
         type_kind =
@@ -382,10 +384,8 @@ let load_file filename =
   in
   let () =
     with_info (fun info ->
-        (* Format.printf "%s %d    %s\n%!" __FILE__ __LINE__ info.source_file; *)
         if String.equal (String.suffix info.source_file 3) ".ml"
         then (
-          (* Format.printf "%s %d\n%!" __FILE__ __LINE__; *)
           let parsetree = Compile_common.parse_impl info in
           on_structure info parsetree)
         else if String.equal (String.suffix info.source_file 4) ".mli"
