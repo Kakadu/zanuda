@@ -14,8 +14,6 @@
   3 |   | Abs of string * exprA
   4 |   | Var of string
   Alert zanuda-linter: Type name `exprA` should be in snake case
-  rdjson reports about exprA
-  Golint reports about exprA
   File "Parsetree.mli", line 2, characters 2-24:
   2 |   | App of exprA * exprA
         ^^^^^^^^^^^^^^^^^^^^^^

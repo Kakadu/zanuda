@@ -15,10 +15,14 @@ end
 
 open UntypedLints
 
-let all_linters = [ GuardInsteadOfIf.stru; Casing.stru; ParsetreeHasDocs.stru ]
+let all_linters =
+  [ (module GuardInsteadOfIf : LINT.S)
+  ; (module Casing : LINT.S)
+  ; (module ParsetreeHasDocs : LINT.S)
+  ]
+;;
 
-let build_iterator info ~f =
-  let compose lint fallback = lint info fallback in
+let build_iterator ~compose ~f =
   let o =
     List.fold_left
       ~f:(fun acc lint -> compose lint acc)
@@ -28,8 +32,17 @@ let build_iterator info ~f =
   f o
 ;;
 
-let on_structure = build_iterator ~f:(fun o -> o.Ast_iterator.structure o)
-let on_signature = build_iterator ~f:(fun o -> o.Ast_iterator.signature o)
+let on_structure info =
+  build_iterator
+    ~f:(fun o -> o.Ast_iterator.structure o)
+    ~compose:(fun (module L : LINT.S) -> L.stru info)
+;;
+
+let on_signature info =
+  build_iterator
+    ~f:(fun o -> o.Ast_iterator.signature o)
+    ~compose:(fun (module L : LINT.S) -> L.stru info)
+;;
 
 let load_file filename =
   let with_info f =

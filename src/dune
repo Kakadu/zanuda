@@ -3,19 +3,10 @@
   (flags
    (:standard -w -3-9-32-39 -warn-error -26-27))))
 
-(library
- (name hack)
- (modules hack)
- (wrapped false)
- (inline_tests)
- (libraries str yojson)
- (preprocess
-  (pps ppx_inline_test)))
-
 (executable
  (name mylint)
  (public_name mylinter)
  (modules Config LINT CollectedLints UntypedLints mylint)
  (modules_without_implementation LINT)
- (libraries base compiler-libs.common hack)
+ (libraries base yojson compiler-libs.common)
  (package mylinter))
