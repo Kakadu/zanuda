@@ -1,0 +1,35 @@
+[
+  {
+    "id": "use_guard_instead_of_if",
+    "group": "correctness",
+    "level": "deny",
+    "docs":
+      "\n### What it does\nChecks for comparisons where one side of the relation is either the minimum or maximum value for its type and warns if it involves a case that is always true or always false. Only integer and boolean types are checked.\n\n### Why is this bad?\nAn expression like min <= x may misleadingly imply that it is possible for x to be less than the minimum. Expressions like max < x are probably mistakes.\n\n### Known problems\nFor usize the size of the current compile target will be assumed (e.g., 64 bits on 64 bit systems). This means code that uses such a comparison to detect target pointer width will trigger this lint. One can use mem::sizeof and compare its value or conditional compilation attributes like #[cfg(target_pointer_width = \"64\")] .. instead.\n\n### Example\n```\nlet vec: Vec<isize> = Vec::new();\nif vec.len() <= 0 {}\nif 100 > i32::MAX {}\n```\n  ",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "camel_cased_types",
+    "group": "correctness",
+    "level": "deny",
+    "docs":
+      "\n### What it does\nChecks for comparisons where one side of the relation is either the minimum or maximum value for its type and warns if it involves a case that is always true or always false. Only integer and boolean types are checked.\n\n### Why is this bad?\nAn expression like min <= x may misleadingly imply that it is possible for x to be less than the minimum. Expressions like max < x are probably mistakes.\n\n### Known problems\nFor usize the size of the current compile target will be assumed (e.g., 64 bits on 64 bit systems). This means code that uses such a comparison to detect target pointer width will trigger this lint. One can use mem::sizeof and compare its value or conditional compilation attributes like #[cfg(target_pointer_width = \"64\")] .. instead.\n\n### Example\n```\nlet vec: Vec<isize> = Vec::new();\nif vec.len() <= 0 {}\nif 100 > i32::MAX {}\n```\n  ",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "no_docs_parsetree",
+    "group": "correctness",
+    "level": "deny",
+    "docs":
+      "\n### What it does\nChecks for comparisons where one side of the relation is either the minimum or maximum value for its type and warns if it involves a case that is always true or always false. Only integer and boolean types are checked.\n\n### Why is this bad?\nAn expression like min <= x may misleadingly imply that it is possible for x to be less than the minimum. Expressions like max < x are probably mistakes.\n\n### Known problems\nFor usize the size of the current compile target will be assumed (e.g., 64 bits on 64 bit systems). This means code that uses such a comparison to detect target pointer width will trigger this lint. One can use mem::sizeof and compare its value or conditional compilation attributes like #[cfg(target_pointer_width = \"64\")] .. instead.\n\n### Example\n```\nlet vec: Vec<isize> = Vec::new();\nif vec.len() <= 0 {}\nif 100 > i32::MAX {}\n```\n  ",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  }
+]
