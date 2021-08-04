@@ -1,5 +1,6 @@
 module type S = sig
   val stru : Compile_common.info -> Ast_iterator.iterator -> Ast_iterator.iterator
+  val describe_itself : unit -> Yojson.Safe.t
 end
 
 module type REPORTER = sig

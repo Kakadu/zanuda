@@ -45,6 +45,7 @@ let on_signature info =
 ;;
 
 let load_file filename =
+  Clflags.error_style := Some Misc.Error_style.Contextual;
   let with_info f =
     Compile_common.with_info
       ~native:false
@@ -87,11 +88,24 @@ let () =
     ; ( "-add-prefix"
       , Arg.String Options.set_prefix_to_add
       , "Set prefix to reprend to file names" )
+    ; ( "-dump-lints"
+      , Arg.String Options.set_dump_file
+      , "Dump information about available linters to JSON" )
     ]
     Options.set_in_file
     "usage";
-  Clflags.error_style := Some Misc.Error_style.Contextual;
-  let filename = Caml.Sys.argv.(1) in
-  load_file filename;
-  Caml.exit 0
+  let () =
+    match Options.dump_file () with
+    | None -> ()
+    | Some filename ->
+      let info =
+        List.map all_linters ~f:(fun (module L : LINT.S) -> L.describe_itself ())
+      in
+      let ch = Caml.open_out filename in
+      Exn.protect
+        ~f:(fun () -> Yojson.Safe.pretty_to_channel ~std:true ch (`List info))
+        ~finally:(fun () -> Caml.close_out ch);
+      Caml.exit 0
+  in
+  load_file (Options.infile ())
 ;;

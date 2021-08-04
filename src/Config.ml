@@ -6,6 +6,7 @@ module Options = struct
     ; mutable outgolint : string option
     ; mutable out_rdjsonl : string option
           (* Spec: https://github.com/reviewdog/reviewdog/tree/master/proto/rdf#rdjson *)
+    ; mutable dump_file : string option
     ; mutable infile : string
           (* Below options to manage file paths. Not sure are they really required *)
     ; mutable workspace : string option
@@ -17,6 +18,7 @@ module Options = struct
     { outfile = None
     ; outgolint = None
     ; out_rdjsonl = None
+    ; dump_file = None
     ; infile = ""
     ; workspace = None
     ; prefix_to_cut = None
@@ -32,11 +34,13 @@ module Options = struct
   let set_prefix_to_add s = opts.prefix_to_add <- Some s
   let prefix_to_cut () = opts.prefix_to_cut
   let prefix_to_add () = opts.prefix_to_add
+  let dump_file () = opts.dump_file
   let outfile () = opts.outfile
   let out_golint () = opts.outgolint
   let out_rdjsonl () = opts.out_rdjsonl
   let infile () = opts.infile
   let set_in_file s = opts.infile <- s
+  let set_dump_file s = opts.dump_file <- Some s
 end
 
 let recover_filepath s =
