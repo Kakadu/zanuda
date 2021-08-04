@@ -1,5 +1,7 @@
-#### An OCaml linter experiment.
+#### An OCaml linter experiment
 
-API: https://mylinter.github.io/api
+Mostly inspired by (How possible is a clippy-like linter for OCaml?)[https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml/]
 
-Lints: https://mylinter.github.io/lints
+Lints: https://kakadu.github.io/mylinter/lints/
+
+API: https://kakadu.github.io/mylinter/api/ is currently empty
