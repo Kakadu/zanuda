@@ -4,7 +4,7 @@
     "group": "correctness",
     "level": "deny",
     "docs":
-      "\n### What it does\nChecks for comparisons where one side of the relation is either the minimum or maximum value for its type and warns if it involves a case that is always true or always false. Only integer and boolean types are checked.\n\n### Why is this bad?\nAn expression like min <= x may misleadingly imply that it is possible for x to be less than the minimum. Expressions like max < x are probably mistakes.\n\n### Known problems\nFor usize the size of the current compile target will be assumed (e.g., 64 bits on 64 bit systems). This means code that uses such a comparison to detect target pointer width will trigger this lint. One can use mem::sizeof and compare its value or conditional compilation attributes like #[cfg(target_pointer_width = \"64\")] .. instead.\n\n### Example\n```\nlet vec: Vec<isize> = Vec::new();\nif vec.len() <= 0 {}\nif 100 > i32::MAX {}\n```\n  ",
+      "\n### What it does\nPattern matching guards are not very common in mainstream languages so it easy to forget about them for OCaml wannabies.\nThis lint looks for if-then-else expressions in right hand sides of pattern matching, and recommends to use pattern guards.\n\n### Why is this bad?\nSometimes guards allow you to write less error-prone code. For example, you are matching three values and want to\n. if 1st fits predicate then do something and return, check other components otherwise.\n. if 2nd fits predicate then do something and return, check other components otherwise.\n. if 3rd ..., do something else otherwise.\n\nThe implementation with if-then-else could be like this.\n```ocaml\nmatch ... with\n| (a,b,c) ->\n    if pred1 a then ...\n    else if pred2 b then ...\n    else if pred3 c then ...\n    else ... something_else ...\n| ...\n```\nIn this case all three bindings are in scope in the right hand side of matching, you can by mistake use them for something. And you can't use wildcards because all three bindings are required in right hand side.\n\nLet's rewrite it with guards:\n```ocaml\nmatch ... with\n| (a,_,_) when pred1 a -> ...\n| (_,b,_) when pred2 b -> ...\n| (_,_,c) when pred3 c -> ...\n| ...\n```\n\nIn this variant you have less potential for copy-paste mistake\n  ",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -15,7 +15,7 @@
     "group": "correctness",
     "level": "deny",
     "docs":
-      "\n### What it does\nChecks for comparisons where one side of the relation is either the minimum or maximum value for its type and warns if it involves a case that is always true or always false. Only integer and boolean types are checked.\n\n### Why is this bad?\nAn expression like min <= x may misleadingly imply that it is possible for x to be less than the minimum. Expressions like max < x are probably mistakes.\n\n### Known problems\nFor usize the size of the current compile target will be assumed (e.g., 64 bits on 64 bit systems). This means code that uses such a comparison to detect target pointer width will trigger this lint. One can use mem::sizeof and compare its value or conditional compilation attributes like #[cfg(target_pointer_width = \"64\")] .. instead.\n\n### Example\n```\nlet vec: Vec<isize> = Vec::new();\nif vec.len() <= 0 {}\nif 100 > i32::MAX {}\n```\n  ",
+      "\n### What it does\nChecks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp) popular in Python and Haskell.\n\n### Why is this bad?\nWrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Module names in standart library are in snake case but in most Janestreet libraries (ppxlib, base) they are in snake case too.\n  ",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -26,7 +26,18 @@
     "group": "correctness",
     "level": "deny",
     "docs":
-      "\n### What it does\nChecks for comparisons where one side of the relation is either the minimum or maximum value for its type and warns if it involves a case that is always true or always false. Only integer and boolean types are checked.\n\n### Why is this bad?\nAn expression like min <= x may misleadingly imply that it is possible for x to be less than the minimum. Expressions like max < x are probably mistakes.\n\n### Known problems\nFor usize the size of the current compile target will be assumed (e.g., 64 bits on 64 bit systems). This means code that uses such a comparison to detect target pointer width will trigger this lint. One can use mem::sizeof and compare its value or conditional compilation attributes like #[cfg(target_pointer_width = \"64\")] .. instead.\n\n### Example\n```\nlet vec: Vec<isize> = Vec::new();\nif vec.len() <= 0 {}\nif 100 > i32::MAX {}\n```\n  ",
+      "\n### What it does\nIt checks that file `Parsetree.mli' has documentation comments for all constructors. Usually files like this are used to describe abstract syntax tree (AST) of a language. In this case it's recommended to annotate every constructor with a documentation about meaning of the constructors, for example, which real syntax if supposed to be parsed to this part of AST.\n\nAs example of this kind of documentation you can consult [OCaml 4.13 parse tree](https://github.com/ocaml/ocaml/blob/4.13/parsing/parsetree.mli#L282)\n  ",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "list_length_comparisons",
+    "group": "correctness",
+    "level": "deny",
+    "docs":
+      "\n### What it does\nThe function `Stdlib.List.length` evaluated length of standart OCaml linked lists (`'a list'). There return values supposed to be non-negative, so all code like `List.length .. <= 0` smells bad. If they need to check that list is empty it is more recommended to use pattern matching instead of calculating length, because for large list we will do full iteration, and it will not be too efficient.\n  ",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
