@@ -21,6 +21,7 @@ jobs:
           #- ocaml-variants.4.12.0+options,ocaml-option-flambda
         opam-disable-sandboxing:
           - true
+        dune-cache: true
 
     runs-on: ${{ matrix.os }}
 
