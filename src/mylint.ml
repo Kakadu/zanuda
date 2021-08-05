@@ -131,8 +131,12 @@ let () =
     | None -> ()
     | Some filename ->
       let info =
-        List.map untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
-            L.describe_itself ())
+        List.concat
+          [ List.map untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
+                L.describe_itself ())
+          ; List.map typed_linters ~f:(fun (module L : LINT.TYPED) ->
+                L.describe_itself ())
+          ]
       in
       let ch = Caml.open_out filename in
       Exn.protect

@@ -10,9 +10,7 @@ module type UNTYPED = sig
   type input = Ast_iterator.iterator
 
   include GENERAL with type input := input
-  (* val xxx : (GENERAL with type input = Ast_iterator.iterator).run *)
 
-  (* val run : Compile_common.info -> Ast_iterator.iterator -> Ast_iterator.iterator *)
   val describe_itself : unit -> Yojson.Safe.t
 end
 
@@ -21,7 +19,6 @@ module type TYPED = sig
 
   include GENERAL with type input := input
 
-  (* val run : Compile_common.info -> Tast_iterator.iterator -> Tast_iterator.iterator *)
   val describe_itself : unit -> Yojson.Safe.t
 end
 

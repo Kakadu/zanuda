@@ -55,20 +55,10 @@ module Casing : LINT.UNTYPED = struct
       ~docs:
         {|
 ### What it does
-Checks for comparisons where one side of the relation is either the minimum or maximum value for its type and warns if it involves a case that is always true or always false. Only integer and boolean types are checked.
+Checks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp) popular in Python and Haskell.
 
 ### Why is this bad?
-An expression like min <= x may misleadingly imply that it is possible for x to be less than the minimum. Expressions like max < x are probably mistakes.
-
-### Known problems
-For usize the size of the current compile target will be assumed (e.g., 64 bits on 64 bit systems). This means code that uses such a comparison to detect target pointer width will trigger this lint. One can use mem::sizeof and compare its value or conditional compilation attributes like #[cfg(target_pointer_width = "64")] .. instead.
-
-### Example
-```
-let vec: Vec<isize> = Vec::new();
-if vec.len() <= 0 {}
-if 100 > i32::MAX {}
-```
+Wrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Module names in standart library are in snake case but in most Janestreet libraries (ppxlib, base) they are in snake case too.
   |}
   ;;
 
@@ -95,7 +85,6 @@ if 100 > i32::MAX {}
     let module M = struct
       let md ppf () = report_md name ~loc ppf
       let txt ppf () = report_txt name ~loc ppf
-      (* let rdjson ppf () = report_rdjson name ~loc ppf *)
 
       let rdjsonl ppf () =
         RDJsonl.pp
@@ -140,20 +129,37 @@ module GuardInsteadOfIf : LINT.UNTYPED = struct
       ~docs:
         {|
 ### What it does
-Checks for comparisons where one side of the relation is either the minimum or maximum value for its type and warns if it involves a case that is always true or always false. Only integer and boolean types are checked.
+Pattern matching guards are not very common in mainstream languages so it easy to forget about them for OCaml wannabies.
+This lint looks for if-then-else expressions in right hand sides of pattern matching, and recommends to use pattern guards.
 
 ### Why is this bad?
-An expression like min <= x may misleadingly imply that it is possible for x to be less than the minimum. Expressions like max < x are probably mistakes.
+Sometimes guards allow you to write less error-prone code. For example, you are matching three values and want to
+. if 1st fits predicate then do something and return, check other components otherwise.
+. if 2nd fits predicate then do something and return, check other components otherwise.
+. if 3rd ..., do something else otherwise.
 
-### Known problems
-For usize the size of the current compile target will be assumed (e.g., 64 bits on 64 bit systems). This means code that uses such a comparison to detect target pointer width will trigger this lint. One can use mem::sizeof and compare its value or conditional compilation attributes like #[cfg(target_pointer_width = "64")] .. instead.
+The implementation with if-then-else could be like this.
+```ocaml
+match ... with
+| (a,b,c) ->
+    if pred1 a then ...
+    else if pred2 b then ...
+    else if pred3 c then ...
+    else ... something_else ...
+| ...
+```
+In this case all three bindings are in scope in the right hand side of matching, you can by mistake use them for something. And you can't use wildcards because all three bindings are required in right hand side.
 
-### Example
+Let's rewrite it with guards:
+```ocaml
+match ... with
+| (a,_,_) when pred1 a -> ...
+| (_,b,_) when pred2 b -> ...
+| (_,_,c) when pred3 c -> ...
+| ...
 ```
-let vec: Vec<isize> = Vec::new();
-if vec.len() <= 0 {}
-if 100 > i32::MAX {}
-```
+
+In this variant you have less potential for copy-paste mistake
   |}
   ;;
 
@@ -227,20 +233,9 @@ module ParsetreeHasDocs : LINT.UNTYPED = struct
       ~docs:
         {|
 ### What it does
-Checks for comparisons where one side of the relation is either the minimum or maximum value for its type and warns if it involves a case that is always true or always false. Only integer and boolean types are checked.
+It checks that file `Parsetree.mli' has documentation comments for all constructors. Usually files like this are used to describe abstract syntax tree (AST) of a language. In this case it's recommended to annotate every constructor with a documentation about meaning of the constructors, for example, which real syntax if supposed to be parsed to this part of AST.
 
-### Why is this bad?
-An expression like min <= x may misleadingly imply that it is possible for x to be less than the minimum. Expressions like max < x are probably mistakes.
-
-### Known problems
-For usize the size of the current compile target will be assumed (e.g., 64 bits on 64 bit systems). This means code that uses such a comparison to detect target pointer width will trigger this lint. One can use mem::sizeof and compare its value or conditional compilation attributes like #[cfg(target_pointer_width = "64")] .. instead.
-
-### Example
-```
-let vec: Vec<isize> = Vec::new();
-if vec.len() <= 0 {}
-if 100 > i32::MAX {}
-```
+As example of this kind of documentation you can consult [OCaml 4.13 parse tree](https://github.com/ocaml/ocaml/blob/4.13/parsing/parsetree.mli#L282)
   |}
   ;;
 

@@ -1,6 +1,4 @@
 open Base
-
-(* open Parsetree *)
 open Location
 module ErrorFormat = UntypedLints.ErrorFormat
 module RDJsonl = UntypedLints.RDJsonl
@@ -8,7 +6,15 @@ module RDJsonl = UntypedLints.RDJsonl
 module L1 : LINT.TYPED = struct
   type input = Tast_iterator.iterator
 
-  let describe_itself _ = `String "none"
+  let describe_itself () =
+    UntypedLints.describe_as_clippy_json
+      "list_length_comparisons"
+      ~docs:
+        {|
+### What it does
+The function `Stdlib.List.length` evaluated length of standart OCaml linked lists (`'a list'). There return values supposed to be non-negative, so all code like `List.length .. <= 0` smells bad. If they need to check that list is empty it is more recommended to use pattern matching instead of calculating length, because for large list we will do full iteration, and it will not be too efficient.
+  |}
+  ;;
 
   let msg ppf () =
     Format.fprintf ppf "Bad measurement of a list (with non-negative size)%!"
