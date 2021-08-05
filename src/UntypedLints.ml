@@ -58,7 +58,7 @@ module Casing : LINT.UNTYPED = struct
 Checks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp) popular in Python and Haskell.
 
 ### Why is this bad?
-Wrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Module names in standart library are in snake case but in most Janestreet libraries (ppxlib, base) they are in snake case too.
+Wrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Modules names' in standard library are in camel case but in most Janestreet libraries (ppxlib, base) they are in snake case too.
   |}
   ;;
 
