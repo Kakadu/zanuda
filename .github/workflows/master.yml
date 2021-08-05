@@ -70,10 +70,19 @@ jobs:
       - name: Build linter descriptions...
         run: mkdir -p _build/_lintinfo && opam exec -- dune exec -- src/mylint.exe -dump-lints _build/_lintinfo/lints.json
 
-      - name: Deploy linters descriptions
+      - name: Deploy linters' descriptions
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: _build/_lintinfo
           keep_files: true
           destination_dir: lints
+
+      - name: Deploy linters' descriptions to another repo
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: _build/_lintinfo
+          external_repository: Kakadu/kakadu.github.io
+          keep_files: true
+          destination_dir: zanuda
