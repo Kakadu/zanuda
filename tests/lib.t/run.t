@@ -22,3 +22,20 @@
   3 |   | Abs of string * exprA
         ^^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Constructor 'Abs' has no documentation attribute
+      mylinter alias lint
+  File "lib2.ml", line 1, characters 19-37:
+  1 | let nonsense1 xs = List.length xs < 0
+                         ^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Bad measurement of a list (with non-negative size)
+  File "lib2.ml", line 3, characters 19-38:
+  3 | let is_empty1 xs = List.length xs <= 0
+                         ^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Bad measurement of a list (with non-negative size)
+  File "lib2.ml", line 7, characters 20-39:
+  7 | let tautology1 xs = List.length xs >= 0
+                          ^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Bad measurement of a list (with non-negative size)
+  File "lib2.ml", line 8, characters 19-37:
+  8 | let not_empty xs = List.length xs > 0
+                         ^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Bad measurement of a list (with non-negative size)
