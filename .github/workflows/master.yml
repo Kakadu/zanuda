@@ -85,7 +85,7 @@ jobs:
         with:
           #github_token: ${{ secrets.GITHUB_TOKEN }}
           #personal_token: ${{ secrets.A_TOKEN_TO_PUSH_DOC_TO_ANOTHER_REPO }}
-          deploy_key: ${{ secrets.DEPLOY_PK }}
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_dir: _build/_lintinfo
           external_repository: Kakadu/kakadu.github.io
           keep_files: true
