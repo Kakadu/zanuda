@@ -81,7 +81,8 @@ jobs:
       - name: Deploy linters' descriptions to another repo
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          #github_token: ${{ secrets.GITHUB_TOKEN }}
+          personal_token: ${{ secrets.A_TOKEN_TO_PUSH_DOC_TO_ANOTHER_REPO }}
           publish_dir: _build/_lintinfo
           external_repository: Kakadu/kakadu.github.io
           keep_files: true
