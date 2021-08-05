@@ -1,12 +1,21 @@
 (env
  (dev
   (flags
-   (:standard -w -3-9-32-39 -warn-error -26-27))))
+   (:standard -w -3-9-32-33-39 -warn-error -26-27))))
+
+(library
+ (name Tast_pattern)
+ (modules Tast_pattern)
+ (wrapped false)
+ (libraries ppxlib)
+ (preprocess
+  (pps ppx_inline_test))
+ (inline_tests))
 
 (executable
  (name mylint)
  (public_name mylinter)
- (modules Config LINT CollectedLints UntypedLints mylint)
+ (modules Config LINT CollectedLints UntypedLints TypedLints mylint)
  (modules_without_implementation LINT)
- (libraries base yojson compiler-libs.common)
+ (libraries base yojson ppxlib compiler-libs.common Tast_pattern)
  (package mylinter))

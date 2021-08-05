@@ -46,7 +46,7 @@ let describe_as_clippy_json id ~docs : Yojson.Safe.t =
     ]
 ;;
 
-module Casing : LINT.S = struct
+module Casing : LINT.UNTYPED = struct
   let is_camel_case s = String.(lowercase s <> s)
 
   let describe_itself () =
@@ -71,6 +71,8 @@ if 100 > i32::MAX {}
 ```
   |}
   ;;
+
+  type input = Ast_iterator.iterator
 
   open Ast_iterator
 
@@ -118,7 +120,7 @@ if 100 > i32::MAX {}
     (module M : LINT.REPORTER)
   ;;
 
-  let stru _ fallback =
+  let run _ fallback =
     { fallback with
       type_declaration =
         (fun self tdecl ->
@@ -131,7 +133,7 @@ if 100 > i32::MAX {}
   ;;
 end
 
-module GuardInsteadOfIf : LINT.S = struct
+module GuardInsteadOfIf : LINT.UNTYPED = struct
   let describe_itself () =
     describe_as_clippy_json
       "use_guard_instead_of_if"
@@ -157,6 +159,8 @@ if 100 > i32::MAX {}
 
   open Parsetree
   open Ast_iterator
+
+  type input = Ast_iterator.iterator
 
   let msg = "Prefer guard instead of if-then-else in case construction"
 
@@ -201,7 +205,7 @@ if 100 > i32::MAX {}
     (module M : LINT.REPORTER)
   ;;
 
-  let stru _ fallback =
+  let run _ fallback =
     { fallback with
       case =
         (fun self case ->
@@ -216,7 +220,7 @@ end
 
 let ends_with ~suffix s = String.equal (String.suffix s (String.length suffix)) suffix
 
-module ParsetreeHasDocs : LINT.S = struct
+module ParsetreeHasDocs : LINT.UNTYPED = struct
   let describe_itself () =
     describe_as_clippy_json
       "no_docs_parsetree"
@@ -242,6 +246,8 @@ if 100 > i32::MAX {}
 
   open Parsetree
   open Ast_iterator
+
+  type input = Ast_iterator.iterator
 
   let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
   let msg ppf name = fprintf ppf "Constructor '%s' has no documentation attribute" name
@@ -291,7 +297,7 @@ if 100 > i32::MAX {}
 
   let is_mli s = ends_with ~suffix:".mli" s
 
-  let stru { Compile_common.source_file; _ } fallback =
+  let run { Compile_common.source_file; _ } fallback =
     if ends_with ~suffix:"arsetree.mli" source_file
     then
       { fallback with

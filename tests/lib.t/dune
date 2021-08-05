@@ -4,7 +4,13 @@
  (modules Lib)
  (lint
   (action
-   (run mylinter %{input-file} -o /tmp/out.md))))
+   (run
+    mylinter
+    %{input-file}
+    -ordjsonl
+    /tmp/out.rdjsonl
+    -ws
+    %{workspace_root}))))
 
 (library
  (name testlib2)
@@ -13,7 +19,13 @@
  (modules_without_implementation Parsetree)
  (lint
   (action
-   (run mylinter %{input-file} -o /tmp/out.md -ogolint /tmp/out.golint -ordjsonl /tmp/out.rdjsonl -ws %{workspace_root}))))
+   (run
+    mylinter
+    %{input-file}
+    -ordjsonl
+    /tmp/out.rdjsonl
+    -ws
+    %{workspace_root}))))
 
 (cram
  (deps %{workspace_root}/utils/mylint.exe))
