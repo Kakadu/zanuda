@@ -10,9 +10,10 @@ homepage: "https://github.com/Kakadu/mylinter"
 bug-reports: "https://github.com/Kakadu/mylinter/issues"
 depends: [
   "dune" {>= "2.8"}
-  "yojson" {>= "0"}
-  "ppxlib" {>= "0"}
-  "base" {>= "v0.14.1"}
+  "yojson"
+  "ppxlib"
+  "ppx_inline_test" {with-test}
+  "base"
   "odoc" {with-doc}
 ]
 build: [

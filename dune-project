@@ -23,9 +23,7 @@
  (description
   "Inspired by https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml")
  (depends
-  (yojson
-   (>= 0))
-  (ppxlib
-   (>= 0))
-  (base
-   (>= v0.14.1))))
+  yojson
+  ppxlib
+  (ppx_inline_test :with-test)
+  base))
