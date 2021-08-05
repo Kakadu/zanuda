@@ -15,7 +15,7 @@
     "group": "correctness",
     "level": "deny",
     "docs":
-      "\n### What it does\nChecks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp) popular in Python and Haskell.\n\n### Why is this bad?\nWrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Module names in standart library are in snake case but in most Janestreet libraries (ppxlib, base) they are in snake case too.\n  ",
+      "\n### What it does\nChecks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp) popular in Python and Haskell.\n\n### Why is this bad?\nWrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Modules names' in standard library are in camel case but in most Janestreet libraries (ppxlib, base) they are in snake case too.\n  ",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
