@@ -5,7 +5,7 @@
   4 | type myAst = MyAst
       ^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Type name `myAst` should be in snake case
-  $ dune build testlib2.cmxa
+$ dune build testlib2.cmxa
   $ dune build @lint -p testsuite2 --force
       mylinter alias lint
   File "Parsetree.mli", lines 1-4, characters 0-17:

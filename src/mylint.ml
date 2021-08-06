@@ -66,6 +66,7 @@ let typed_on_signature info =
 
 let load_file filename =
   Clflags.error_style := Some Misc.Error_style.Contextual;
+  Clflags.include_dirs := Config.Options.includes () @ Clflags.include_dirs.contents;
   let with_info f =
     Compile_common.with_info
       ~native:false
@@ -79,9 +80,13 @@ let load_file filename =
     let process_structure info =
       let parsetree = Compile_common.parse_impl info in
       untyped_on_structure info parsetree;
-      let typedtree, _ = Compile_common.typecheck_impl info parsetree in
-      typed_on_structure info typedtree;
-      ()
+      try
+        let typedtree, _ = Compile_common.typecheck_impl info parsetree in
+        typed_on_structure info typedtree
+      with
+      | Env.Error e ->
+        Format.eprintf "%a\n%!" Env.report_error e;
+        Caml.exit 1
     in
     let process_signature info =
       let parsetree = Compile_common.parse_intf info in
@@ -111,6 +116,7 @@ let () =
   let open Config in
   Arg.parse
     [ "-o", Arg.String Options.set_out_file, "Set Markdown output file"
+    ; "-dir", Arg.String Options.set_in_dir, ""
     ; "-ogolint", Arg.String Options.set_out_golint, "Set output file in golint format"
     ; "-ordjsonl", Arg.String Options.set_out_rdjsonl, "Set output file in rdjsonl format"
     ; "-ws", Arg.String Options.set_workspace, "Set dune workspace root"
@@ -123,13 +129,14 @@ let () =
     ; ( "-dump-lints"
       , Arg.String Options.set_dump_file
       , "Dump information about available linters to JSON" )
+    ; "-I", Arg.String Options.add_include, "Add extra include path for type checking"
     ]
     Options.set_in_file
     "usage";
   let () =
-    match Options.dump_file () with
-    | None -> ()
-    | Some filename ->
+    match Options.mode () with
+    | Unspecified -> ()
+    | Dump filename ->
       let info =
         List.concat
           [ List.map untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
@@ -143,6 +150,8 @@ let () =
         ~f:(fun () -> Yojson.Safe.pretty_to_channel ~std:true ch (`List info))
         ~finally:(fun () -> Caml.close_out ch);
       Caml.exit 0
+    | File file -> load_file file
+    | Dir path -> PerDictionary.analyze_dir load_file path
   in
-  load_file (Options.infile ())
+  ()
 ;;

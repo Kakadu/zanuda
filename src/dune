@@ -15,7 +15,16 @@
 (executable
  (name mylint)
  (public_name mylinter)
- (modules Config LINT CollectedLints UntypedLints TypedLints mylint)
+ (modules
+  Config
+  LINT
+  CollectedLints
+  UntypedLints
+  TypedLints
+  PerDictionary
+  mylint)
  (modules_without_implementation LINT)
- (libraries base yojson ppxlib compiler-libs.common Tast_pattern)
+ (libraries base sexplib yojson ppxlib compiler-libs.common Tast_pattern)
+ (preprocess
+  (pps ppx_sexp_conv ppx_inline_test))
  (package mylinter))

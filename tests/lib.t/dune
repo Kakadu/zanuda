@@ -27,5 +27,19 @@
     -ws
     %{workspace_root}))))
 
+(executable
+ (name exec1)
+ (modules exec1)
+ (libraries testsuite2)
+ (lint
+  (action
+   (run
+    mylinter
+    %{input-file}
+    -ordjsonl
+    /tmp/out.rdjsonl
+    -ws
+    %{workspace_root}))))
+
 (cram
  (deps %{workspace_root}/utils/mylint.exe))
