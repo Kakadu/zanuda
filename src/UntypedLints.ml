@@ -41,6 +41,7 @@ Wrong casing is not exactly bad but OCaml tradition says that types' and module 
   let report_txt typ_name ~loc ~filename ppf =
     Location.input_name := filename;
     cut_build_dir ();
+    (* printf "Location.input_name = %s\n%!" !Location.input_name; *)
     let main = Location.mkloc (fun ppf -> msg ppf typ_name) loc in
     let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
     Location.print_report ppf r
@@ -271,6 +272,7 @@ As example of this kind of documentation you can consult [OCaml 4.13 parse tree]
 
   let run { Compile_common.source_file; _ } fallback =
     if ends_with ~suffix:"arsetree.mli" source_file
+       || ends_with ~suffix:"ast.mli" source_file
     then
       { fallback with
         type_kind =

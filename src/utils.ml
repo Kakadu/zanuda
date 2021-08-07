@@ -1,6 +1,8 @@
 open Base
 open Format
 
+let printfn fmt = Format.kfprintf (fun ppf -> Format.fprintf ppf "\n%!") std_formatter fmt
+
 module ErrorFormat = struct
   let pp ppf ~filename ~line ~col:_ msg x =
     Format.fprintf ppf "%s:%d:%d:%a\n%!" filename line (* col *) 0 msg x

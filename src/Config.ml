@@ -20,6 +20,7 @@ module Options = struct
     ; mutable prefix_to_cut : string option
     ; mutable prefix_to_add : string option
     ; mutable extra_includes : string list
+    ; mutable verbose : bool
     }
 
   let opts =
@@ -31,6 +32,7 @@ module Options = struct
     ; prefix_to_cut = None
     ; prefix_to_add = None
     ; extra_includes = []
+    ; verbose = false
     }
   ;;
 
@@ -54,9 +56,12 @@ module Options = struct
   let outfile () = opts.outfile
   let out_golint () = opts.outgolint
   let out_rdjsonl () = opts.out_rdjsonl
+
   (* let infile () = opts.infile *)
   (* let set_in_file s = opts.infile <- s *)
   (* let set_dump_file s = opts.dump_file <- Some s *)
+  let verbose () = opts.verbose
+  let set_verbose () = opts.verbose <- true
 end
 
 let recover_filepath s =

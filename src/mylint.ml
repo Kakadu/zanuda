@@ -1,4 +1,5 @@
 open Base
+open Utils
 
 module Level = struct
   type t =
@@ -75,7 +76,13 @@ let with_info filename f =
 ;;
 
 let process_cmt_typedtree filename typedtree =
+  if Config.Options.verbose () then printfn "Analyzing cmt: %s" filename;
   with_info filename (fun info -> typed_on_structure info typedtree)
+;;
+
+let process_cmti_typedtree filename typedtree =
+  if Config.Options.verbose () then printfn "Analyzing cmti: %s" filename;
+  with_info filename (fun info -> typed_on_signature info typedtree)
 ;;
 
 let load_file filename =
@@ -145,6 +152,7 @@ let () =
       , Arg.String Options.set_dump_file
       , "Dump information about available linters to JSON" )
     ; "-I", Arg.String Options.add_include, "Add extra include path for type checking"
+    ; "-v", Arg.Unit Options.set_verbose, "More verbose output"
     ]
     Options.set_in_file
     "usage";
@@ -169,7 +177,11 @@ let () =
       load_file file;
       CollectedLints.report ()
     | Dir path ->
-      PerDictionary.analyze_dir load_file process_cmt_typedtree path;
+      PerDictionary.analyze_dir
+        load_file
+        process_cmt_typedtree
+        process_cmti_typedtree
+        path;
       CollectedLints.report ()
   in
   ()
