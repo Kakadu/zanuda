@@ -1,0 +1,13 @@
+(library
+ (name testlib1)
+ (wrapped false)
+ (modules list_len Parsetree)
+ (modules_without_implementation parsetree))
+
+(executable
+ (name exec1)
+ (modules exec1)
+ (libraries testlib1))
+
+(cram
+ (deps %{workspace_root}/utils/mylint.exe))

@@ -64,6 +64,20 @@ let typed_on_signature info =
     typed_linters
 ;;
 
+let with_info filename f =
+  Compile_common.with_info
+    ~native:false
+    ~source_file:filename
+    ~tool_name:"asdf" (* TODO: pass right tool name *)
+    ~output_prefix:"asdf"
+    ~dump_ext:"asdf"
+    f
+;;
+
+let process_cmt_typedtree filename typedtree =
+  with_info filename (fun info -> typed_on_structure info typedtree)
+;;
+
 let load_file filename =
   Clflags.error_style := Some Misc.Error_style.Contextual;
   Clflags.include_dirs := Config.Options.includes () @ Clflags.include_dirs.contents;
@@ -81,8 +95,9 @@ let load_file filename =
       let parsetree = Compile_common.parse_impl info in
       untyped_on_structure info parsetree;
       try
-        let typedtree, _ = Compile_common.typecheck_impl info parsetree in
-        typed_on_structure info typedtree
+        (* let typedtree, _ = Compile_common.typecheck_impl info parsetree in
+        typed_on_structure info typedtree;  *)
+        ()
       with
       | Env.Error e ->
         Format.eprintf "%a\n%!" Env.report_error e;
@@ -109,7 +124,7 @@ let load_file filename =
           in
           Caml.exit 1))
   in
-  CollectedLints.report ()
+  ()
 ;;
 
 let () =
@@ -150,8 +165,12 @@ let () =
         ~f:(fun () -> Yojson.Safe.pretty_to_channel ~std:true ch (`List info))
         ~finally:(fun () -> Caml.close_out ch);
       Caml.exit 0
-    | File file -> load_file file
-    | Dir path -> PerDictionary.analyze_dir load_file path
+    | File file ->
+      load_file file;
+      CollectedLints.report ()
+    | Dir path ->
+      PerDictionary.analyze_dir load_file process_cmt_typedtree path;
+      CollectedLints.report ()
   in
   ()
 ;;

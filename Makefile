@@ -10,7 +10,7 @@ watch:
 	dune build -w
 
 test:
-	dune build @runtest
+	dune build && dune build @runtest
 
 promote:
 	dune build @runtest --auto-promote
@@ -21,4 +21,3 @@ install:
 
 clean:
 	dune clean
-

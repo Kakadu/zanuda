@@ -16,6 +16,7 @@
  (name mylint)
  (public_name mylinter)
  (modules
+  utils
   Config
   LINT
   CollectedLints

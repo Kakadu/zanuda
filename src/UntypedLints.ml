@@ -1,36 +1,6 @@
 open Base
 open Format
-
-module ErrorFormat = struct
-  let pp ppf ~filename ~line ~col:_ msg x =
-    Format.fprintf ppf "%s:%d:%d:%a\n%!" filename line (* col *) 0 msg x
-  ;;
-end
-
-module RDJsonl = struct
-  let pp ppf ~filename ~line ?code msg x =
-    let location file ~line ~col =
-      `Assoc
-        [ "path", `String file
-        ; "range", `Assoc [ "start", `Assoc [ "line", `Int line; "column", `Int col ] ]
-        ]
-    in
-    let j =
-      `Assoc
-        ([ "message", `String (asprintf "%a" msg x)
-         ; "location", location filename ~line ~col:1
-         ; "severity", `String "INFO"
-         ]
-        @
-        match code with
-        | None -> []
-        | Some (desc, url) ->
-          [ "code", `Assoc [ "value", `String desc; "url", `String url ] ])
-    in
-    Format.fprintf ppf "%s\n%!" (Yojson.to_string j)
-  ;;
-  (* { "message": "Constructor 'XXX' has no documentation attribute",  "location": {    "path": "Lambda/lib/ast.mli",    "range": {      "start": { "line": 12, "column": 13 }, "end": { "line": 12, "column": 15      }    }  },  "severity": "INFO",  "code": {  "value": "RULE1",    "url": "https://example.com/url/to/super-lint/RULE1"  }}*)
-end
+open Utils
 
 let describe_as_clippy_json id ~docs : Yojson.Safe.t =
   `Assoc
@@ -68,23 +38,25 @@ Wrong casing is not exactly bad but OCaml tradition says that types' and module 
 
   let msg ppf name = fprintf ppf "Type name `%s` should be in snake case" name
 
-  let report_txt name ~loc ppf =
-    let main = Location.mkloc (fun ppf -> msg ppf name) loc in
+  let report_txt typ_name ~loc ~filename ppf =
+    Location.input_name := filename;
+    cut_build_dir ();
+    let main = Location.mkloc (fun ppf -> msg ppf typ_name) loc in
     let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
     Location.print_report ppf r
   ;;
 
-  let report_md name ~loc ppf =
+  let report_md ~loc ~filename name ppf =
     fprintf ppf "* %a\n%!" msg name;
     fprintf ppf "  ```\n%!";
-    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt name ~loc ppf) ();
+    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt ~filename name ~loc ppf) ();
     fprintf ppf "  ```\n%!"
   ;;
 
-  let report ~loc name =
+  let report ~loc ~filename name =
     let module M = struct
-      let md ppf () = report_md name ~loc ppf
-      let txt ppf () = report_txt name ~loc ppf
+      let md ppf () = report_md name ~filename ~loc ppf
+      let txt ppf () = report_txt name ~filename ~loc ppf
 
       let rdjsonl ppf () =
         RDJsonl.pp
@@ -116,8 +88,11 @@ Wrong casing is not exactly bad but OCaml tradition says that types' and module 
           let open Parsetree in
           let tname = tdecl.ptype_name.txt in
           let loc = tdecl.ptype_loc in
-          if is_camel_case tname then CollectedLints.add ~loc (report ~loc tname);
-          fallback.type_declaration self tdecl)
+          if is_camel_case tname
+          then (
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            CollectedLints.add ~loc (report ~loc ~filename tname);
+            fallback.type_declaration self tdecl))
     }
   ;;
 end
@@ -171,6 +146,7 @@ In this variant you have less potential for copy-paste mistake
   let msg = "Prefer guard instead of if-then-else in case construction"
 
   let report_txt ~loc ppf =
+    cut_build_dir ();
     let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" msg) loc in
     let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
     Location.print_report ppf r
@@ -248,6 +224,7 @@ As example of this kind of documentation you can consult [OCaml 4.13 parse tree]
   let msg ppf name = fprintf ppf "Constructor '%s' has no documentation attribute" name
 
   let report_txt name ~loc ppf =
+    cut_build_dir ();
     let r =
       let main = Location.mkloc (fun ppf -> msg ppf name) loc in
       Location.{ sub = []; main; kind = Report_alert "zanuda-linter" }

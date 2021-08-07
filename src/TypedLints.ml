@@ -1,7 +1,6 @@
 open Base
 open Location
-module ErrorFormat = UntypedLints.ErrorFormat
-module RDJsonl = UntypedLints.RDJsonl
+open Utils
 
 module L1 : LINT.TYPED = struct
   type input = Tast_iterator.iterator
@@ -20,19 +19,27 @@ The function `Stdlib.List.length` evaluated length of standart OCaml linked list
     Format.fprintf ppf "Bad measurement of a list (with non-negative size)%!"
   ;;
 
-  let report_md ~loc:_ ppf = msg ppf ()
+  let report_md ~loc:_ ppf =
+    (* TODO: repair markdown output *)
+    msg ppf ()
+  ;;
 
-  let report_txt ~loc ppf =
-    (* Format.fprintf ppf "%a\n" msg () *)
+  let report_txt ~loc filename ppf =
+    Location.input_name := filename;
+    cut_build_dir ();
     let main = Location.mkloc (fun ppf -> msg ppf ()) loc in
     let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
     Location.print_report ppf r
   ;;
 
-  let report ~loc =
+  let report filename ~loc =
     let module M = struct
       let md ppf () = report_md ~loc ppf
-      let txt ppf () = report_txt ~loc ppf
+
+      let txt ppf () =
+        Option.iter !Location.input_lexbuf ~f:Lexing.flush_input;
+        report_txt filename ~loc ppf
+      ;;
 
       let golint ppf () =
         ErrorFormat.pp
@@ -60,14 +67,26 @@ The function `Stdlib.List.length` evaluated length of standart OCaml linked list
   let run _ fallback =
     let pat =
       let open Tast_pattern in
-      let ops = [ ">", 0; "<", 0; ">=", 0; "<=", 0 ] in
-      (* TODO: flippable operators *)
-      let single (op, n) =
-        Tast_pattern.(
-          texp_apply2
-            (texp_ident (path [ "Stdlib"; op ]))
-            (texp_apply1 (texp_ident (path [ "Stdlib"; "List"; "length" ])) __)
-            (eint @@ int n))
+      let ops = [ ">=", "<=", 0; "<=", ">=", 0; ">", "<", 0; "=", "=", 0 ] in
+      let single (op, dualop, n) =
+        let open Tast_pattern in
+        let pat_list_length =
+          texp_ident (path [ "Stdlib"; "List"; "length" ])
+          ||| texp_ident (path [ "Stdlib!"; "List"; "length" ])
+          ||| texp_ident (path [ "Base"; "List"; "length" ])
+          ||| texp_ident (path [ "Base!"; "List"; "length" ])
+        in
+        (* TODO: understand difference between Stdlib and Stdlib! *)
+        let make_pat_op op =
+          texp_ident (path [ "Stdlib"; op ])
+          ||| texp_ident (path [ "Stdlib!"; op ])
+          ||| texp_ident (path [ "Base!"; op ])
+          ||| texp_ident (path [ "Base"; op ])
+        in
+        let pat_op = make_pat_op op in
+        let pat_op2 = make_pat_op dualop in
+        texp_apply2 pat_op (texp_apply1 pat_list_length __) (eint @@ int n)
+        ||| texp_apply2 pat_op2 (eint @@ int n) (texp_apply1 pat_list_length __)
       in
       List.fold
         ~init:(single @@ List.hd_exn ops)
@@ -76,20 +95,34 @@ The function `Stdlib.List.length` evaluated length of standart OCaml linked list
     in
     let open Tast_iterator in
     { fallback with
-      expr =
+      structure =
+        (fun self stru ->
+          (*           if String.is_substring
+               (List.hd_exn stru.str_items).str_loc.loc_start.pos_fname
+               ~substring:"exec"
+          then Printtyped.implementation Format.std_formatter stru; *)
+          fallback.structure self stru)
+    ; expr =
         (fun self expr ->
-          (* Format.printf
-            "%a\n%!"
-            Pprintast.expression
-            Untypeast.(default_mapper.expr default_mapper expr); *)
           let open Typedtree in
           let loc = expr.exp_loc in
+          (* if String.is_substring loc.loc_start.pos_fname ~substring:"exec"
+          then
+            Format.printf
+              "%a\n%!"
+              Pprintast.expression
+              Untypeast.(default_mapper.expr default_mapper expr); *)
           Tast_pattern.parse
             pat
             loc
-            ~on_error:(fun () -> ())
+            ~on_error:(fun _desc ->
+              (* Format.printf "\t\tfail: expected %s\n%!" desc; *)
+              ())
             expr
-            (fun _list_to_be_measured -> CollectedLints.add ~loc (report ~loc));
+            (fun _list_to_be_measured ->
+              CollectedLints.add
+                ~loc
+                (report loc.Location.loc_start.Lexing.pos_fname ~loc));
           fallback.expr self expr)
     }
   ;;

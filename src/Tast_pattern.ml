@@ -35,7 +35,7 @@ let parse (T f) loc ?on_error x k =
   | Expected (loc, expected) ->
     (match on_error with
     | None -> Location.raise_errorf ~loc "%s expected" expected
-    | Some f -> f ())
+    | Some f -> f expected)
 ;;
 
 module Packed = struct
@@ -72,6 +72,7 @@ let cst ~to_string ?(equal = Poly.equal) v =
       if equal x v
       then (
         incr_matched ctx;
+        (* printf "cst succeeded for %s\n%!" (to_string v); *)
         k)
       else fail loc (to_string v))
 ;;
@@ -213,8 +214,9 @@ let pack3 t = map t ~f:(fun f x y z -> f (x, y, z))
 let path xs =
   let rec helper ps ctx loc x k =
     let cmp_names l r =
-      (* printf "Compare names %s and %s\n%!" l r; *)
-      String.equal l r
+      let ans = String.equal l r in
+      (* printf "\t\tCompare names %s and %s:  %b\n%!" l r ans; *)
+      ans
     in
     match x, ps with
     | Path.Pident id, [ id0 ] ->
@@ -225,7 +227,7 @@ let path xs =
       else fail loc "path"
     | Path.Pdot (next, id), id0 :: ids when cmp_names id id0 -> helper ids ctx loc next k
     | Path.Papply _, _ -> fail loc "path got Papply"
-    | _ -> fail loc "path"
+    | _ -> fail loc (sprintf "path %s" (String.concat ~sep:"." xs))
   in
   T (helper (List.rev xs))
 ;;
@@ -256,7 +258,7 @@ include struct
     parse
       (path names)
       noloc
-      ~on_error:(fun () ->
+      ~on_error:(fun _ ->
         print_endline "some error";
         false)
       (path_of_list names)
@@ -274,17 +276,8 @@ include struct
         | Texp_constant (Asttypes.Const_int n) ->
           ctx.matched <- ctx.matched + 1;
           f0 ctx loc n k
-        | _ -> fail loc "eint")
-  ;;
-
-  let texp_ident (T path0) =
-    T
-      (fun ctx loc x k ->
-        match x.exp_desc with
-        | Texp_ident (path, _, _) ->
-          ctx.matched <- ctx.matched + 1;
-          path0 ctx loc path k
-        | _ -> fail loc "texp_ident")
+        | xx ->
+          fail loc (sprintf "eint %s %d, tag = %d" __FILE__ __LINE__ Obj.(tag @@ repr xx)))
   ;;
 
   let texp_ident (T path0) =
