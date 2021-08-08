@@ -25,7 +25,7 @@ module Casing : LINT.UNTYPED = struct
       ~docs:
         {|
 ### What it does
-Checks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp) popular in Python and Haskell.
+Checks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp`) popular in Python and Haskell.
 
 ### Why is this bad?
 Wrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Modules names' in standard library are in camel case but in most Janestreet libraries (ppxlib, base) they are in snake case too.
@@ -196,7 +196,7 @@ module ParsetreeHasDocs : LINT.UNTYPED = struct
       ~docs:
         {|
 ### What it does
-It checks that file `Parsetree.mli' has documentation comments for all constructors. Usually files like this are used to describe abstract syntax tree (AST) of a language. In this case it's recommended to annotate every constructor with a documentation about meaning of the constructors, for example, which real syntax if supposed to be parsed to this part of AST.
+It checks that file `Parsetree.mli` has documentation comments for all constructors. Usually files like this are used to describe abstract syntax tree (AST) of a language. In this case it's recommended to annotate every constructor with a documentation about meaning of the constructors, for example, which real syntax if supposed to be parsed to this part of AST.
 
 As example of this kind of documentation you can consult [OCaml 4.13 parse tree](https://github.com/ocaml/ocaml/blob/4.13/parsing/parsetree.mli#L282)
   |}
