@@ -2,20 +2,6 @@ open Base
 open Caml.Format
 open Utils
 
-let describe_as_clippy_json id ~docs : Yojson.Safe.t =
-  `Assoc
-    [ "id", `String id
-    ; "group", `String "correctness"
-    ; "level", `String "deny"
-    ; "docs", `String docs
-    ; ( "applicability"
-      , `Assoc
-          [ "is_multi_part_suggestion", `Bool false
-          ; "applicability", `String "Unresolved"
-          ] )
-    ]
-;;
-
 module Casing : LINT.UNTYPED = struct
   let is_camel_case s = String.(lowercase s <> s)
 

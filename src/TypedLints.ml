@@ -8,7 +8,7 @@ module L1 : LINT.TYPED = struct
   let lint_id = "list_length_comparisons"
 
   let describe_itself () =
-    UntypedLints.describe_as_clippy_json
+    describe_as_clippy_json
       lint_id
       ~docs:
         {|

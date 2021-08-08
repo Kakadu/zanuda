@@ -59,3 +59,18 @@ module Report = struct
     RDJsonl.pp ppf ~filename ~line:loc.Location.loc_start.pos_lnum msg msg_arg
   ;;
 end
+
+let describe_as_clippy_json id ~docs : Yojson.Safe.t =
+  (* List if clippy lints https://github.com/rust-lang/rust-clippy/blob/gh-pages/master/lints.json *)
+  `Assoc
+    [ "id", `String id
+    ; "group", `String "correctness"
+    ; "level", `String "deny"
+    ; "docs", `String docs
+    ; ( "applicability"
+      , `Assoc
+          [ "is_multi_part_suggestion", `Bool false
+          ; "applicability", `String "Unresolved"
+          ] )
+    ]
+;;
