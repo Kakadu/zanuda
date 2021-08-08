@@ -1,0 +1,14 @@
+(env
+ (_
+  (flags
+   (:standard -w -3-9-32-33-39 -warn-error -26-27))))
+
+(library
+ (name test_all_lints)
+ (modules Camel_cased_types List_length_comparisons No_docs_parsetree)
+ (modules_without_implementation no_docs_parsetree)
+ (wrapped false)
+ (libraries base)
+ (preprocess
+  (pps ppx_inline_test))
+ (inline_tests))

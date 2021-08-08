@@ -1,0 +1,74 @@
+name: Build Example
+
+on:
+  pull_request:
+    branches:
+      - 'example'
+  push:
+    branches:
+      - 'example'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        ocaml-compiler:
+          - ocaml-variants.4.11.2+flambda
+        opam-disable-sandboxing:
+          - true
+        dune-cache:
+          - true
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.7.0
+        with:
+          access_token: ${{ github.token }}
+
+      # checking out the code seems to be important because local switch is used
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0                      # fix me later
+
+      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2.0.0-beta3
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          dune-cache: true
+
+      - name: Installing dependencies
+        run: |
+          opam install . --deps-only --with-test --with-doc
+
+      - name: Building...
+        run: |
+          opam exec -- dune build
+
+      - name: Running tests...
+        run: |
+          opam exec -- dune runtest
+
+      - name: Install linter
+        run: opam pin add https://github.com/Kakadu/mylinter.git
+
+      - name: Build linter descriptions...
+        run: mkdir -p _build/_lintinfo && opam exec -- mylinter -dir . -ordjsonl _build/default/review.json
+
+      - uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest # Optional. [latest,nightly,v.X.Y.Z]
+
+      - run: cat _build/default/review.json
+
+      - name: Run reviewdog
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          cat _build/default/review.json |
+          reviewdog -f=rdjsonl -filter-mode nofilter -reporter=github-pr-review
