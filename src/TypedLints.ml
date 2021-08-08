@@ -18,7 +18,7 @@ The function `Stdlib.List.length` evaluated length of standart OCaml linked list
   ;;
 
   let msg ppf () =
-    Format.fprintf ppf "Bad measurement of a list (with non-negative size)%!"
+    Caml.Format.fprintf ppf "Bad measurement of a list (with non-negative size)%!"
   ;;
 
   let report filename ~loc =

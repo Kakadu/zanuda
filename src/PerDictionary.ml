@@ -1,5 +1,5 @@
 open Base
-open Format
+open Caml.Format
 open Utils
 
 type module_ =
@@ -71,15 +71,15 @@ let analyze_dir analyze_untyped analyze_cmt analyze_cmti path =
           | Cmt_format.Packed _
           | Cmt_format.Partial_implementation _
           | Cmt_format.Partial_interface _ ->
-            printf "%s %d\n%!" __FILE__ __LINE__;
+            printf "%s %d\n%!" Caml.__FILE__ Caml.__LINE__;
             Caml.exit 1)
     in
     List.iter [ m.impl, m.cmt; m.intf, m.cmti ] ~f:(function
         | None, None -> ()
         | Some filename, None ->
-          Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
+          Caml.Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
         | None, Some filename ->
-          Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
+          Caml.Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
         | Some source_filename, Some cmt_filename ->
           let build_dir = "_build/default/" in
           let wrap =
@@ -87,8 +87,7 @@ let analyze_dir analyze_untyped analyze_cmt analyze_cmti path =
             then (fun f ->
               Unix.chdir build_dir;
               let infos =
-                if Config.Options.verbose ()
-                then printfn "Reading cmt[i] file '%s'" cmt_filename;
+                if Config.verbose () then printfn "Reading cmt[i] file '%s'" cmt_filename;
                 Cmt_format.read
                   (String.drop_prefix cmt_filename (String.length build_dir))
               in

@@ -19,5 +19,9 @@ install:
 	dune build @install
 	dune install
 
+uninstall:
+	dune build @install
+	dune uninstall
+
 clean:
 	dune clean

@@ -1,11 +1,11 @@
 open Base
-open Format
+open Caml.Format
 
-let printfn fmt = Format.kfprintf (fun ppf -> Format.fprintf ppf "\n%!") std_formatter fmt
+let printfn fmt = kfprintf (fun ppf -> fprintf ppf "\n%!") std_formatter fmt
 
 module ErrorFormat = struct
   let pp ppf ~filename ~line ~col:_ msg x =
-    Format.fprintf ppf "%s:%d:%d:%a\n%!" filename line (* col *) 0 msg x
+    fprintf ppf "%s:%d:%d:%a\n%!" filename line (* col *) 0 msg x
   ;;
 end
 
@@ -29,7 +29,7 @@ module RDJsonl = struct
         | Some (desc, url) ->
           [ "code", `Assoc [ "value", `String desc; "url", `String url ] ])
     in
-    Format.fprintf ppf "%s\n%!" (Yojson.to_string j)
+    fprintf ppf "%s\n%!" (Yojson.to_string j)
   ;;
   (* { "message": "Constructor 'XXX' has no documentation attribute",  "location": {    "path": "Lambda/lib/ast.mli",    "range": {      "start": { "line": 12, "column": 13 }, "end": { "line": 12, "column": 15      }    }  },  "severity": "INFO",  "code": {  "value": "RULE1",    "url": "https://example.com/url/to/super-lint/RULE1"  }}*)
 end
@@ -56,11 +56,6 @@ module Report = struct
   ;;
 
   let rdjsonl ~loc ~filename ppf msg msg_arg =
-    RDJsonl.pp
-      ppf
-      ~filename (* :(Config.recover_filepath loc.loc_start.pos_fname) *)
-      ~line:loc.Location.loc_start.pos_lnum
-      msg
-      msg_arg
+    RDJsonl.pp ppf ~filename ~line:loc.Location.loc_start.pos_lnum msg msg_arg
   ;;
 end

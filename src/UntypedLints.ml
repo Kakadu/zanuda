@@ -1,5 +1,5 @@
 open Base
-open Format
+open Caml.Format
 open Utils
 
 let describe_as_clippy_json id ~docs : Yojson.Safe.t =
@@ -228,8 +228,7 @@ As example of this kind of documentation you can consult [OCaml 4.13 parse tree]
   ;;
 
   let run { Compile_common.source_file; _ } fallback =
-    if Config.Options.verbose ()
-    then printfn "Trying lint '%s' on file '%s'" lint_id source_file;
+    if Config.verbose () then printfn "Trying lint '%s' on file '%s'" lint_id source_file;
     if String.is_suffix ~suffix:"arsetree.mli" source_file
        || String.is_suffix ~suffix:"ast.mli" source_file
     then

@@ -276,8 +276,7 @@ include struct
         | Texp_constant (Asttypes.Const_int n) ->
           ctx.matched <- ctx.matched + 1;
           f0 ctx loc n k
-        | xx ->
-          fail loc (sprintf "eint %s %d, tag = %d" __FILE__ __LINE__ Obj.(tag @@ repr xx)))
+        | _ -> fail loc (sprintf "eint"))
   ;;
 
   let texp_ident (T path0) =

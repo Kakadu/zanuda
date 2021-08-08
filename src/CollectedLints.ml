@@ -1,9 +1,8 @@
 open Base
-open Format
+open Caml.Format
 open Utils
 
 type t = string
-type single_printer = loc:Warnings.loc -> Format.formatter -> unit
 
 let found_Lints : (Location.t * (module LINT.REPORTER)) Queue.t = Queue.create ()
 let clear () = Queue.clear found_Lints
@@ -36,13 +35,13 @@ let report () =
     | None -> []
   in *)
   let rdjsonl_files =
-    match Config.Options.out_rdjsonl () with
+    match Config.out_rdjsonl () with
     | Some s ->
       let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
       (* By some reason on CI Open_creat is not enough to create a file *)
       let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
       [ ( (fun (module M : LINT.REPORTER) ppf -> M.rdjsonl ppf)
-        , Format.formatter_of_out_channel ch
+        , Caml.Format.formatter_of_out_channel ch
         , ch )
       ]
     | None -> []
@@ -58,11 +57,11 @@ let report () =
     ~f:(fun () ->
       (* Format.printf "Total lints found: %d\n%!" (Queue.length found_Lints); *)
       Queue.iter found_Lints ~f:(fun (_loc, ((module M : LINT.REPORTER) as m)) ->
-          M.txt Format.std_formatter ();
+          M.txt Caml.Format.std_formatter ();
           List.iter all_files ~f:(fun (f, ppf, _) -> f m ppf ())))
     ~finally:(fun () ->
       let f (_, ppf, ch) =
-        Format.pp_print_flush ppf ();
+        Caml.Format.fprintf ppf "%!";
         Caml.close_out ch
       in
       List.iter ~f all_files)
