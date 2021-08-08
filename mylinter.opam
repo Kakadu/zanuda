@@ -5,7 +5,7 @@ description:
   "Inspired by https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml"
 maintainer: ["kakadu@pm.me"]
 authors: ["Kakadu"]
-license: "GPL"
+license: "LGPL-3.0-only"
 homepage: "https://github.com/Kakadu/mylinter"
 bug-reports: "https://github.com/Kakadu/mylinter/issues"
 depends: [

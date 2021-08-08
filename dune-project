@@ -7,7 +7,7 @@
 (source
  (github Kakadu/mylinter))
 
-(license GPL)
+(license LGPL-3.0-only)
 
 (authors "Kakadu")
 
