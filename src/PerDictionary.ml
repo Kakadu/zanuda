@@ -84,15 +84,23 @@ let analyze_dir analyze_untyped analyze_cmt analyze_cmti path =
           let build_dir = "_build/default/" in
           let wrap =
             if String.is_prefix ~prefix:build_dir cmt_filename
-            then (fun f ->
-              Unix.chdir build_dir;
-              let infos =
-                if Config.verbose () then printfn "Reading cmt[i] file '%s'" cmt_filename;
-                Cmt_format.read
-                  (String.drop_prefix cmt_filename (String.length build_dir))
-              in
-              f infos;
-              Unix.chdir "../..")
+            then
+              if Caml.Sys.file_exists cmt_filename
+              then (fun f ->
+                Unix.chdir build_dir;
+                let infos =
+                  if Config.verbose ()
+                  then printfn "Reading cmt[i] file '%s'" cmt_filename;
+                  Cmt_format.read
+                    (String.drop_prefix cmt_filename (String.length build_dir))
+                in
+                f infos;
+                Unix.chdir "../..")
+              else
+                fun _ ->
+                eprintf
+                  "File '%s' doesn't exist. Maybe some of source files are not compiled?"
+                  source_filename
             else
               fun f ->
               let cmt = Cmt_format.read cmt_filename in
