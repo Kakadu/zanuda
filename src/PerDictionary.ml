@@ -1,5 +1,6 @@
 open Base
 open Format
+open Utils
 
 type module_ =
   { name : string
@@ -38,7 +39,7 @@ type t =
 
 let fine_module { impl } =
   match impl with
-  | Some s when UntypedLints.ends_with s ~suffix:".ml-gen" -> false
+  | Some s when String.is_suffix s ~suffix:".ml-gen" -> false
   | _ -> true
 ;;
 
@@ -60,57 +61,45 @@ let analyze_dir analyze_untyped analyze_cmt analyze_cmti path =
   let on_module _ m =
     (* we analyze syntax tree without expanding syntax extensions *)
     Option.iter m.impl ~f:analyze_untyped;
-    let on_cmti (cmi_info, cmt_info) =
+    Option.iter m.intf ~f:analyze_untyped;
+    (* Now analyze Typedtree extracted from cmt[i] *)
+    let on_cmti source_file (_cmi_info, cmt_info) =
       Option.iter cmt_info ~f:(fun cmt ->
           match cmt.Cmt_format.cmt_annots with
-          | Cmt_format.Implementation stru ->
-            (* TODO: exception *)
-            (* TODO: unmangle source file name *)
-            analyze_cmt (Option.value_exn cmt.Cmt_format.cmt_sourcefile) stru
-          | Cmt_format.Interface sign ->
-            analyze_cmti (Option.value_exn cmt.Cmt_format.cmt_sourcefile) sign
+          | Cmt_format.Implementation stru -> analyze_cmt source_file stru
+          | Cmt_format.Interface sign -> analyze_cmti source_file sign
           | Cmt_format.Packed _
           | Cmt_format.Partial_implementation _
           | Cmt_format.Partial_interface _ ->
             printf "%s %d\n%!" __FILE__ __LINE__;
             Caml.exit 1)
-      (* Option.iter cmi ~f:(fun cmt ->
-        List.iter cmt.Cmi_format.cmi_sign ~f:(analyze_cmt_si )
-          match
-           with
-          | Cmt_format.Implementation stru ->
-            (* TODO: exception *)
-            (* TODO: unmangle source file name *)
-            analyze_cmt_si (Option.value_exn cmt.Cmt_format.cmt_sourcefile) stru
-          | Cmt_format.Packed _
-          | Cmt_format.Interface _
-          | Cmt_format.Partial_implementation _
-          | Cmt_format.Partial_interface _ ->
-            printf "%s %d\n%!" __FILE__ __LINE__;
-            Caml.exit 1) *)
     in
-    (* try to analyze Typedtree extracted from cmt[i] *)
-    List.iter
-      [ m.cmt; m.cmti ]
-      ~f:
-        (Option.iter ~f:(fun cmt_filename ->
-             let build_dir = "_build/default/" in
-             let wrap =
-               if String.is_prefix ~prefix:build_dir cmt_filename
-               then (fun f ->
-                 Unix.chdir build_dir;
-                 let infos =
-                   Cmt_format.read
-                     (String.drop_prefix cmt_filename (String.length build_dir))
-                 in
-                 f infos;
-                 Unix.chdir "../..")
-               else
-                 fun f ->
-                 let cmt = Cmt_format.read cmt_filename in
-                 f cmt
-             in
-             wrap on_cmti))
+    List.iter [ m.impl, m.cmt; m.intf, m.cmti ] ~f:(function
+        | None, None -> ()
+        | Some filename, None ->
+          Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
+        | None, Some filename ->
+          Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
+        | Some source_filename, Some cmt_filename ->
+          let build_dir = "_build/default/" in
+          let wrap =
+            if String.is_prefix ~prefix:build_dir cmt_filename
+            then (fun f ->
+              Unix.chdir build_dir;
+              let infos =
+                if Config.Options.verbose ()
+                then printfn "Reading cmt[i] file '%s'" cmt_filename;
+                Cmt_format.read
+                  (String.drop_prefix cmt_filename (String.length build_dir))
+              in
+              f infos;
+              Unix.chdir "../..")
+            else
+              fun f ->
+              let cmt = Cmt_format.read cmt_filename in
+              f cmt
+          in
+          wrap (on_cmti source_filename))
   in
   let loop_database () =
     List.iter db ~f:(function

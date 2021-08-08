@@ -38,44 +38,54 @@ Wrong casing is not exactly bad but OCaml tradition says that types' and module 
 
   let msg ppf name = fprintf ppf "Type name `%s` should be in snake case" name
 
-  let report_txt typ_name ~loc ~filename ppf =
-    Location.input_name := filename;
-    cut_build_dir ();
-    (* printf "Location.input_name = %s\n%!" !Location.input_name; *)
+  (*
+    Option.iter !Location.input_lexbuf ~f:Lexing.flush_input;
+    Location.input_name := cut_build_dir filename;
+    let loc =
+      let open Location in
+      { loc with
+        loc_start = { loc.loc_start with pos_fname = !input_name }
+      ; loc_end = { loc.loc_end with pos_fname = !input_name }
+      }
+    in
+    (*     let () =
+      let open Location in
+      printfn
+        "loc = { ghost=%b, start = { fname=%S, lnum=%d, cnum=%d }, end = { fname = %s, \
+         lnum = %d, cnum=%d } }"
+        loc.loc_ghost
+        loc.loc_start.pos_fname
+        loc.loc_start.pos_lnum
+        loc.loc_start.pos_cnum
+        loc.loc_end.pos_fname
+        loc.loc_end.pos_lnum
+        loc.loc_end.pos_cnum
+    in *)
+    if Config.Options.verbose ()
+    then printf "Location.input_name = %s\n%!" !Location.input_name;
     let main = Location.mkloc (fun ppf -> msg ppf typ_name) loc in
     let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
     Location.print_report ppf r
-  ;;
-
+    *)
+  (*
   let report_md ~loc ~filename name ppf =
     fprintf ppf "* %a\n%!" msg name;
     fprintf ppf "  ```\n%!";
     fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt ~filename name ~loc ppf) ();
     fprintf ppf "  ```\n%!"
-  ;;
+  ;; *)
 
-  let report ~loc ~filename name =
+  let report ~loc ~filename typ_name =
     let module M = struct
-      let md ppf () = report_md name ~filename ~loc ppf
-      let txt ppf () = report_txt name ~filename ~loc ppf
+      let txt ppf () = Report.txt ~loc ~filename ppf msg typ_name
 
       let rdjsonl ppf () =
-        RDJsonl.pp
+        Report.rdjsonl
+          ~loc
           ppf
           ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum
           msg
-          name
-      ;;
-
-      let golint ppf () =
-        ErrorFormat.pp
-          ppf
-          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum (* loc.loc_start.pos_cnum *)
-          ~col:0
-          msg
-          name
+          typ_name
       ;;
     end
     in
@@ -92,8 +102,8 @@ Wrong casing is not exactly bad but OCaml tradition says that types' and module 
           if is_camel_case tname
           then (
             let filename = loc.Location.loc_start.Lexing.pos_fname in
-            CollectedLints.add ~loc (report ~loc ~filename tname);
-            fallback.type_declaration self tdecl))
+            CollectedLints.add ~loc (report ~loc ~filename tname));
+          fallback.type_declaration self tdecl)
     }
   ;;
 end
@@ -146,40 +156,15 @@ In this variant you have less potential for copy-paste mistake
 
   let msg = "Prefer guard instead of if-then-else in case construction"
 
-  let report_txt ~loc ppf =
-    cut_build_dir ();
-    let main = Location.mkloc (fun ppf -> Caml.Format.fprintf ppf "%s" msg) loc in
-    let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
-    Location.print_report ppf r
-  ;;
-
-  let report_md ~loc ppf =
-    fprintf ppf "* %s\n%!" msg;
-    fprintf ppf "  ```\n%!";
-    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt ~loc ppf) ();
-    fprintf ppf "  ```\n%!"
-  ;;
-
-  let report ~loc =
+  let report ~filename ~loc =
     let module M = struct
-      let md ppf () = report_md ~loc ppf
-      let txt ppf () = report_txt ~loc ppf
-
-      let golint ppf () =
-        ErrorFormat.pp
-          ppf
-          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum (* loc.loc_start.pos_cnum *)
-          ~col:0
-          pp_print_string
-          msg
-      ;;
+      let txt ppf () = Report.txt ~loc ~filename ppf pp_print_string msg
 
       let rdjsonl ppf () =
-        RDJsonl.pp
+        Report.rdjsonl
+          ~loc
           ppf
           ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum
           pp_print_string
           msg
       ;;
@@ -195,18 +180,19 @@ In this variant you have less potential for copy-paste mistake
           match case.pc_rhs.pexp_desc with
           | Pexp_ifthenelse (_, _, _) ->
             let loc = case.pc_rhs.pexp_loc in
-            CollectedLints.add ~loc (report ~loc)
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            CollectedLints.add ~loc (report ~filename ~loc)
           | _ -> fallback.case self case)
     }
   ;;
 end
 
-let ends_with ~suffix s = String.equal (String.suffix s (String.length suffix)) suffix
-
 module ParsetreeHasDocs : LINT.UNTYPED = struct
+  let lint_id = "no_docs_parsetree"
+
   let describe_itself () =
     describe_as_clippy_json
-      "no_docs_parsetree"
+      lint_id
       ~docs:
         {|
 ### What it does
@@ -224,65 +210,37 @@ As example of this kind of documentation you can consult [OCaml 4.13 parse tree]
   let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
   let msg ppf name = fprintf ppf "Constructor '%s' has no documentation attribute" name
 
-  let report_txt name ~loc ppf =
-    cut_build_dir ();
-    let r =
-      let main = Location.mkloc (fun ppf -> msg ppf name) loc in
-      Location.{ sub = []; main; kind = Report_alert "zanuda-linter" }
-    in
-    Location.print_report ppf r
-  ;;
-
-  let report_md name ~loc ppf =
-    fprintf ppf "* %a\n%!" msg name;
-    fprintf ppf "  ```\n%!";
-    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt name ~loc ppf) ();
-    fprintf ppf "  ```\n%!"
-  ;;
-
-  let report name ~loc =
+  let report ~filename cname ~loc =
     let module M = struct
-      let md ppf () = report_md name ~loc ppf
-      let txt ppf () = report_txt name ~loc ppf
-
-      let golint ppf () =
-        ErrorFormat.pp
-          ppf
-          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum (* loc.loc_start.pos_cnum *)
-          ~col:0
-          msg
-          name
-      ;;
+      let txt ppf () = Report.txt ~loc ~filename ppf msg cname
 
       let rdjsonl ppf () =
-        RDJsonl.pp
+        Report.rdjsonl
+          ~loc
           ppf
           ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum
           msg
-          name
+          cname
       ;;
     end
     in
     (module M : LINT.REPORTER)
   ;;
 
-  let is_mli s = ends_with ~suffix:".mli" s
-
   let run { Compile_common.source_file; _ } fallback =
-    if ends_with ~suffix:"arsetree.mli" source_file
-       || ends_with ~suffix:"ast.mli" source_file
+    if Config.Options.verbose ()
+    then printfn "Trying lint '%s' on file '%s'" lint_id source_file;
+    if String.is_suffix ~suffix:"arsetree.mli" source_file
+       || String.is_suffix ~suffix:"ast.mli" source_file
     then
       { fallback with
-        type_kind =
-          (fun self -> function
-            | Ptype_variant cds ->
-              List.iter cds ~f:(fun cd ->
-                  let loc = cd.pcd_loc in
-                  if not (List.exists cd.pcd_attributes ~f:is_doc_attribute)
-                  then CollectedLints.add ~loc (report cd.pcd_name.txt ~loc))
-            | tk -> fallback.type_kind self tk)
+        constructor_declaration =
+          (fun self cd ->
+            let loc = cd.pcd_loc in
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            if not (List.exists cd.pcd_attributes ~f:is_doc_attribute)
+            then CollectedLints.add ~loc (report ~filename cd.pcd_name.txt ~loc);
+            fallback.constructor_declaration self cd)
       }
     else fallback
   ;;

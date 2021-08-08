@@ -1,5 +1,6 @@
 open Base
 open Format
+open Utils
 
 type t = string
 type single_printer = loc:Warnings.loc -> Format.formatter -> unit
@@ -10,7 +11,7 @@ let is_empty () = Queue.is_empty found_Lints
 let add ~loc m = Queue.enqueue found_Lints (loc, m)
 
 let report () =
-  let mdfile =
+  (* let mdfile =
     match Config.Options.outfile () with
     | Some s ->
       (* Format.printf "Opening file '%s'...\n%!" s; *)
@@ -21,8 +22,8 @@ let report () =
         , ch )
       ]
     | None -> []
-  in
-  let golint_files =
+  in *)
+  (*   let golint_files =
     match Config.Options.out_golint () with
     | Some s ->
       let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
@@ -33,7 +34,7 @@ let report () =
         , ch )
       ]
     | None -> []
-  in
+  in *)
   let rdjsonl_files =
     match Config.Options.out_rdjsonl () with
     | Some s ->
@@ -46,7 +47,13 @@ let report () =
       ]
     | None -> []
   in
-  let all_files = List.concat [ rdjsonl_files; golint_files; mdfile ] in
+  let all_files =
+    List.concat
+      [ rdjsonl_files
+        (* golint_files  *)
+        (* mdfile *)
+      ]
+  in
   Base.Exn.protect
     ~f:(fun () ->
       (* Format.printf "Total lints found: %d\n%!" (Queue.length found_Lints); *)

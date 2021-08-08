@@ -4,16 +4,16 @@ all:
 	dune build
 
 release:
-	dune build -p release
+	dune build --profile release
 
 watch:
 	dune build -w
 
 test:
-	dune build && dune build @runtest
+	dune build && dune test
 
 promote:
-	dune build @runtest --auto-promote
+	dune test --auto-promote
 
 install:
 	dune build @install

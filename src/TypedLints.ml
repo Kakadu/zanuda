@@ -5,9 +5,11 @@ open Utils
 module L1 : LINT.TYPED = struct
   type input = Tast_iterator.iterator
 
+  let lint_id = "list_length_comparisons"
+
   let describe_itself () =
     UntypedLints.describe_as_clippy_json
-      "list_length_comparisons"
+      lint_id
       ~docs:
         {|
 ### What it does
@@ -19,37 +21,9 @@ The function `Stdlib.List.length` evaluated length of standart OCaml linked list
     Format.fprintf ppf "Bad measurement of a list (with non-negative size)%!"
   ;;
 
-  let report_md ~loc:_ ppf =
-    (* TODO: repair markdown output *)
-    msg ppf ()
-  ;;
-
-  let report_txt ~loc filename ppf =
-    Location.input_name := filename;
-    cut_build_dir ();
-    let main = Location.mkloc (fun ppf -> msg ppf ()) loc in
-    let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
-    Location.print_report ppf r
-  ;;
-
   let report filename ~loc =
     let module M = struct
-      let md ppf () = report_md ~loc ppf
-
-      let txt ppf () =
-        Option.iter !Location.input_lexbuf ~f:Lexing.flush_input;
-        report_txt filename ~loc ppf
-      ;;
-
-      let golint ppf () =
-        ErrorFormat.pp
-          ppf
-          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum (* loc.loc_start.pos_cnum *)
-          ~col:0
-          msg
-          ()
-      ;;
+      let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg ()
 
       let rdjsonl ppf () =
         RDJsonl.pp
@@ -95,14 +69,7 @@ The function `Stdlib.List.length` evaluated length of standart OCaml linked list
     in
     let open Tast_iterator in
     { fallback with
-      structure =
-        (fun self stru ->
-          (*           if String.is_substring
-               (List.hd_exn stru.str_items).str_loc.loc_start.pos_fname
-               ~substring:"exec"
-          then Printtyped.implementation Format.std_formatter stru; *)
-          fallback.structure self stru)
-    ; expr =
+      expr =
         (fun self expr ->
           let open Typedtree in
           let loc = expr.exp_loc in
@@ -115,15 +82,20 @@ The function `Stdlib.List.length` evaluated length of standart OCaml linked list
           Tast_pattern.parse
             pat
             loc
-            ~on_error:(fun _desc ->
-              (* Format.printf "\t\tfail: expected %s\n%!" desc; *)
-              ())
+            ~on_error:(fun _desc -> ())
             expr
             (fun _list_to_be_measured ->
               CollectedLints.add
                 ~loc
                 (report loc.Location.loc_start.Lexing.pos_fname ~loc));
           fallback.expr self expr)
+        (* ; structure =
+        (fun self stru ->
+          (*           if String.is_substring
+               (List.hd_exn stru.str_items).str_loc.loc_start.pos_fname
+               ~substring:"exec"
+          then Printtyped.implementation Format.std_formatter stru; *)
+          fallback.structure self stru) *)
     }
   ;;
 end

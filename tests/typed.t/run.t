@@ -17,6 +17,10 @@ $ dune describe
   4 | let __  xs = 0 <= List.length xs
                    ^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Bad measurement of a list (with non-negative size)
+  File "Parsetree.mli", line 2, characters 2-16:
+  2 |   | App of t * t
+        ^^^^^^^^^^^^^^
+  Alert zanuda-linter: Constructor 'App' has no documentation attribute
   File "list_len.ml", line 6, characters 12-31:
   6 | let __ xs = List.length xs <= 0
                   ^^^^^^^^^^^^^^^^^^^

@@ -76,12 +76,15 @@ let with_info filename f =
 ;;
 
 let process_cmt_typedtree filename typedtree =
-  if Config.Options.verbose () then printfn "Analyzing cmt: %s" filename;
+  (* if Config.Options.verbose () then printfn "Analyzing cmt: %s" filename; *)
   with_info filename (fun info -> typed_on_structure info typedtree)
 ;;
 
 let process_cmti_typedtree filename typedtree =
-  if Config.Options.verbose () then printfn "Analyzing cmti: %s" filename;
+  (* if Config.Options.verbose ()
+  then (
+    let () = printfn "Analyzing cmti: %s" filename in
+    printfn "%a" Printtyped.interface typedtree); *)
   with_info filename (fun info -> typed_on_signature info typedtree)
 ;;
 
@@ -117,9 +120,9 @@ let load_file filename =
       typed_on_signature info typedtree
     in
     with_info (fun info ->
-        if UntypedLints.ends_with info.source_file ~suffix:".ml"
+        if String.is_suffix info.source_file ~suffix:".ml"
         then process_structure info
-        else if UntypedLints.ends_with info.source_file ~suffix:".mli"
+        else if String.is_suffix info.source_file ~suffix:".mli"
         then process_signature info
         else (
           let () =

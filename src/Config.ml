@@ -12,8 +12,6 @@ module Options = struct
     ; mutable outgolint : string option
     ; mutable out_rdjsonl : string option
           (* Spec: https://github.com/reviewdog/reviewdog/tree/master/proto/rdf#rdjson *)
-          (* ; mutable dump_file : string option *)
-          (* ; mutable infile : string *)
     ; mutable mode : mode
           (* Below options to manage file paths. Not sure are they really required *)
     ; mutable workspace : string option
@@ -29,7 +27,7 @@ module Options = struct
     ; out_rdjsonl = None
     ; mode = Unspecified
     ; workspace = None
-    ; prefix_to_cut = None
+    ; prefix_to_cut = Some "_build/default/"
     ; prefix_to_add = None
     ; extra_includes = []
     ; verbose = false
@@ -64,12 +62,15 @@ module Options = struct
   let set_verbose () = opts.verbose <- true
 end
 
-let recover_filepath s =
-  let filepath = s in
+let recover_filepath filepath =
   let filepath =
     match Options.prefix_to_cut () with
-    | Some s -> String.drop_prefix filepath (String.length s)
-    | None -> filepath
+    | Some prefix when String.is_prefix filepath ~prefix ->
+      String.drop_prefix filepath (String.length prefix)
+    | Some prefix when Options.verbose () ->
+      Format.eprintf "Can't cut prefix '%s' from '%s'\n%!" prefix filepath;
+      filepath
+    | Some _ | None -> filepath
   in
   let filepath =
     match Options.prefix_to_add () with
