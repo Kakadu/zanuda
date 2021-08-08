@@ -25,5 +25,6 @@
  (depends
   yojson
   ppxlib
+  sexplib
   (ppx_inline_test :with-test)
   base))
