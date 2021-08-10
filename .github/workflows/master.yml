@@ -88,3 +88,4 @@ jobs:
           external_repository: Kakadu/fp2021-ci-reports
           publish_branch: master
           keep_files: true
+          enable_jekyll: true
