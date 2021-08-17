@@ -33,6 +33,17 @@
     }
   },
   {
+    "id": "no_toplevel_eval",
+    "group": "correctness",
+    "level": "deny",
+    "docs":
+      "\n### What it does\nAdding toplevel evaluation statements is not recommended because it forces to add `;;`. Rewrite using `let () = ...`\n  ",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "list_length_comparisons",
     "group": "correctness",
     "level": "deny",
