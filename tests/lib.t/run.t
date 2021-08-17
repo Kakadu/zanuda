@@ -5,6 +5,10 @@
   4 | type myAst = MyAst
       ^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Type name `myAst` should be in snake case
+  File "lib.ml", line 7, characters 0-3:
+  7 | 1+1;;
+      ^^^
+  Alert zanuda-linter: Toplevel eval not recommended
 $ dune build testlib2.cmxa
   $ dune build @lint -p testsuite2 --force
       mylinter alias lint
