@@ -1,0 +1,4 @@
+(library
+ (name UntypedLints)
+ (libraries zanuda_core)
+ (modules Casing GuardInsteadOfIf ParsetreeHasDocs))

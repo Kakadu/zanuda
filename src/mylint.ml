@@ -1,5 +1,6 @@
 open Caml
 open Base
+open Zanuda_core
 open Utils
 
 let untyped_linters =

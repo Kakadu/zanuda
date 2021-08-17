@@ -12,20 +12,28 @@
   (pps ppx_inline_test))
  (inline_tests))
 
+(library
+ (name zanuda_core)
+ (modules Utils LINT Config CollectedLints PerDictionary)
+ (modules_without_implementation LINT)
+ (libraries ppxlib sexplib yojson)
+ (preprocess
+  (pps ppx_sexp_conv ppx_inline_test))
+ (inline_tests))
+
 (executable
  (name mylint)
  (public_name mylinter)
- (modules
-  utils
-  Config
-  LINT
-  CollectedLints
-  UntypedLints
+ (modules mylint)
+ (libraries
+  base
+  yojson
+  ppxlib
+  compiler-libs.common
+  Tast_pattern
+  zanuda_core
   TypedLints
-  PerDictionary
-  mylint)
- (modules_without_implementation LINT)
- (libraries base sexplib yojson ppxlib compiler-libs.common Tast_pattern)
+  UntypedLints)
  (preprocess
-  (pps ppx_sexp_conv ppx_inline_test))
+  (pps ppx_inline_test))
  (package mylinter))
