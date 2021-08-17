@@ -279,6 +279,16 @@ include struct
         | _ -> fail loc (sprintf "eint"))
   ;;
 
+  let tpat_var (T fname) =
+    T
+      (fun ctx loc x k ->
+        match x.pat_desc with
+        | Tpat_var (_, { txt }) ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fname ctx loc txt
+        | _ -> fail loc "tpat_var")
+  ;;
+
   let texp_ident (T path0) =
     T
       (fun ctx loc x k ->
@@ -313,5 +323,31 @@ include struct
 
   let texp_apply2 f x y =
     texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
+  ;;
+
+  let texp_function (T fcases) =
+    T
+      (fun ctx loc e k ->
+        match e.exp_desc with
+        | Texp_function { cases } ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fcases ctx loc cases
+        | _ -> fail loc "texp_function")
+  ;;
+
+  let case (T pat) (T guard) (T rhs) =
+    T
+      (fun ctx loc { c_lhs; c_rhs; c_guard } k ->
+        k |> pat ctx loc c_lhs |> guard ctx loc c_guard |> rhs ctx loc c_rhs)
+  ;;
+
+  let texp_match (T fexpr) (T fcases) =
+    T
+      (fun ctx loc e k ->
+        match e.exp_desc with
+        | Texp_match (e, cases, _) ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fexpr ctx loc e |> fcases ctx loc cases
+        | _ -> fail loc "texp_match")
   ;;
 end
