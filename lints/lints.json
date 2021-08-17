@@ -44,6 +44,17 @@
     }
   },
   {
+    "id": "failwith",
+    "group": "suspicious",
+    "level": "allow",
+    "docs":
+      "\n### What it does\nThe usage of 'Stdlib.failwith' in production code could be error-prone. The constructions `failwith \"not implemented\"` should be implemented sooner or later.\n\nConstructions `failwith \"should not happen\"` smells. Maybe techniques from https://doi.org/10.1145/3299711.3242755 could help.\n",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "list_length_comparisons",
     "group": "correctness",
     "level": "deny",
