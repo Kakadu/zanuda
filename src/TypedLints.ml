@@ -2,7 +2,7 @@ open Base
 open Location
 open Utils
 
-module L1 : LINT.TYPED = struct
+module ListLength : LINT.TYPED = struct
   type input = Tast_iterator.iterator
 
   let lint_id = "list_length_comparisons"

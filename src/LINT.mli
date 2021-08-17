@@ -1,3 +1,20 @@
+type group =
+  | Style
+  | Correctness
+  | Perf
+  | Restriction
+  | Deprecated
+  | Pedantic
+  | Complexity
+  | Suspicious
+  | Nursery
+
+type level =
+  | Allow
+  | Warn
+  | Deny
+  | Deprecated
+
 module type GENERAL = sig
   type input
 

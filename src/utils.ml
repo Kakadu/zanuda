@@ -60,12 +60,33 @@ module Report = struct
   ;;
 end
 
-let describe_as_clippy_json id ~docs : Yojson.Safe.t =
+let string_of_group : LINT.group -> string = function
+  | LINT.Correctness -> "correctness"
+  | Style -> "style"
+  | Perf -> "perf"
+  | Restriction -> "restriction"
+  | Deprecated -> "deprecated"
+  | Pedantic -> "pedantic"
+  | Complexity -> "complexity"
+  | Suspicious -> "suspicious"
+  | Nursery -> "nursery"
+;;
+
+let string_of_level : LINT.level -> string = function
+  | LINT.Allow -> "allow"
+  | Warn -> "warn"
+  | Deny -> "deny"
+  | Deprecated -> "deprecated"
+;;
+
+let describe_as_clippy_json ?(group = LINT.Correctness) ?(level = LINT.Deny) id ~docs
+    : Yojson.Safe.t
+  =
   (* List if clippy lints https://github.com/rust-lang/rust-clippy/blob/gh-pages/master/lints.json *)
   `Assoc
     [ "id", `String id
-    ; "group", `String "correctness"
-    ; "level", `String "deny"
+    ; "group", `String (string_of_group group)
+    ; "level", `String (string_of_level level)
     ; "docs", `String docs
     ; ( "applicability"
       , `Assoc

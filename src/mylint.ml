@@ -2,19 +2,6 @@ open Caml
 open Base
 open Utils
 
-module Level = struct
-  type t =
-    | Allow
-    | Warn
-    | Deny
-    | Deprecated
-end
-
-module Groups = struct
-  type t = Style
-  (* Correctness Perf Restriction Deprecated Pedantic Complexity Suspicious Cargo Nursery *)
-end
-
 let untyped_linters =
   let open UntypedLints in
   [ (module GuardInsteadOfIf : LINT.UNTYPED)
@@ -25,7 +12,7 @@ let untyped_linters =
 
 let typed_linters =
   let open TypedLints in
-  [ (module L1 : LINT.TYPED) ]
+  [ (module ListLength : LINT.TYPED) ]
 ;;
 
 (* TODO: Functions below are a little bit copy-pasty. Rework them *)
