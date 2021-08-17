@@ -14,7 +14,11 @@ let untyped_linters =
 
 let typed_linters =
   let open TypedLints in
-  [ (module ListLength : LINT.TYPED) ]
+  [ (* * *********************** *)
+    (module Failwith : LINT.TYPED)
+  ; (module ListLength : LINT.TYPED)
+    (* * *********************** *)
+  ]
 ;;
 
 (* TODO: Functions below are a little bit copy-pasty. Rework them *)

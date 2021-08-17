@@ -26,7 +26,7 @@
     - [ ] 'filter' + 'map' => `filter_map`
     - [ ] etc...
   - [ ] Exceptions
-    - [ ] `failwith`
+    - [x] `failwith`
     - [ ] Using of `List.hd_exn` may be error-prone
     - [ ] Matching with `_` exception
     - [ ] Catching `Failure _` exception
