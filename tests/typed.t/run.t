@@ -41,3 +41,7 @@ $ dune describe
   14 | let __ xs =  0 < List.length xs
                     ^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Bad measurement of a list (with non-negative size)
+  File "Failwith.ml", line 1, characters 12-20:
+  1 | let foo _ = failwith "not implemented"
+                  ^^^^^^^^
+  Alert zanuda-linter: Using failwith unsafely
