@@ -8,6 +8,7 @@ let untyped_linters =
   [ (module GuardInsteadOfIf : LINT.UNTYPED)
   ; (module Casing : LINT.UNTYPED)
   ; (module ParsetreeHasDocs : LINT.UNTYPED)
+  ; (module ToplevelEval : LINT.UNTYPED)
   ]
 ;;
 
