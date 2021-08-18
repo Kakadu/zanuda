@@ -325,6 +325,16 @@ include struct
     texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
   ;;
 
+  [%%if ocaml_version < (4, 12, 0)]
+
+  type case1 = Typedtree.case
+
+  [%%else]
+
+  type case1 = value case
+
+  [%%endif]
+
   let texp_function (T fcases) =
     T
       (fun ctx loc e k ->
