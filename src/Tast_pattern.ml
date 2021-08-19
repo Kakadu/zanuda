@@ -325,13 +325,16 @@ include struct
     texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
   ;;
 
-  [%%if ocaml_version < (4, 12, 0)]
+  [%%if ocaml_version < (4, 11, 2)]
 
-  type case1 = Typedtree.case
+  (* 4.10 *)
+  type case_val = Typedtree.case
+  type case_comp = Typedtree.case
 
   [%%else]
 
-  type case1 = value case
+  type case_val = value case
+  type case_comp = computation case
 
   [%%endif]
 

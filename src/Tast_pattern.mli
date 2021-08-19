@@ -46,25 +46,27 @@ val texp_apply2
   -> (expression, 'c, 'd) t
   -> (expression, 'a, 'd) t
 
-[%%if ocaml_version < (4, 12, 0)]
+[%%if ocaml_version < (4, 11, 0)]
 
-type case1 = Typedtree.case
+type case_val = Typedtree.case
+type case_comp = Typedtree.case
 
 [%%else]
 
-type case1 = value case
+type case_val = value case
+type case_comp = computation case
 
 [%%endif]
 
-val texp_function : (case1 list, 'a, 'b) t -> (expression, 'a, 'b) t
+val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t
 
 val case
   :  (pattern, 'a, 'b) t
   -> (expression option, 'b, 'c) t
   -> (expression, 'c, 'd) t
-  -> (case1, 'a, 'd) t
+  -> (case_val, 'a, 'd) t
 
 val texp_match
   :  (expression, 'a, 'b) t
-  -> (case1 list, 'b, 'c) t
+  -> (case_comp list, 'b, 'c) t
   -> (expression, 'a, 'c) t
