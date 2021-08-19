@@ -64,5 +64,15 @@
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
     }
+  },
+  {
+    "id": "failwith",
+    "group": "suspicious",
+    "level": "allow",
+    "docs": "\n### TODO\n",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
   }
 ]
