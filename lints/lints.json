@@ -66,10 +66,11 @@
     }
   },
   {
-    "id": "failwith",
-    "group": "suspicious",
+    "id": "propose_function",
+    "group": "style",
     "level": "allow",
-    "docs": "\n### TODO\n",
+    "docs":
+      "\n### What it does\nProposes to rewrite 'fun x -> match x with ...' to `function`.\n\n### Why?\nThe `function` keyword allows more shorter syntax for pattern matching on last argument.\nThe lint should not be raised if scrutinee variable is used later in the code.\n\nThe following code is recommended:\n\n```ocaml\n  let f = function\n    | [] -> ...\n    | (x::xs) as arg -> ... x ... xs ... arg\n```\n\nAnd this piece of code is discouraged:\n\n```ocaml\n  let f arg  = match arg with\n    | [] -> ...\n    | (x::xs) -> ... x ... xs ... arg\n```\n",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
