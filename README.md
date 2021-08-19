@@ -1,3 +1,7 @@
+[![Build Master](https://github.com/Kakadu/mylinter/actions/workflows/master.yml/badge.svg?branch=master)](https://github.com/Kakadu/mylinter/actions/workflows/master.yml)
+
+[![](http://github-actions.40ants.com/Kakadu/mylinter/matrix.svg)](https://github.com/Kakadu/mylinter)
+
 #### An OCaml linter experiment
 
 Mostly inspired by (How possible is a clippy-like linter for OCaml?)[https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml/]
