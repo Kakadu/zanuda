@@ -4,9 +4,9 @@ open Zanuda_core.Utils
 
 type input = Tast_iterator.iterator
 
-let lint_id = "exc_failwith"
+let lint_id = "exc_error_swallowing"
 let group = LINT.Suspicious
-let level = LINT.Allow
+let level = LINT.Deny
 
 let describe_itself () =
   describe_as_clippy_json
@@ -16,13 +16,13 @@ let describe_itself () =
     ~docs:
       {|
 ### What it does
-The usage of 'Stdlib.failwith' in production code could be error-prone. The constructions `failwith "not implemented"` should be implemented sooner or later.
+Catching all possible exceptions with wildcard considered as antipattern
 
-Constructions `failwith "should not happen"` smells. Maybe techniques from https://doi.org/10.1145/3299711.3242755 could help.
+See also https://en.wikipedia.org/wiki/Error_hiding
 |}
 ;;
 
-let msg ppf () = Caml.Format.fprintf ppf "Using failwith unsafely%!"
+let msg ppf () = Caml.Format.fprintf ppf "Antipattern: error swallowing%!"
 
 let report filename ~loc =
   let module M = struct
@@ -44,7 +44,7 @@ let report filename ~loc =
 let run _ fallback =
   let pat =
     let open Tast_pattern in
-    texp_ident (path [ "Stdlib"; "failwith" ])
+    texp_try drop (case tpat_any none __' ^:: nil)
   in
   let open Tast_iterator in
   { fallback with
@@ -52,16 +52,16 @@ let run _ fallback =
       (fun self expr ->
         let open Typedtree in
         let loc = expr.exp_loc in
-        (* if String.is_substring loc.loc_start.pos_fname ~substring:"Failwith"
-        then (
-          let u = Untypeast.(default_mapper.expr default_mapper expr) in
-          Format.printf "%a\n%a\n%!" Pprintast.expression u (Printast.expression 0) u); *)
+        (* TODO: support exceptions during matching *)
         Tast_pattern.parse
           pat
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun () ->
+          (fun { loc } () ->
+            (* Reported location is a location of whole match and not of pattern
+              TODO: understand how to fix it  *)
+            (* Format.printf "%a\n%!" Location.print_loc loc; *)
             CollectedLints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc))
           ();
         fallback.expr self expr)

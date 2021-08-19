@@ -289,6 +289,26 @@ include struct
         | _ -> fail loc "tpat_var")
   ;;
 
+  let tpat_exception (T fpat) =
+    T
+      (fun ctx loc x k ->
+        match x.pat_desc with
+        | Tpat_exception exc ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fpat ctx loc exc
+        | _ -> fail loc "tpat_exception")
+  ;;
+
+  let tpat_any =
+    T
+      (fun ctx loc x k ->
+        match x.pat_desc with
+        | Tpat_any ->
+          ctx.matched <- ctx.matched + 1;
+          k
+        | _ -> fail loc "tpat_any")
+  ;;
+
   let texp_ident (T path0) =
     T
       (fun ctx loc x k ->
@@ -330,11 +350,15 @@ include struct
   (* 4.10 *)
   type case_val = Typedtree.case
   type case_comp = Typedtree.case
+  type value_pat = pattern
+  type comp_pat = pattern
 
   [%%else]
 
   type case_val = value case
   type case_comp = computation case
+  type value_pat = value pattern_desc pattern_data
+  type comp_pat = computation pattern_desc pattern_data
 
   [%%endif]
 
@@ -362,5 +386,15 @@ include struct
           ctx.matched <- ctx.matched + 1;
           k |> fexpr ctx loc e |> fcases ctx loc cases
         | _ -> fail loc "texp_match")
+  ;;
+
+  let texp_try (T fexpr) (T fcases) =
+    T
+      (fun ctx loc e k ->
+        match e.exp_desc with
+        | Texp_try (e, cases) ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fexpr ctx loc e |> fcases ctx loc cases
+        | _ -> fail loc "texp_try")
   ;;
 end
