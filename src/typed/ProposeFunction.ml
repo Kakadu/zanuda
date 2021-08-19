@@ -1,21 +1,46 @@
 open Base
 open Zanuda_core
 open Zanuda_core.Utils
-module Helper = struct end
 
 type input = Tast_iterator.iterator
 
-let lint_id = "failwith"
-let group = LINT.Suspicious
+let lint_id = "propose_function"
+let group = LINT.Style
 let level = LINT.Allow
 
 let describe_itself () =
-  describe_as_clippy_json lint_id ~group ~level ~docs:{|
-### TODO
+  describe_as_clippy_json
+    lint_id
+    ~group
+    ~level
+    ~docs:
+      {|
+### What it does
+Proposes to rewrite 'fun x -> match x with ...' to `function`.
+
+### Why?
+The `function` keyword allows more shorter syntax for pattern matching on last argument.
+The lint should not be raised if scrutinee variable is used later in the code.
+
+The following code is recommended:
+
+```ocaml
+  let f = function
+    | [] -> ...
+    | (x::xs) as arg -> ... x ... xs ... arg
+```
+
+And this piece of code is discouraged:
+
+```ocaml
+  let f arg  = match arg with
+    | [] -> ...
+    | (x::xs) -> ... x ... xs ... arg
+```
 |}
 ;;
 
-let msg ppf () = Caml.Format.fprintf ppf "using `function` is recommended%!"
+let msg ppf () = Caml.Format.fprintf ppf "Using `function` is recommended%!"
 
 let report filename ~loc =
   let module M = struct
