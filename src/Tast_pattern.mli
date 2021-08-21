@@ -108,7 +108,7 @@ val texp_match
 
 val texp_try
   :  (expression, 'a, 'b) t
-  -> (value case list, 'b, 'c) t
+  -> (case_val list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
 val texp_record
