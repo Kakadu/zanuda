@@ -4,10 +4,12 @@ open Zanuda_core
 open Utils
 
 let is_camel_case s = String.(lowercase s <> s)
+let lint_id = "camel_cased_types"
 
 let describe_itself () =
   describe_as_clippy_json
-    "camel_cased_types"
+    lint_id
+    ~impl:LINT.Untyped
     ~docs:
       {|
 ### What it does

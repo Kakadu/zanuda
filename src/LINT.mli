@@ -15,6 +15,10 @@ type level =
   | Deny
   | Deprecated
 
+type impl =
+  | Typed
+  | Untyped
+
 module type GENERAL = sig
   type input
 

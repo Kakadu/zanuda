@@ -8,6 +8,7 @@ let lint_id = "no_docs_parsetree"
 let describe_itself () =
   describe_as_clippy_json
     lint_id
+    ~impl:LINT.Untyped
     ~docs:
       {|
 ### What it does

@@ -3,9 +3,12 @@ open Caml.Format
 open Zanuda_core
 open Utils
 
+let lint_id = "use_guard_instead_of_if"
+
 let describe_itself () =
   describe_as_clippy_json
-    "use_guard_instead_of_if"
+    lint_id
+    ~impl:LINT.Untyped
     ~docs:
       {|
 ### What it does

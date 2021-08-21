@@ -79,7 +79,17 @@ let string_of_level : LINT.level -> string = function
   | Deprecated -> "deprecated"
 ;;
 
-let describe_as_clippy_json ?(group = LINT.Correctness) ?(level = LINT.Deny) id ~docs
+let string_of_impl = function
+  | LINT.Typed -> "typed"
+  | _ -> "untyped"
+;;
+
+let describe_as_clippy_json
+    ?(group = LINT.Correctness)
+    ?(level = LINT.Deny)
+    ?(impl = LINT.Typed)
+    id
+    ~docs
     : Yojson.Safe.t
   =
   (* List if clippy lints https://github.com/rust-lang/rust-clippy/blob/gh-pages/master/lints.json *)
@@ -87,6 +97,7 @@ let describe_as_clippy_json ?(group = LINT.Correctness) ?(level = LINT.Deny) id 
     [ "id", `String id
     ; "group", `String (string_of_group group)
     ; "level", `String (string_of_level level)
+    ; "impl", `String (string_of_impl impl)
     ; "docs", `String docs
     ; ( "applicability"
       , `Assoc

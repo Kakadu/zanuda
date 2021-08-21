@@ -8,6 +8,7 @@ let lint_id = "no_toplevel_eval"
 let describe_itself () =
   describe_as_clippy_json
     lint_id
+    ~impl:LINT.Untyped
     ~docs:
       {|
 ### What it does
