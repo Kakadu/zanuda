@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <!--
+  Zanuda lints presenting page, based on Clippy's ones.
+-->
+<!--
 Welcome to a Clippy's lint list, at least the source code of it. If you are
 interested in contributing to this website checkout `util/gh-pages/index.html`
 inside the rust-clippy repository.
@@ -11,7 +14,7 @@ Otherwise, have a great day =^.^=
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <title>Clippy Lints</title>
+    <title>Zanuda Lints</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/styles/github.min.css"/>
@@ -283,6 +286,22 @@ Otherwise, have a great day =^.^=
                     <div class="col-md-6 form-inline">
                         <div class="form-group form-group-lg">
                             <p class="h4">
+                                Lint implementations
+                                <!--
+                                <a href="https://github.com/rust-lang/rust-clippy/#clippy">(?)</a>
+                                -->
+                            </p>
+                            <div class="checkbox" ng-repeat="(impl, enabled) in impls">
+                                <label class="text-capitalize">
+                                    <input type="checkbox" ng-model="impls[impl]" />
+                                    {{impl}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 form-inline">
+                        <div class="form-group form-group-lg">
+                            <p class="h4">
                                 Lint groups
                                 <a href="https://github.com/rust-lang/rust-clippy/#clippy">(?)</a>
                             </p>
@@ -310,7 +329,7 @@ Otherwise, have a great day =^.^=
                 </div>
             </div>
             <!-- The order of the filters should be from most likely to remove a lint to least likely to improve performance. -->
-            <article class="panel panel-default" id="{{lint.id}}" ng-repeat="lint in data | filter:bySearch | filter:byGroups | filter:byLevels">
+            <article class="panel panel-default" id="{{lint.id}}" ng-repeat="lint in data | filter:bySearch | filter:byGroups | filter:byLevels | filter:byImpls">
                 <header class="panel-heading" ng-click="open[lint.id] = !open[lint.id]">
                     <h2 class="panel-title">
                         <div class="panel-title-name">
@@ -320,6 +339,7 @@ Otherwise, have a great day =^.^=
 
                         <div class="panel-title-addons">
                             <span class="label label-lint-group label-default label-group-{{lint.group}}">{{lint.group}}</span>
+                            <span class="label label-lint-impl label-default label-lint-impl-{{lint.impl}}">{{lint.impl}}</span>
 
                             <span class="label label-lint-level label-lint-level-{{lint.level}}">{{lint.level}}</span>
 
@@ -437,6 +457,12 @@ Otherwise, have a great day =^.^=
             $scope.levels = LEVEL_FILTERS_DEFAULT;
             $scope.byLevels = function (lint) {
                 return $scope.levels[lint.level];
+            };
+
+            var IMPL_FILTERS_DEFAULT = {typed: true, untyped: true};
+            $scope.impls = IMPL_FILTERS_DEFAULT;
+            $scope.byImpls = function (lint) {
+                return $scope.impls[lint.impl];
             };
 
             var GROUPS_FILTER_DEFAULT = {
