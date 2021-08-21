@@ -45,6 +45,8 @@ module Packed = struct
   let parse (T (t, f)) loc x = parse t loc x f
 end
 
+let as__ (T f1) = T (fun ctx loc x k -> k x |> f1 ctx loc x)
+
 let __ =
   T
     (fun ctx _loc x k ->
@@ -194,6 +196,16 @@ let ( >>| ) t f = map t ~f
 let map0 (T func) ~f = T (fun ctx loc x k -> func ctx loc x (k f))
 let map1 (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a -> k (f a)))
 let map2 (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a b -> k (f a b)))
+let map3 (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a b c -> k (f a b c)))
+
+let map4 (T func) ~f =
+  T (fun ctx loc x k -> func ctx loc x (fun a b c d -> k (f a b c d)))
+;;
+
+let map5 (T func) ~f =
+  T (fun ctx loc x k -> func ctx loc x (fun a b c d e -> k (f a b c d e)))
+;;
+
 let map0' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (k (f loc)))
 let map1' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a -> k (f loc a)))
 let map2' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a b -> k (f loc a b)))
@@ -210,6 +222,26 @@ let pack3 t = map t ~f:(fun f x y z -> f (x, y, z))
 
 (* end of copy-paste from https://github.com/ocaml-ppx/ppxlib/blob/0.22.2/src/ast_pattern.ml *)
 (* TODO: deal with licencing issues *)
+
+let lident (T fident) =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Longident.Lident id ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fident ctx loc id
+      | _ -> fail loc (sprintf "lident"))
+;;
+
+let path_pident (T fident) =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Path.Pident id ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fident ctx loc id
+      | _ -> fail loc (sprintf "path_pident"))
+;;
 
 let path xs =
   let rec helper ps ctx loc x k =
@@ -396,5 +428,54 @@ include struct
           ctx.matched <- ctx.matched + 1;
           k |> fexpr ctx loc e |> fcases ctx loc cases
         | _ -> fail loc "texp_try")
+  ;;
+
+  let texp_record (T fext) (T ffields) =
+    T
+      (fun ctx loc e k ->
+        match e.exp_desc with
+        | Texp_record { fields; extended_expression; _ } ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fext ctx loc extended_expression |> ffields ctx loc fields
+        | _ -> fail loc "texp_record")
+  ;;
+
+  let texp_field (T fexpr) (T fdesc) =
+    T
+      (fun ctx loc e k ->
+        match e.exp_desc with
+        | Texp_field (e, _, desc) ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fexpr ctx loc e |> fdesc ctx loc desc
+        | _ -> fail loc "texp_field")
+  ;;
+
+  let label_desc (T fname) =
+    T
+      (fun ctx loc e k ->
+        match e with
+        | { Types.lbl_name; _ } ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fname ctx loc lbl_name)
+  ;;
+
+  let rld_kept =
+    T
+      (fun ctx loc e k ->
+        match e with
+        | Kept _ ->
+          ctx.matched <- ctx.matched + 1;
+          k
+        | _ -> fail loc "rld_kept")
+  ;;
+
+  let rld_overriden (T flident) (T fexpr) =
+    T
+      (fun ctx loc e k ->
+        match e with
+        | Overridden ({ txt = lident }, e) ->
+          ctx.matched <- ctx.matched + 1;
+          k |> flident ctx loc lident |> fexpr ctx loc e
+        | _ -> fail loc "rld_overriden")
   ;;
 end

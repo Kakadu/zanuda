@@ -12,6 +12,8 @@ module Packed : sig
 end
 with type ('a, 'b, 'c) pattern := ('a, 'b, 'c) t
 
+val as__ : ('a, 'b, 'c) t -> ('a, 'a -> 'b, 'c) t
+
 (** Pattern that captures its input. *)
 val __ : ('a, 'a -> 'b, 'b) t
 
@@ -23,13 +25,35 @@ val nil : ('a list, 'b, 'b) t
 val ( ^:: ) : ('a, 'b, 'c) t -> ('a list, 'c, 'd) t -> ('a list, 'b, 'd) t
 val none : ('a option, 'b, 'b) t
 val some : ('a, 'b, 'c) t -> ('a option, 'b, 'c) t
+val pair : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
+val ( ** ) : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
 val ( ||| ) : ('a, 'b, 'c) t -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
 val loc : ('a, 'b, 'c) t -> ('a Location.loc, 'b, 'c) t
+val ( >>| ) : ('a, 'b, 'c) t -> ('d -> 'b) -> ('a, 'd, 'c) t
+val map1 : ('a, 'b -> 'c, 'd) t -> f:('b -> 'e) -> ('a, 'e -> 'c, 'd) t
+val map2 : ('a, 'b -> 'c -> 'd, 'e) t -> f:('b -> 'c -> 'f) -> ('a, 'f -> 'd, 'e) t
+
+val map3
+  :  ('a, 'b -> 'c -> 'd -> 'e, 'f) t
+  -> f:('b -> 'c -> 'd -> 'g)
+  -> ('a, 'g -> 'e, 'f) t
+
+val map4
+  :  ('a, 'b -> 'c -> 'd -> 'e -> 'f, 'g) t
+  -> f:('b -> 'c -> 'd -> 'e -> 'h)
+  -> ('a, 'h -> 'f, 'g) t
+
+val map5
+  :  ('a, 'b -> 'c -> 'd -> 'e -> 'f -> 'g, 'h) t
+  -> f:('b -> 'c -> 'd -> 'e -> 'f -> 'i)
+  -> ('a, 'i -> 'g, 'h) t
 
 open Typedtree
 
 val int : int -> (int, 'a, 'a) t
+val lident : (string, 'a, 'b) t -> (Longident.t, 'a, 'b) t
 val path : string list -> (Path.t, 'a, 'a) t
+val path_pident : (Ident.t, 'a, 'b) t -> (Path.t, 'a, 'b) t
 val eint : (int, 'a, 'b) t -> (expression, 'a, 'b) t
 
 [%%if ocaml_version < (4, 11, 0)]
@@ -86,3 +110,21 @@ val texp_try
   :  (expression, 'a, 'b) t
   -> (value case list, 'b, 'c) t
   -> (expression, 'a, 'c) t
+
+val texp_record
+  :  (expression option, 'a, 'b) t
+  -> ((Types.label_description * record_label_definition) array, 'b, 'c) t
+  -> (expression, 'a, 'c) t
+
+val texp_field
+  :  (expression, 'a, 'b) t
+  -> (Types.label_description, 'b, 'c) t
+  -> (expression, 'a, 'c) t
+
+val label_desc : (string, 'a, 'b) t -> (Types.label_description, 'a, 'b) t
+val rld_kept : (record_label_definition, 'a, 'a) t
+
+val rld_overriden
+  :  (Longident.t, 'a, 'b) t
+  -> (expression, 'b, 'c) t
+  -> (record_label_definition, 'a, 'c) t

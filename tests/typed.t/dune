@@ -1,7 +1,7 @@
 (library
  (name testlib1)
  (wrapped false)
- (modules list_len Parsetree Failwith Function ExcTryWithWildcard)
+ (modules list_len Parsetree Failwith Function ExcTryWithWildcard Record1)
  (modules_without_implementation parsetree))
 
 (executable

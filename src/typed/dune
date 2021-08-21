@@ -1,4 +1,4 @@
 (library
  (name TypedLints)
  (libraries zanuda_core Tast_pattern)
- (modules ListLength Failwith ExcTryWithWildcard ProposeFunction))
+ (modules ListLength Failwith ExcTryWithWildcard Record1 ProposeFunction))

@@ -19,6 +19,7 @@ let typed_linters =
   ; (module ListLength : LINT.TYPED)
   ; (module ProposeFunction : LINT.TYPED)
   ; (module ExcTryWithWildcard : LINT.TYPED)
+  ; (module Record1 : LINT.TYPED)
     (* * *********************** *)
   ]
 ;;
