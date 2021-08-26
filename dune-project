@@ -26,5 +26,5 @@
   yojson
   ppxlib
   sexplib
-  (ppx_inline_test :with-test)
+  ppx_inline_test
   base))
