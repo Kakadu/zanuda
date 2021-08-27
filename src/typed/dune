@@ -8,4 +8,5 @@
   Record1
   ProposeFunction
   ListFusion
+  IfBool
   Ignore))

@@ -59,6 +59,7 @@ val lident : (string, 'a, 'b) t -> (Longident.t, 'a, 'b) t
 val path : string list -> (Path.t, 'a, 'a) t
 val path_pident : (Ident.t, 'a, 'b) t -> (Path.t, 'a, 'b) t
 val eint : (int, 'a, 'b) t -> (expression, 'a, 'b) t
+val ebool : (expression, bool -> 'a, 'a) t
 
 [%%if ocaml_version < (4, 11, 0)]
 
@@ -98,6 +99,11 @@ val texp_apply2
   -> (expression, 'c, 'd) t
   -> (expression, 'a, 'd) t
 
+val texp_apply_nolabelled
+  :  (expression, 'a, 'b) t
+  -> (expression list, 'b, 'c) t
+  -> (expression, 'a, 'c) t
+
 val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t
 
 val case
@@ -110,6 +116,12 @@ val texp_match
   :  (expression, 'a, 'b) t
   -> (case_comp list, 'b, 'c) t
   -> (expression, 'a, 'c) t
+
+val texp_ite
+  :  (expression, 'a, 'b) t
+  -> (expression, 'b, 'c) t
+  -> (expression option, 'c, 'd) t
+  -> (expression, 'a, 'd) t
 
 val texp_try
   :  (expression, 'a, 'b) t

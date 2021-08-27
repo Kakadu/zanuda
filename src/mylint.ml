@@ -22,6 +22,7 @@ let typed_linters =
   ; (module Record1 : LINT.TYPED)
   ; (module Ignore : LINT.TYPED)
   ; (module ListFusion : LINT.TYPED)
+  ; (module IfBool : LINT.TYPED)
     (* * *********************** *)
   ]
 ;;

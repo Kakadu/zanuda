@@ -311,6 +311,19 @@ include struct
         | _ -> fail loc (sprintf "eint"))
   ;;
 
+  let ebool =
+    T
+      (fun ctx loc x k ->
+        match x.exp_desc with
+        | Texp_construct ({ txt = Lident "true" }, _, []) ->
+          ctx.matched <- ctx.matched + 1;
+          k true
+        | Texp_construct ({ txt = Lident "false" }, _, []) ->
+          ctx.matched <- ctx.matched + 1;
+          k false
+        | _ -> fail loc (sprintf "ebool"))
+  ;;
+
   let tpat_var (T fname) =
     T
       (fun ctx loc x k ->
@@ -358,6 +371,26 @@ include struct
         | Texp_apply (f, args) ->
           ctx.matched <- ctx.matched + 1;
           k |> f0 ctx loc f |> args0 ctx loc args
+        | _ -> fail loc "texp_apply")
+  ;;
+
+  let texp_apply_nolabelled (T f0) (T args0) =
+    let exception EarlyExit in
+    T
+      (fun ctx loc x k ->
+        match x.exp_desc with
+        | Texp_apply (f, args) ->
+          ctx.matched <- ctx.matched + 1;
+          let k = f0 ctx loc f k in
+          (try
+             let args =
+               List.map args ~f:(function
+                   | _, None -> raise EarlyExit
+                   | _, Some x -> x)
+             in
+             args0 ctx loc args k
+           with
+          | EarlyExit -> fail loc "texp_apply: None maong the arguments ")
         | _ -> fail loc "texp_apply")
   ;;
 
@@ -418,6 +451,16 @@ include struct
           ctx.matched <- ctx.matched + 1;
           k |> fexpr ctx loc e |> fcases ctx loc cases
         | _ -> fail loc "texp_match")
+  ;;
+
+  let texp_ite (T pred) (T fthen) (T felse) =
+    T
+      (fun ctx loc e k ->
+        match e.exp_desc with
+        | Texp_ifthenelse (p, thenb, elseb) ->
+          ctx.matched <- ctx.matched + 1;
+          k |> pred ctx loc p |> fthen ctx loc thenb |> felse ctx loc elseb
+        | _ -> fail loc "texp_ite")
   ;;
 
   let texp_try (T fexpr) (T fcases) =

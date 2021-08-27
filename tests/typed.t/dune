@@ -10,6 +10,7 @@
   ExcTryWithWildcard
   Record1
   ListFusion
+  IfBool
   Ignore)
  (modules_without_implementation parsetree))
 

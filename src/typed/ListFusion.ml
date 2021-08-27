@@ -74,13 +74,9 @@ let run _ fallback =
       texp_ident (path [ "List"; "concat" ])
       ||| texp_ident (path [ "Stdlib"; "List"; "concat" ])
     in
-    texp_apply
-      list_map
-      ((nolabel ** drop) ^:: (nolabel ** some (texp_apply list_map drop)) ^:: nil)
+    texp_apply_nolabelled list_map (drop ^:: texp_apply list_map drop ^:: nil)
     |> map0 ~f:MapMap
-    ||| (texp_apply
-           list_filter
-           ((nolabel ** drop) ^:: (nolabel ** some (texp_apply list_map drop)) ^:: nil)
+    ||| (texp_apply_nolabelled list_filter (drop ^:: texp_apply list_map drop ^:: nil)
         |> map0 ~f:FilterMap)
     ||| (texp_apply list_concat ((nolabel ** some (texp_apply list_map drop)) ^:: nil)
         |> map0 ~f:ConcatMap)
