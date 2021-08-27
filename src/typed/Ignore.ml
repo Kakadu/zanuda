@@ -59,6 +59,7 @@ let report filename ~loc e =
 let run _ fallback =
   let pat =
     let open Tast_pattern in
+    (* TODO: check that 'asdf |> ignore' is reported properly *)
     texp_apply
       (texp_ident (path [ "Stdlib"; "ignore" ]) ||| texp_ident (path [ "Base"; "ignore" ]))
       ((nolabel ** some __) ^:: nil)

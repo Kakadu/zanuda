@@ -21,6 +21,7 @@ let typed_linters =
   ; (module ExcTryWithWildcard : LINT.TYPED)
   ; (module Record1 : LINT.TYPED)
   ; (module Ignore : LINT.TYPED)
+  ; (module ListFusion : LINT.TYPED)
     (* * *********************** *)
   ]
 ;;

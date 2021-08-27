@@ -9,6 +9,7 @@
   Function
   ExcTryWithWildcard
   Record1
+  ListFusion
   Ignore)
  (modules_without_implementation parsetree))
 
