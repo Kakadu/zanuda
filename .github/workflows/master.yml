@@ -87,7 +87,8 @@ jobs:
         with:
           personal_token: ${{ secrets.PERSONAL_TOKEN }}
           publish_dir: _build/_lintinfo
-          external_repository: Kakadu/fp2021-ci-reports
+          external_repository: Kakadu/kakadu.github.io
+          destination_dir: zanuda
           publish_branch: master
           keep_files: true
           enable_jekyll: true

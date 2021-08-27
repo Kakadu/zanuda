@@ -15,7 +15,7 @@ let describe_itself () =
     ~level
     ~docs:
       {|
-### What it does+
+### What it does
 
 Checks funny uses of if-then-else expresssion, like 'if true ...', 'if ... then false', etc.
 
