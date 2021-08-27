@@ -20,6 +20,7 @@ let typed_linters =
   ; (module ProposeFunction : LINT.TYPED)
   ; (module ExcTryWithWildcard : LINT.TYPED)
   ; (module Record1 : LINT.TYPED)
+  ; (module Ignore : LINT.TYPED)
     (* * *********************** *)
   ]
 ;;

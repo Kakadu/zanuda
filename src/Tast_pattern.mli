@@ -72,6 +72,7 @@ type comp_pat = computation pattern_desc pattern_data
 
 [%%endif]
 
+val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
 val tpat_exception : (value_pat, 'a, 'b) t -> (comp_pat, 'a, 'b) t
 val tpat_any : (value_pat, 'a, 'a) t
