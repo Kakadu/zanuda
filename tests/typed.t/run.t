@@ -89,6 +89,21 @@ $ dune describe
   6 |   Base.ignore (List.map string_of_int xs)
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Unsafe ingore. It's recommended to rewrite it as 'let (_: string list) = List.map string_of_int xs'
+  File "IfBool.ml", line 2, characters 2-23:
+  2 |   if true then 1 else 2
+        ^^^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Executing 'if true' smells bad
+  
+  File "IfBool.ml", line 4, characters 14-39:
+  4 | let __ f x  = if f x then true else f x
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Executing 'if ... then true' smells bad
+  
+  File "IfBool.ml", line 5, characters 14-40:
+  5 | let __ f x  = if f x then f x else false
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Executing 'if ... then .. else false' smells bad
+  
   File "Function.ml", line 1, characters 23-56:
   1 | let should_give_a_lint x = match x with [] -> 1 | _ -> 2
                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
