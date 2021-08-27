@@ -129,5 +129,17 @@
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
     }
+  },
+  {
+    "id": "if_bool",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs":
+      "\n### What it does+\n\nChecks funny uses of if-then-else expresssion, like 'if true ...', 'if ... then false', etc.\n\n",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
   }
 ]
