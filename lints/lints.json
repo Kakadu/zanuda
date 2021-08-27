@@ -118,5 +118,16 @@
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
     }
+  },
+  {
+    "id": "list_fusion",
+    "group": "perf",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "\n### What it does\n\n#### Explanation\n\n",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
   }
 ]
