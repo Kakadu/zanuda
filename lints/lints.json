@@ -124,7 +124,8 @@
     "group": "perf",
     "level": "warn",
     "impl": "typed",
-    "docs": "\n### What it does\n\n#### Explanation\n\n",
+    "docs":
+      "\n### What it does\n\nPerforms List fusion (a.k.a. deforestation) for OCaml lists.\n\n#### Explanation\n\nWhen you performing bunch of list operations, for example `List.map f (List.map g ...)` they has a performance problem:\nthe intermediate lists that are created glut a lot of memory. It's recommended to rewrite the code using 'free thorems'.\nSee the original paper [P.Wadler \"Deforestation: transforming programs to eliminate trees\" (1990)](https://homepages.inf.ed.ac.uk/wadler/topics/deforestation.html) for more details.\n",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -137,6 +138,18 @@
     "impl": "typed",
     "docs":
       "\n### What it does\n\nChecks funny uses of if-then-else expresssion, like 'if true ...', 'if ... then false', etc.\n\n",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "use_match_instead_of_equality",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "typed",
+    "docs":
+      "\n### What it does\nFor most algebraic datatypes it's better to use pattern matching then equality `(=)`. This lint reports that for\nstandard lists, options and bools.\n\nAdopted from camelot's lint list.\n  ",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
