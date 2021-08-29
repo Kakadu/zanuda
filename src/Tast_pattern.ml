@@ -354,14 +354,24 @@ include struct
         | _ -> fail loc "tpat_any")
   ;;
 
-  let texp_ident (T path0) =
+  let texp_ident (T fpath) =
     T
       (fun ctx loc x k ->
         match x.exp_desc with
         | Texp_ident (path, _, _) ->
           ctx.matched <- ctx.matched + 1;
-          path0 ctx loc path k
+          fpath ctx loc path k
         | _ -> fail loc "texp_ident")
+  ;;
+
+  let texp_ident_typ (T fpath) (T ftyp) =
+    T
+      (fun ctx loc x k ->
+        match x.exp_desc with
+        | Texp_ident (path, _, typ) ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fpath ctx loc path |> ftyp ctx loc typ.Types.val_type
+        | _ -> fail loc "texp_ident_typ")
   ;;
 
   let texp_apply (T f0) (T args0) =
@@ -520,5 +530,40 @@ include struct
           ctx.matched <- ctx.matched + 1;
           k |> flident ctx loc lident |> fexpr ctx loc e
         | _ -> fail loc "rld_overriden")
+  ;;
+
+  (*   let hack0 (T path0) =
+    T
+      (fun ctx loc x k ->
+        match x.Types.val_type.Types.desc with
+        | Tconstr (path, [], _) ->
+          ctx.matched <- ctx.matched + 1;
+          path0 ctx loc path k
+        | _ -> fail loc "hack0")
+  ;;
+
+  let hack1 ?(on_vd = drop) (T path0) =
+    T
+      (fun ctx loc x k ->
+        match x.exp_desc with
+        | Texp_ident (path, _, vd) ->
+          ctx.matched <- ctx.matched + 1;
+          let (T fvd) = on_vd in
+          k |> path0 ctx loc path |> fvd ctx loc vd
+        | _ -> fail loc "texp_ident")
+  ;;
+
+  let __ path = hack1 __ path *)
+
+  let rec typ_constr (T fpath) (T fargs) =
+    let rec helper ctx loc x k =
+      match x.Types.desc with
+      | Tconstr (path, args, _) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fpath ctx loc path |> fargs ctx loc args
+      | Tlink arg -> helper ctx loc arg k
+      | _ -> fail loc "typ_constr"
+    in
+    T helper
   ;;
 end

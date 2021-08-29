@@ -11,6 +11,7 @@
   Record1
   ListFusion
   IfBool
+  Equality
   Ignore)
  (modules_without_implementation parsetree))
 

@@ -83,6 +83,11 @@ val tpat_exception : (value_pat, 'a, 'b) t -> (comp_pat, 'a, 'b) t
 val tpat_any : (value_pat, 'a, 'a) t
 val texp_ident : (Path.t, 'a, 'b) t -> (expression, 'a, 'b) t
 
+val texp_ident_typ
+  :  (Path.t, 'a, 'b) t
+  -> (Types.type_expr, 'b, 'c) t
+  -> (expression, 'a, 'c) t
+
 val texp_apply
   :  (expression, 'a, 'b) t
   -> ((Asttypes.arg_label * expression option) list, 'b, 'c) t
@@ -145,3 +150,8 @@ val rld_overriden
   :  (Longident.t, 'a, 'b) t
   -> (expression, 'b, 'c) t
   -> (record_label_definition, 'a, 'c) t
+
+val typ_constr
+  :  (Path.t, 'a, 'b) t
+  -> (Types.type_expr list, 'b, 'c) t
+  -> (Types.type_expr, 'a, 'c) t
