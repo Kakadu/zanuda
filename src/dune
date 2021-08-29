@@ -14,11 +14,11 @@
 
 (library
  (name zanuda_core)
- (modules Utils LINT Config CollectedLints PerDictionary)
+ (modules Utils MyUntype LINT Config CollectedLints PerDictionary)
  (modules_without_implementation LINT)
  (libraries ppxlib sexplib yojson)
  (preprocess
-  (pps ppx_sexp_conv ppx_inline_test))
+  (pps ppx_optcomp ppx_sexp_conv ppx_inline_test))
  (inline_tests))
 
 (executable

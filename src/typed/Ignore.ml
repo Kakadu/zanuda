@@ -27,7 +27,7 @@ Let's look at expression 'ignore (f x)'. If in the future the function 'f' will 
 
 let msg ppf e0 =
   let open Parsetree in
-  let e = Untypeast.untype_expression e0 in
+  let e = MyUntype.untype_expression e0 in
   let si =
     let open Ast_helper in
     Format.asprintf
