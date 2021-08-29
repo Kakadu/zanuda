@@ -7,6 +7,7 @@ type input = Tast_iterator.iterator
 let lint_id = "if_bool"
 let group = LINT.Style
 let level = LINT.Warn
+let lint_source = LINT.FPCourse
 
 let describe_itself () =
   describe_as_clippy_json

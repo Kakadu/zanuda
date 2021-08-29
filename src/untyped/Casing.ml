@@ -5,6 +5,7 @@ open Utils
 
 let is_camel_case s = String.(lowercase s <> s)
 let lint_id = "camel_cased_types"
+let lint_source = LINT.FPCourse
 
 let describe_itself () =
   describe_as_clippy_json

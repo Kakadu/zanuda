@@ -4,6 +4,7 @@ open Zanuda_core
 open Utils
 
 let lint_id = "no_docs_parsetree"
+let lint_source = LINT.FPCourse
 
 let describe_itself () =
   describe_as_clippy_json

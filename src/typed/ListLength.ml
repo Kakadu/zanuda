@@ -5,6 +5,7 @@ open Zanuda_core.Utils
 type input = Tast_iterator.iterator
 
 let lint_id = "list_length_comparisons"
+let lint_source = LINT.FPCourse
 
 let describe_itself () =
   describe_as_clippy_json
@@ -86,12 +87,5 @@ let run _ fallback =
           (fun _list_to_be_measured ->
             CollectedLints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc));
         fallback.expr self expr)
-      (* ; structure =
-        (fun self stru ->
-          (*           if String.is_substring
-               (List.hd_exn stru.str_items).str_loc.loc_start.pos_fname
-               ~substring:"exec"
-          then Printtyped.implementation Format.std_formatter stru; *)
-          fallback.structure self stru) *)
   }
 ;;

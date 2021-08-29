@@ -7,6 +7,7 @@ type input = Tast_iterator.iterator
 let lint_id = "exc_error_swallowing"
 let group = LINT.Suspicious
 let level = LINT.Deny
+let lint_source = LINT.FPCourse
 
 let describe_itself () =
   describe_as_clippy_json

@@ -7,6 +7,7 @@ type input = Tast_iterator.iterator
 let lint_id = "wrong_ignoring"
 let group = LINT.Suspicious
 let level = LINT.Allow
+let lint_source = LINT.FPCourse
 
 let describe_itself () =
   describe_as_clippy_json

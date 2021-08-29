@@ -7,17 +7,24 @@ type input = Tast_iterator.iterator
 let lint_id = "list_fusion"
 let group = LINT.Perf
 let level = LINT.Warn
+let lint_source = LINT.FPCourse
 
 let describe_itself () =
   describe_as_clippy_json
     lint_id
     ~group
     ~level
-    ~docs:{|
+    ~docs:
+      {|
 ### What it does
+
+Performs List fusion (a.k.a. deforestation) for OCaml lists.
 
 #### Explanation
 
+When you performing bunch of list operations, for example `List.map f (List.map g ...)` they has a performance problem:
+the intermediate lists that are created glut a lot of memory. It's recommended to rewrite the code using 'free thorems'.
+See the original paper [P.Wadler "Deforestation: transforming programs to eliminate trees" (1990)](https://homepages.inf.ed.ac.uk/wadler/topics/deforestation.html) for more details.
 |}
 ;;
 

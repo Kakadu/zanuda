@@ -1,6 +1,6 @@
 (library
  (name TypedLints)
- (libraries zanuda_core Tast_pattern)
+ (libraries zanuda_core Tast_pattern ppx_show.runtime)
  (modules
   ListLength
   Failwith
@@ -9,4 +9,5 @@
   ProposeFunction
   ListFusion
   IfBool
+  Equality
   Ignore))

@@ -19,9 +19,17 @@ type impl =
   | Typed
   | Untyped
 
+type lint_source =
+  | Camelot
+  | Clippy
+  | FPCourse
+  | Other
+
 module type GENERAL = sig
   type input
 
+  val lint_id : string
+  val lint_source : lint_source
   val run : Compile_common.info -> input -> input
 end
 
@@ -48,5 +56,4 @@ module type REPORTER = sig
 
   (* val md : Format.formatter -> unit -> unit *)
   val rdjsonl : Format.formatter -> unit -> unit
-  (* val golint : Format.formatter -> unit -> unit *)
 end
