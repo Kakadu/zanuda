@@ -26,3 +26,5 @@ $ dune build testlib2.cmxa
   3 |   | Abs of string * exprA
         ^^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Constructor 'Abs' has no documentation attribute
+  $ dune build @lint -p testsuite3 --force
+# no screaming yet but should be

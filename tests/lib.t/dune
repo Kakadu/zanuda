@@ -27,10 +27,10 @@
     -ws
     %{workspace_root}))))
 
-(executable
- (name exec1)
- (modules exec1)
- (libraries testsuite2)
+(library
+ (name dollar)
+ (modules dollar)
+ (package testsuite3)
  (lint
   (action
    (run
