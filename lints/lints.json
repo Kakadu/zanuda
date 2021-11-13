@@ -12,6 +12,18 @@
     }
   },
   {
+    "id": "camel_extra_dollar",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "untyped",
+    "docs":
+      "\n### What it does\nThe `@@` operator is used for writing less parentheses in expression. Code like `f (g (h x))` could be rewritten as\n`f @@ g (h x)`. But is some cases it is not required, like `print_int @@ 1`.\nSome of these cases are reported by this lint.\n\n  ",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "camel_cased_types",
     "group": "correctness",
     "level": "deny",
