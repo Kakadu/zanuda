@@ -27,43 +27,6 @@ open Ast_iterator
 
 let msg ppf name = fprintf ppf "Type name `%s` should be in snake case" name
 
-(*
-    Option.iter !Location.input_lexbuf ~f:Lexing.flush_input;
-    Location.input_name := cut_build_dir filename;
-    let loc =
-      let open Location in
-      { loc with
-        loc_start = { loc.loc_start with pos_fname = !input_name }
-      ; loc_end = { loc.loc_end with pos_fname = !input_name }
-      }
-    in
-    (*     let () =
-      let open Location in
-      printfn
-        "loc = { ghost=%b, start = { fname=%S, lnum=%d, cnum=%d }, end = { fname = %s, \
-         lnum = %d, cnum=%d } }"
-        loc.loc_ghost
-        loc.loc_start.pos_fname
-        loc.loc_start.pos_lnum
-        loc.loc_start.pos_cnum
-        loc.loc_end.pos_fname
-        loc.loc_end.pos_lnum
-        loc.loc_end.pos_cnum
-    in *)
-    if Config.Options.verbose ()
-    then printf "Location.input_name = %s\n%!" !Location.input_name;
-    let main = Location.mkloc (fun ppf -> msg ppf typ_name) loc in
-    let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
-    Location.print_report ppf r
-    *)
-(*
-  let report_md ~loc ~filename name ppf =
-    fprintf ppf "* %a\n%!" msg name;
-    fprintf ppf "  ```\n%!";
-    fprintf ppf "  @[%a@]%!" (fun ppf () -> report_txt ~filename name ~loc ppf) ();
-    fprintf ppf "  ```\n%!"
-  ;; *)
-
 let report ~loc ~filename typ_name =
   let module M = struct
     let txt ppf () = Report.txt ~loc ~filename ppf msg typ_name

@@ -7,7 +7,7 @@ release:
 	dune build --profile release
 
 watch:
-	dune build -w
+	dune test -w
 
 test:
 	dune build && dune test
