@@ -6,6 +6,7 @@ open Utils
 let untyped_linters =
   let open UntypedLints in
   [ (module GuardInsteadOfIf : LINT.UNTYPED)
+  ; (module Dollar : LINT.UNTYPED)
   ; (module Casing : LINT.UNTYPED)
   ; (module ParsetreeHasDocs : LINT.UNTYPED)
   ; (module ToplevelEval : LINT.UNTYPED)

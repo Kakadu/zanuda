@@ -76,10 +76,13 @@ let run _ fallback =
     case =
       (fun self case ->
         match case.pc_rhs.pexp_desc with
-        | Pexp_ifthenelse (_, _, _) ->
+        | Pexp_ifthenelse (cond, th, el) ->
           let loc = case.pc_rhs.pexp_loc in
           let filename = loc.Location.loc_start.Lexing.pos_fname in
-          CollectedLints.add ~loc (report ~filename ~loc)
+          CollectedLints.add ~loc (report ~filename ~loc);
+          self.expr self cond;
+          self.expr self th;
+          Option.iter ~f:(self.expr self) el
         | _ -> fallback.case self case)
   }
 ;;

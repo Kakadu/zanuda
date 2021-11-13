@@ -27,4 +27,9 @@ $ dune build testlib2.cmxa
         ^^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Constructor 'Abs' has no documentation attribute
   $ dune build @lint -p testsuite3 --force
+      mylinter alias lint
+  File "dollar.ml", line 3, characters 2-21:
+  3 |   pp @@ { field = 1 };;
+        ^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Extranous `@@`.
 # no screaming yet but should be
