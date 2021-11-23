@@ -1,8 +1,8 @@
 (library
  (name test_Parsetree)
  (wrapped false)
- (modules Parsetree)
- (modules_without_implementation))
+ (modules Parser Parsetree)
+ (modules_without_implementation Parsetree))
 
 (cram
  (deps %{bin:mylinter.exe}))
