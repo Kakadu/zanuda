@@ -83,7 +83,7 @@ let parse_args () =
   let open Caml in
   Arg.parse
     [ "-o", Arg.String set_out_file, "Set Markdown output file"
-    ; "-dir", Arg.String set_in_dir, ""
+    ; "-dir", Arg.String set_in_dir, "Set root directory of dune project"
     ; "-ogolint", Arg.String set_out_golint, "Set output file in golint format"
     ; "-ordjsonl", Arg.String set_out_rdjsonl, "Set output file in rdjsonl format"
     ; "-ws", Arg.String set_workspace, "Set dune workspace root"
@@ -96,5 +96,6 @@ let parse_args () =
     ; "-v", Arg.Unit set_verbose, "More verbose output"
     ]
     set_in_file
-    "usage"
+    "Calling [mylinter FILES] runs untyped checks on specified files. Use [-dir PATH] \
+     switch to check dune-based project"
 ;;

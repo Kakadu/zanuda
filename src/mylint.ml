@@ -92,7 +92,7 @@ let process_cmti_typedtree filename typedtree =
   with_info filename (fun info -> typed_on_signature info typedtree)
 ;;
 
-let load_file filename =
+let process_untyped filename =
   Clflags.error_style := Some Misc.Error_style.Contextual;
   Clflags.include_dirs := Config.includes () @ Clflags.include_dirs.contents;
   let with_info f =
@@ -119,9 +119,15 @@ let load_file filename =
     in
     let process_signature info =
       let parsetree = Compile_common.parse_intf info in
-      untyped_on_signature info parsetree;
-      let typedtree = Compile_common.typecheck_intf info parsetree in
-      typed_on_signature info typedtree
+      untyped_on_signature info parsetree
+      (* let typedtree =
+        try Compile_common.typecheck_intf info parsetree with
+        | Env.Error err ->
+          Format.eprintf "%a\n%!" Env.report_error err;
+          Format.eprintf "%s\n%!" info.Compile_common.source_file;
+          exit 1
+      in
+      typed_on_signature info typedtree *)
     in
     with_info (fun info ->
         if String.is_suffix info.source_file ~suffix:".ml"
@@ -161,11 +167,11 @@ let () =
         ~finally:(fun () -> Caml.close_out ch);
       Caml.exit 0
     | File file ->
-      load_file file;
+      process_untyped file;
       CollectedLints.report ()
     | Dir path ->
       PerDictionary.analyze_dir
-        load_file
+        process_untyped
         process_cmt_typedtree
         process_cmti_typedtree
         path;
