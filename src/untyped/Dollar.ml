@@ -34,6 +34,7 @@ let report ~loc ~filename info =
     let rdjsonl ppf () =
       Report.rdjsonl
         ~loc
+        ~code:lint_id
         ppf
         ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
         msg

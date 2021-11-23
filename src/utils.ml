@@ -55,8 +55,9 @@ module Report = struct
     Location.print_report ppf r
   ;;
 
-  let rdjsonl ~loc ~filename ppf msg msg_arg =
-    RDJsonl.pp ppf ~filename ~line:loc.Location.loc_start.pos_lnum msg msg_arg
+  let rdjsonl ~loc ~filename ~code ppf msg msg_arg =
+    let code = "https://kakadu.github.io/zanuda/", code in
+    RDJsonl.pp ppf ~filename ~line:loc.Location.loc_start.pos_lnum ~code msg msg_arg
   ;;
 end
 

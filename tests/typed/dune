@@ -1,4 +1,3 @@
 (executable
  (name exec1)
- (modules exec1)
- (libraries testlib1))
+ (modules exec1))
