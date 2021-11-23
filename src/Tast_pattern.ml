@@ -250,6 +250,7 @@ let path xs =
       (* printf "\t\tCompare names %s and %s:  %b\n%!" l r ans; *)
       ans
     in
+    (* Format.printf "path = %a\n%!" Path.print x; *)
     match x, ps with
     | Path.Pident id, [ id0 ] ->
       if cmp_names (Ident.name id) id0
@@ -357,6 +358,9 @@ include struct
   let texp_ident (T fpath) =
     T
       (fun ctx loc x k ->
+        let __ _ =
+          Format.printf "%a\n%!" (Printast.expression 0) (Untypeast.(untype_expression) x)
+        in
         match x.exp_desc with
         | Texp_ident (path, _, _) ->
           ctx.matched <- ctx.matched + 1;
@@ -367,6 +371,12 @@ include struct
   let texp_ident_typ (T fpath) (T ftyp) =
     T
       (fun ctx loc x k ->
+        let __ _ =
+          Format.printf
+            "texp_ident_typ %a\n%!"
+            (Printast.expression 0)
+            (Untypeast.(untype_expression) x)
+        in
         match x.exp_desc with
         | Texp_ident (path, _, typ) ->
           ctx.matched <- ctx.matched + 1;
@@ -557,6 +567,7 @@ include struct
 
   let rec typ_constr (T fpath) (T fargs) =
     let rec helper ctx loc x k =
+      (* Format.printf "typ = %a\n%!" Printtyp.type_expr x; *)
       match x.Types.desc with
       | Tconstr (path, args, _) ->
         ctx.matched <- ctx.matched + 1;

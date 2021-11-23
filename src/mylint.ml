@@ -17,6 +17,7 @@ let typed_linters =
   let open TypedLints in
   [ (* * *********************** *)
     (module Failwith : LINT.TYPED)
+  ; (module Hashtables : LINT.TYPED)
   ; (module ListLength : LINT.TYPED)
   ; (module ProposeFunction : LINT.TYPED)
   ; (module ExcTryWithWildcard : LINT.TYPED)
@@ -78,7 +79,8 @@ let with_info filename f =
 ;;
 
 let process_cmt_typedtree filename typedtree =
-  (* if Config.Options.verbose () then printfn "Analyzing cmt: %s" filename; *)
+  (* if Config.verbose () then printfn "Analyzing cmt: %s" filename; *)
+  (* Format.printf "%a\n%!" Printtyped.implementation typedtree; *)
   with_info filename (fun info -> typed_on_structure info typedtree)
 ;;
 

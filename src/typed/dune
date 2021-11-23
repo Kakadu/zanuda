@@ -10,4 +10,5 @@
   ListFusion
   IfBool
   Equality
+  Hashtables
   Ignore))
