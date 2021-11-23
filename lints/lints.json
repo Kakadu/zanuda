@@ -72,6 +72,18 @@
     }
   },
   {
+    "id": "mutable_hashtables",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "typed",
+    "docs":
+      "\n### What it does\nUsing mutable data structures for teaching purposes is usually discouraged. You\n     should try to use standart tree-like maps. If you really want to use hashing\n     consider Hash-Array Mapped Tries (HAMT)\n\n\n##### TODO\nWrite down cases when mutation is really required.\n",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "list_length_comparisons",
     "group": "correctness",
     "level": "deny",
