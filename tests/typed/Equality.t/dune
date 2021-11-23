@@ -1,0 +1,4 @@
+(library
+ (name test_Equality)
+ (wrapped false)
+ (modules Equality))

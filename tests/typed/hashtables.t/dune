@@ -1,0 +1,5 @@
+(library
+ (name test_hashtables)
+ (wrapped false)
+ (libraries base)
+ (modules Hashtables))

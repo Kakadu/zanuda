@@ -1,0 +1,7 @@
+(library
+ (name test_ifbool)
+ (wrapped false)
+ (modules ifBool))
+
+(cram
+ (deps %{bin:mylinter.exe}))

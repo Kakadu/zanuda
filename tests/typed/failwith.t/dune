@@ -1,0 +1,4 @@
+(library
+ (name test_failwith)
+ (wrapped false)
+ (modules failwith))
