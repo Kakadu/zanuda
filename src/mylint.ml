@@ -26,6 +26,7 @@ let typed_linters =
   ; (module ListFusion : LINT.TYPED)
   ; (module IfBool : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
+  ; (module StringConcat : LINT.TYPED)
     (* * *********************** *)
   ]
 ;;
@@ -80,7 +81,7 @@ let with_info filename f =
 
 let process_cmt_typedtree filename typedtree =
   (* if Config.verbose () then printfn "Analyzing cmt: %s" filename; *)
-  (* Format.printf "%a\n%!" Printtyped.implementation typedtree; *)
+  (* Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree; *)
   with_info filename (fun info -> typed_on_structure info typedtree)
 ;;
 
@@ -89,6 +90,7 @@ let process_cmti_typedtree filename typedtree =
   then (
     let () = printfn "Analyzing cmti: %s" filename in
     printfn "%a" Printtyped.interface typedtree); *)
+  Format.printf "Typedtree MLI:\n%a\n%!" Printtyped.interface typedtree;
   with_info filename (fun info -> typed_on_signature info typedtree)
 ;;
 

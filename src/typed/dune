@@ -11,4 +11,5 @@
   IfBool
   Equality
   Hashtables
+  StringConcat
   Ignore))
