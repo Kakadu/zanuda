@@ -1,0 +1,17 @@
+(env
+ (dev
+  (flags
+   (:standard -w -3-9-32-33-39 -warn-error -26-27))))
+
+(executable
+ (name demo)
+ (package ts_demo)
+ (public_name demo)
+ (libraries base ppx_protocol_conv_xmlm xmlm)
+ (preprocessor_deps
+  (file a.ts))
+ (preprocess
+  (pps ppx_inline_test ppx_protocol_conv ppx_blob)))
+
+;(cram
+; (deps ./demo.exe))
