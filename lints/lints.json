@@ -60,6 +60,18 @@
     }
   },
   {
+    "id": "var_should_not_be_used",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "untyped",
+    "docs":
+      "\n### What it does\nReport identifier starting with '_' and used later\n\n### Why is this bad?\nOCaml compiler has a tendency to report warning 26 about unused variables. Usually this warning could be supressed by adding '_' in the beginning of identifier to make it look like wildcard variable. But if that identifier is used later it contradicts the purpose of adding undescore in the beginnning.\n  ",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "exc_failwith",
     "group": "suspicious",
     "level": "allow",
