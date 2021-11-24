@@ -32,4 +32,13 @@ $ dune build testlib2.cmxa
   3 |   pp @@ { field = 1 };;
         ^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Extranous `@@`.
-# no screaming yet but should be
+  $ dune build @lint -p testsuite4 --force
+      mylinter alias lint
+  File "startingWildcard.ml", line 1, characters 8-12:
+  1 | let rec _foo x = _foo x
+              ^^^^
+  Alert zanuda-linter: Identifier `_foo` used somewhere else but supposed to be unused.
+  File "startingWildcard.ml", line 2, characters 4-8:
+  2 | let _boo x = 1+x
+          ^^^^
+  Alert zanuda-linter: Identifier `_boo` used somewhere else but supposed to be unused.

@@ -10,6 +10,7 @@ let untyped_linters =
   ; (module Casing : LINT.UNTYPED)
   ; (module ParsetreeHasDocs : LINT.UNTYPED)
   ; (module ToplevelEval : LINT.UNTYPED)
+  ; (module VarShouldNotBeUsed : LINT.UNTYPED)
   ]
 ;;
 

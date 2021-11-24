@@ -41,5 +41,19 @@
     -ws
     %{workspace_root}))))
 
+(library
+ (name test_startingWildcard)
+ (modules startingWildcard)
+ (package testsuite4)
+ (lint
+  (action
+   (run
+    mylinter
+    %{input-file}
+    -ordjsonl
+    /tmp/out.rdjsonl
+    -ws
+    %{workspace_root}))))
+
 (cram
  (deps %{workspace_root}/utils/mylint.exe))
