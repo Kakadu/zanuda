@@ -9,7 +9,18 @@ module ErrorFormat = struct
   ;;
 end
 
-module RDJsonl = struct
+type rdjsonl_code = string * string option
+
+module RDJsonl : sig
+  val pp
+    :  formatter
+    -> filename:string
+    -> line:int
+    -> ?code:rdjsonl_code
+    -> (formatter -> 'a -> unit)
+    -> 'a
+    -> unit
+end = struct
   let pp ppf ~filename ~line ?code msg x =
     let location file ~line ~col =
       `Assoc
@@ -26,7 +37,8 @@ module RDJsonl = struct
         @
         match code with
         | None -> []
-        | Some (desc, url) ->
+        | Some (desc, None) -> [ "code", `Assoc [ "value", `String desc ] ]
+        | Some (desc, Some url) ->
           [ "code", `Assoc [ "value", `String desc; "url", `String url ] ])
     in
     fprintf ppf "%s\n%!" (Yojson.to_string j)
@@ -56,7 +68,7 @@ module Report = struct
   ;;
 
   let rdjsonl ~loc ~filename ~code ppf msg msg_arg =
-    let code = "https://kakadu.github.io/zanuda/", code in
+    let code = code, Some "https://kakadu.github.io/zanuda/" in
     RDJsonl.pp ppf ~filename ~line:loc.Location.loc_start.pos_lnum ~code msg msg_arg
   ;;
 end
