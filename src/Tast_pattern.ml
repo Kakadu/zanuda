@@ -19,9 +19,10 @@ module Ast_pattern0 = struct
   (* TODO: deal with licencing issues *)
 end
 
-open Format
 open Location
 open Base
+module Format = Caml.Format
+open Format
 open Ast_pattern0
 
 type ('a, 'b, 'c) t = ('a, 'b, 'c) Ast_pattern0.t

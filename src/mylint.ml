@@ -90,7 +90,7 @@ let process_cmti_typedtree filename typedtree =
   then (
     let () = printfn "Analyzing cmti: %s" filename in
     printfn "%a" Printtyped.interface typedtree); *)
-  Format.printf "Typedtree MLI:\n%a\n%!" Printtyped.interface typedtree;
+  (* Format.printf "Typedtree MLI:\n%a\n%!" Printtyped.interface typedtree; *)
   with_info filename (fun info -> typed_on_signature info typedtree)
 ;;
 
