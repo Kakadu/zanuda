@@ -1,4 +1,10 @@
 (library
  (name UntypedLints)
  (libraries zanuda_core)
- (modules Casing GuardInsteadOfIf ParsetreeHasDocs ToplevelEval Dollar))
+ (modules
+  Casing
+  GuardInsteadOfIf
+  ParsetreeHasDocs
+  ToplevelEval
+  Dollar
+  VarShouldNotBeUsed))
