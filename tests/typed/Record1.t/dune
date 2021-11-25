@@ -2,3 +2,6 @@
  (name test_Record1)
  (wrapped false)
  (modules Record1))
+
+(cram
+ (deps %{bin:mylinter}))

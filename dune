@@ -1,1 +1,9 @@
 (dirs :standard \ ts)
+
+; (env
+;  (_
+;   (binaries
+;    (src/mylinter.exe as make_dune_release_deterministic))))
+
+(cram
+ (deps %{bin:mylinter}))

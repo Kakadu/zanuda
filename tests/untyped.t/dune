@@ -2,44 +2,47 @@
  (name testlib1)
  (package testsuite1)
  (modules Lib)
- (lint
-  (action
-   (run
-    mylinter
-    %{input-file}
-    -ordjsonl
-    /tmp/out.rdjsonl
-    -ws
-    %{workspace_root}))))
+ ;  (lint
+ ;   (action
+ ;    (run
+ ;     mylinter
+ ;     %{input-file}
+ ;     -ordjsonl
+ ;     /tmp/out.rdjsonl
+ ;     -ws
+ ;     %{workspace_root})))
+ )
 
 (library
  (name testlib2)
  (package testsuite2)
  (modules Lib2 ast)
  (modules_without_implementation ast)
- (lint
-  (action
-   (run
-    mylinter
-    %{input-file}
-    -ordjsonl
-    /tmp/out.rdjsonl
-    -ws
-    %{workspace_root}))))
+ ;  (lint
+ ;   (action
+ ;    (run
+ ;     mylinter
+ ;     %{input-file}
+ ;     -ordjsonl
+ ;     /tmp/out.rdjsonl
+ ;     -ws
+ ;     %{workspace_root})))
+ )
 
 (library
  (name dollar)
  (modules dollar)
  (package testsuite3)
- (lint
-  (action
-   (run
-    mylinter
-    %{input-file}
-    -ordjsonl
-    /tmp/out.rdjsonl
-    -ws
-    %{workspace_root}))))
+ ;  (lint
+ ;   (action
+ ;    (run
+ ;     mylinter
+ ;     %{input-file}
+ ;     -ordjsonl
+ ;     /tmp/out.rdjsonl
+ ;     -ws
+ ;     %{workspace_root})))
+ )
 
 (library
  (name test_startingWildcard)
@@ -57,3 +60,6 @@
 
 (cram
  (deps %{workspace_root}/utils/mylint.exe))
+
+(cram
+ (deps %{bin:mylinter}))

@@ -1,3 +1,6 @@
 (executable
  (name exec1)
  (modules exec1))
+
+(cram
+ (deps %{bin:mylinter}))

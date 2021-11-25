@@ -3,15 +3,19 @@
  (package testsuite2)
  (modules A)
  (libraries testlib2)
- (lint
-  (action
-   (run
-    mylinter
-    %{input-file}
-    -ordjsonl
-    /tmp/out.rdjsonl
-    -ws
-    %{workspace_root}))))
+ ;  (lint
+ ;   (action
+ ;    (run
+ ;     mylinter
+ ;     %{input-file}
+ ;     -ordjsonl
+ ;     /tmp/out.rdjsonl
+ ;     -ws
+ ;     %{workspace_root})))
+ )
+
+(cram
+ (deps %{bin:mylinter}))
 
 (cram
  (deps %{workspace_root}/utils/mylint.exe))
