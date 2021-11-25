@@ -1,5 +1,6 @@
 open Base
-open Caml.Format
+module Format = Caml.Format
+open Format
 open Zanuda_core
 open Utils
 
