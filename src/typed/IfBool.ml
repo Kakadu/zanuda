@@ -46,18 +46,27 @@ let report filename ~loc e =
 let run _ fallback =
   let pat =
     let open Tast_pattern in
-    texp_ite ebool drop drop
-    |> map1 ~f:(Format.asprintf "Executing 'if %b' smells bad")
-    ||| (texp_ite drop ebool drop
-        |> map1 ~f:(Format.asprintf "Executing 'if ... then %b' smells bad"))
-    ||| (texp_ite drop drop (some ebool)
-        |> map1 ~f:(Format.asprintf "Executing 'if ... then .. else %b' smells bad"))
+    let ite =
+      texp_ite ebool drop drop
+      |> map1 ~f:(Format.asprintf "Executing 'if %b' smells bad")
+      ||| (texp_ite drop ebool drop
+          |> map1 ~f:(Format.asprintf "Executing 'if ... then %b' smells bad"))
+      ||| (texp_ite drop drop (some ebool)
+          |> map1 ~f:(Format.asprintf "Executing 'if ... then .. else %b' smells bad"))
+    in
+    let ops =
+      texp_apply2 (texp_ident (path [ "Stdlib"; "&&" ])) ebool drop
+      ||| texp_apply2 (texp_ident (path [ "Stdlib"; "&&" ])) drop ebool
+      |> map1 ~f:(fun _ -> Format.asprintf "Conjunction with boolean smells smells bad")
+    in
+    ite ||| ops
   in
   let open Tast_iterator in
   { fallback with
     expr =
       (fun self expr ->
         let open Typedtree in
+        let __ _ = Format.eprintf "%a\n%!" MyPrinttyped.expr expr in
         let loc = expr.exp_loc in
         Tast_pattern.parse
           pat

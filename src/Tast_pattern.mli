@@ -81,6 +81,13 @@ val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
 val tpat_exception : (value_pat, 'a, 'b) t -> (comp_pat, 'a, 'b) t
 val tpat_any : (value_pat, 'a, 'a) t
+
+(** Trying to parse identifier with a given path. Beware that standard function
+  are locted implicitly in Stdlib module. For example
+
+    texp_ident (path [ "&&" ])  (* WRONG *)
+    texp_ident (path [ "Stdlib"; "&&" ])  (* CORRECT *)
+*)
 val texp_ident : (Path.t, 'a, 'b) t -> (expression, 'a, 'b) t
 
 val texp_ident_typ

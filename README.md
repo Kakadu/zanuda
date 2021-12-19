@@ -15,3 +15,15 @@ API: https://kakadu.github.io/mylinter/api/ is currently empty
 * [Ocp-lint paper](https://hal.inria.fr/hal-01352013/document)
 * Lexifi's dead [dead_code_analyzer](https://github.com/LexiFi/dead_code_analyzer)
 * [Camelot](https://github.com/upenn-cis1xx/camelot)
+
+
+
+##### Developing
+
+Running a single test:
+
+    dune build && dune build @ifbool --force
+
+Running all tests:
+
+    dune build && dune runtest --force
