@@ -173,7 +173,7 @@
     "level": "warn",
     "impl": "typed",
     "docs":
-      "\n### What it does\n\nChecks funny uses of if-then-else expresssion, like 'if true ...', 'if ... then false', etc.\n\n",
+      "\n### What it does?\n\nChecks funny uses of boolean expressions, for example\n* `if true ...`\n* `if ... then false`\n* `... && true`\n* etc.\n\n### Why it is important?\n\nThese unwise boolean expressions make code longer than it should be. For example, the expression `f x && false`\nis semantically equivalent to false unless `f x` performs any effect (mutation, IO, exceptions, etc.).\nThe general rule of thumb is not to depend of the order of evaluation of this conjucts.\n(The same idea as our functions should not depend on evaluation order of its' arguments.)\n",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
