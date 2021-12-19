@@ -202,5 +202,17 @@
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
     }
+  },
+  {
+    "id": "monad_laws_simplify",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "typed",
+    "docs":
+      "\n### What it does?\nWarns if monadic code could be simplified.\n\n### Monad laws\n  1) **return x >>= f === f x** for any  f and x\n  2) **m >>= retunr === m** for any monadic value m\n  3) **(m >>= g) >>= k  ===  m >>= fun x -> ((g x) >>= k)** for any monadic values m,g,k\n\n",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
   }
 ]
