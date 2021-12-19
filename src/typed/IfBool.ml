@@ -17,10 +17,20 @@ let describe_itself () =
     ~level
     ~docs:
       {|
-### What it does
+### What it does?
 
-Checks funny uses of if-then-else expresssion, like 'if true ...', 'if ... then false', etc.
+Checks funny uses of boolean expressions, for example
+* `if true ...`
+* `if ... then false`
+* `... && true`
+* etc.
 
+### Why it is important?
+
+These unwise boolean expressions make code longer than it should be. For example, the expression `f x && false`
+is semantically equivalent to false unless `f x` performs any effect (mutation, IO, exceptions, etc.).
+The general rule of thumb is not to depend of the order of evaluation of this conjucts.
+(The same idea as our functions should not depend on evaluation order of its' arguments.)
 |}
 ;;
 
