@@ -369,10 +369,18 @@ include struct
         | _ -> fail loc "texp_ident")
   ;;
 
+  let pident (T fstr) =
+    T
+      (fun ctx loc x k ->
+        match x with
+        | Path.Pident id -> fstr ctx loc (Ident.name id) k
+        | _ -> fail loc "pident")
+  ;;
+
   let texp_ident_typ (T fpath) (T ftyp) =
     T
       (fun ctx loc x k ->
-        let __ _ = Format.printf "texp_ident_typ %a\n%!" MyPrinttyped.expr x in
+        (* let __ _ = Format.printf "texp_ident_typ %a\n%!" MyPrinttyped.expr x in *)
         match x.exp_desc with
         | Texp_ident (path, _, typ) ->
           ctx.matched <- ctx.matched + 1;

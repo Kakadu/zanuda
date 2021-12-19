@@ -55,6 +55,7 @@ val map5
 open Typedtree
 
 val int : int -> (int, 'a, 'a) t
+val string : string -> (string, 'a, 'a) t
 val lident : (string, 'a, 'b) t -> (Longident.t, 'a, 'b) t
 val path : string list -> (Path.t, 'a, 'a) t
 val path_pident : (Ident.t, 'a, 'b) t -> (Path.t, 'a, 'b) t
@@ -82,6 +83,7 @@ val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
 val tpat_exception : (value_pat, 'a, 'b) t -> (comp_pat, 'a, 'b) t
 val tpat_any : (value_pat, 'a, 'a) t
 
+val pident : (string, 'a, 'b) t -> (Path.t, 'a, 'b) t
 (** Trying to parse identifier with a given path. Beware that standard function
   are locted implicitly in Stdlib module. For example
 

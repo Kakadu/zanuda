@@ -1,0 +1,7 @@
+(library
+ (name test_laws)
+ (wrapped false)
+ (modules laws))
+
+(cram
+ (deps %{bin:mylinter.exe}))

@@ -28,6 +28,7 @@ let typed_linters =
   ; (module IfBool : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
   ; (module StringConcat : LINT.TYPED)
+  ; (module MonadLaws : LINT.TYPED)
     (* * *********************** *)
   ]
 ;;
