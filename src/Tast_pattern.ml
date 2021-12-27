@@ -300,253 +300,249 @@ include struct
   ;;
 end
 
-include struct
-  open Typedtree
+open Typedtree
 
-  let eint (T f0) =
-    T
-      (fun ctx loc x k ->
-        match x.exp_desc with
-        | Texp_constant (Asttypes.Const_int n) ->
-          ctx.matched <- ctx.matched + 1;
-          f0 ctx loc n k
-        | _ -> fail loc (sprintf "eint"))
-  ;;
+let eint (T f0) =
+  T
+    (fun ctx loc x k ->
+      match x.exp_desc with
+      | Texp_constant (Asttypes.Const_int n) ->
+        ctx.matched <- ctx.matched + 1;
+        f0 ctx loc n k
+      | _ -> fail loc (sprintf "eint"))
+;;
 
-  let ebool =
-    T
-      (fun ctx loc x k ->
-        match x.exp_desc with
-        | Texp_construct ({ txt = Lident "true" }, _, []) ->
-          ctx.matched <- ctx.matched + 1;
-          k true
-        | Texp_construct ({ txt = Lident "false" }, _, []) ->
-          ctx.matched <- ctx.matched + 1;
-          k false
-        | _ -> fail loc (sprintf "ebool"))
-  ;;
+let ebool =
+  T
+    (fun ctx loc x k ->
+      match x.exp_desc with
+      | Texp_construct ({ txt = Lident "true" }, _, []) ->
+        ctx.matched <- ctx.matched + 1;
+        k true
+      | Texp_construct ({ txt = Lident "false" }, _, []) ->
+        ctx.matched <- ctx.matched + 1;
+        k false
+      | _ -> fail loc (sprintf "ebool"))
+;;
 
-  let tpat_var (T fname) =
-    T
-      (fun ctx loc x k ->
-        match x.pat_desc with
-        | Tpat_var (_, { txt }) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fname ctx loc txt
-        | _ -> fail loc "tpat_var")
-  ;;
+let tpat_var (T fname) =
+  T
+    (fun ctx loc x k ->
+      match x.pat_desc with
+      | Tpat_var (_, { txt }) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fname ctx loc txt
+      | _ -> fail loc "tpat_var")
+;;
 
-  let tpat_exception (T fpat) =
-    T
-      (fun ctx loc x k ->
-        match x.pat_desc with
-        | Tpat_exception exc ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fpat ctx loc exc
-        | _ -> fail loc "tpat_exception")
-  ;;
+let tpat_exception (T fpat) =
+  T
+    (fun ctx loc x k ->
+      match x.pat_desc with
+      | Tpat_exception exc ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fpat ctx loc exc
+      | _ -> fail loc "tpat_exception")
+;;
 
-  let tpat_any =
-    T
-      (fun ctx loc x k ->
-        match x.pat_desc with
-        | Tpat_any ->
-          ctx.matched <- ctx.matched + 1;
-          k
-        | _ -> fail loc "tpat_any")
-  ;;
+let tpat_any =
+  T
+    (fun ctx loc x k ->
+      match x.pat_desc with
+      | Tpat_any ->
+        ctx.matched <- ctx.matched + 1;
+        k
+      | _ -> fail loc "tpat_any")
+;;
 
-  let texp_ident (T fpath) =
-    T
-      (fun ctx loc x k ->
-        let __ _ =
-          Format.printf "%a\n%!" (Printast.expression 0) (Untypeast.(untype_expression) x)
-        in
-        match x.exp_desc with
-        | Texp_ident (path, _, _) ->
-          ctx.matched <- ctx.matched + 1;
-          fpath ctx loc path k
-        | _ -> fail loc "texp_ident")
-  ;;
+let texp_ident (T fpath) =
+  T
+    (fun ctx loc x k ->
+      let __ _ =
+        Format.printf "%a\n%!" (Printast.expression 0) (Untypeast.(untype_expression) x)
+      in
+      match x.exp_desc with
+      | Texp_ident (path, _, _) ->
+        ctx.matched <- ctx.matched + 1;
+        fpath ctx loc path k
+      | _ -> fail loc "texp_ident")
+;;
 
-  let pident (T fstr) =
-    T
-      (fun ctx loc x k ->
-        match x with
-        | Path.Pident id -> fstr ctx loc (Ident.name id) k
-        | _ -> fail loc "pident")
-  ;;
+let pident (T fstr) =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Path.Pident id -> fstr ctx loc (Ident.name id) k
+      | _ -> fail loc "pident")
+;;
 
-  let texp_ident_typ (T fpath) (T ftyp) =
-    T
-      (fun ctx loc x k ->
-        (* let __ _ = Format.printf "texp_ident_typ %a\n%!" MyPrinttyped.expr x in *)
-        match x.exp_desc with
-        | Texp_ident (path, _, typ) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fpath ctx loc path |> ftyp ctx loc typ.Types.val_type
-        | _ -> fail loc "texp_ident_typ")
-  ;;
+let texp_ident_typ (T fpath) (T ftyp) =
+  T
+    (fun ctx loc x k ->
+      (* let __ _ = Format.printf "texp_ident_typ %a\n%!" MyPrinttyped.expr x in *)
+      match x.exp_desc with
+      | Texp_ident (path, _, typ) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fpath ctx loc path |> ftyp ctx loc typ.Types.val_type
+      | _ -> fail loc "texp_ident_typ")
+;;
 
-  let texp_apply (T f0) (T args0) =
-    T
-      (fun ctx loc x k ->
-        match x.exp_desc with
-        | Texp_apply (f, args) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> f0 ctx loc f |> args0 ctx loc args
-        | _ -> fail loc "texp_apply")
-  ;;
+let texp_apply (T f0) (T args0) =
+  T
+    (fun ctx loc x k ->
+      match x.exp_desc with
+      | Texp_apply (f, args) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> f0 ctx loc f |> args0 ctx loc args
+      | _ -> fail loc "texp_apply")
+;;
 
-  let texp_apply_nolabelled (T f0) (T args0) =
-    let exception EarlyExit in
-    T
-      (fun ctx loc x k ->
-        match x.exp_desc with
-        | Texp_apply (f, args) ->
-          ctx.matched <- ctx.matched + 1;
-          let k = f0 ctx loc f k in
-          (try
-             let args =
-               List.map args ~f:(function
-                   | _, None -> raise EarlyExit
-                   | _, Some x -> x)
-             in
-             args0 ctx loc args k
-           with
-          | EarlyExit -> fail loc "texp_apply: None maong the arguments ")
-        | _ -> fail loc "texp_apply")
-  ;;
+let texp_apply_nolabelled (T f0) (T args0) =
+  let exception EarlyExit in
+  T
+    (fun ctx loc x k ->
+      match x.exp_desc with
+      | Texp_apply (f, args) ->
+        ctx.matched <- ctx.matched + 1;
+        let k = f0 ctx loc f k in
+        (try
+           let args =
+             List.map args ~f:(function
+                 | _, None -> raise EarlyExit
+                 | _, Some x -> x)
+           in
+           args0 ctx loc args k
+         with
+        | EarlyExit -> fail loc "texp_apply: None maong the arguments ")
+      | _ -> fail loc "texp_apply")
+;;
 
-  let nolabel =
-    T
-      (fun ctx loc x k ->
-        match x with
-        | Asttypes.Nolabel ->
-          ctx.matched <- ctx.matched + 1;
-          k
-        | _ -> fail loc "nolabel")
-  ;;
+let nolabel =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Asttypes.Nolabel ->
+        ctx.matched <- ctx.matched + 1;
+        k
+      | _ -> fail loc "nolabel")
+;;
 
-  let texp_apply1 f x = texp_apply f ((nolabel ** some x) ^:: nil)
+let texp_apply1 f x = texp_apply f ((nolabel ** some x) ^:: nil)
+let texp_apply2 f x y = texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
 
-  let texp_apply2 f x y =
-    texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
-  ;;
+[%%if ocaml_version < (4, 11, 2)]
 
-  [%%if ocaml_version < (4, 11, 2)]
+(* 4.10 *)
+type case_val = Typedtree.case
+type case_comp = Typedtree.case
+type value_pat = pattern
+type comp_pat = pattern
 
-  (* 4.10 *)
-  type case_val = Typedtree.case
-  type case_comp = Typedtree.case
-  type value_pat = pattern
-  type comp_pat = pattern
+[%%else]
 
-  [%%else]
+type case_val = value case
+type case_comp = computation case
+type value_pat = value pattern_desc pattern_data
+type comp_pat = computation pattern_desc pattern_data
 
-  type case_val = value case
-  type case_comp = computation case
-  type value_pat = value pattern_desc pattern_data
-  type comp_pat = computation pattern_desc pattern_data
+[%%endif]
 
-  [%%endif]
+let texp_function (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_function { cases } ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fcases ctx loc cases
+      | _ -> fail loc "texp_function")
+;;
 
-  let texp_function (T fcases) =
-    T
-      (fun ctx loc e k ->
-        match e.exp_desc with
-        | Texp_function { cases } ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fcases ctx loc cases
-        | _ -> fail loc "texp_function")
-  ;;
+let case (T pat) (T guard) (T rhs) =
+  T
+    (fun ctx loc { c_lhs; c_rhs; c_guard } k ->
+      k |> pat ctx loc c_lhs |> guard ctx loc c_guard |> rhs ctx loc c_rhs)
+;;
 
-  let case (T pat) (T guard) (T rhs) =
-    T
-      (fun ctx loc { c_lhs; c_rhs; c_guard } k ->
-        k |> pat ctx loc c_lhs |> guard ctx loc c_guard |> rhs ctx loc c_rhs)
-  ;;
+let texp_match (T fexpr) (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_match (e, cases, _) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fexpr ctx loc e |> fcases ctx loc cases
+      | _ -> fail loc "texp_match")
+;;
 
-  let texp_match (T fexpr) (T fcases) =
-    T
-      (fun ctx loc e k ->
-        match e.exp_desc with
-        | Texp_match (e, cases, _) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fexpr ctx loc e |> fcases ctx loc cases
-        | _ -> fail loc "texp_match")
-  ;;
+let texp_ite (T pred) (T fthen) (T felse) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_ifthenelse (p, thenb, elseb) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> pred ctx loc p |> fthen ctx loc thenb |> felse ctx loc elseb
+      | _ -> fail loc "texp_ite")
+;;
 
-  let texp_ite (T pred) (T fthen) (T felse) =
-    T
-      (fun ctx loc e k ->
-        match e.exp_desc with
-        | Texp_ifthenelse (p, thenb, elseb) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> pred ctx loc p |> fthen ctx loc thenb |> felse ctx loc elseb
-        | _ -> fail loc "texp_ite")
-  ;;
+let texp_try (T fexpr) (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_try (e, cases) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fexpr ctx loc e |> fcases ctx loc cases
+      | _ -> fail loc "texp_try")
+;;
 
-  let texp_try (T fexpr) (T fcases) =
-    T
-      (fun ctx loc e k ->
-        match e.exp_desc with
-        | Texp_try (e, cases) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fexpr ctx loc e |> fcases ctx loc cases
-        | _ -> fail loc "texp_try")
-  ;;
+let texp_record (T fext) (T ffields) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_record { fields; extended_expression; _ } ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fext ctx loc extended_expression |> ffields ctx loc fields
+      | _ -> fail loc "texp_record")
+;;
 
-  let texp_record (T fext) (T ffields) =
-    T
-      (fun ctx loc e k ->
-        match e.exp_desc with
-        | Texp_record { fields; extended_expression; _ } ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fext ctx loc extended_expression |> ffields ctx loc fields
-        | _ -> fail loc "texp_record")
-  ;;
+let texp_field (T fexpr) (T fdesc) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_field (e, _, desc) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fexpr ctx loc e |> fdesc ctx loc desc
+      | _ -> fail loc "texp_field")
+;;
 
-  let texp_field (T fexpr) (T fdesc) =
-    T
-      (fun ctx loc e k ->
-        match e.exp_desc with
-        | Texp_field (e, _, desc) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fexpr ctx loc e |> fdesc ctx loc desc
-        | _ -> fail loc "texp_field")
-  ;;
+let label_desc (T fname) =
+  T
+    (fun ctx loc e k ->
+      match e with
+      | { Types.lbl_name; _ } ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fname ctx loc lbl_name)
+;;
 
-  let label_desc (T fname) =
-    T
-      (fun ctx loc e k ->
-        match e with
-        | { Types.lbl_name; _ } ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fname ctx loc lbl_name)
-  ;;
+let rld_kept =
+  T
+    (fun ctx loc e k ->
+      match e with
+      | Kept _ ->
+        ctx.matched <- ctx.matched + 1;
+        k
+      | _ -> fail loc "rld_kept")
+;;
 
-  let rld_kept =
-    T
-      (fun ctx loc e k ->
-        match e with
-        | Kept _ ->
-          ctx.matched <- ctx.matched + 1;
-          k
-        | _ -> fail loc "rld_kept")
-  ;;
+let rld_overriden (T flident) (T fexpr) =
+  T
+    (fun ctx loc e k ->
+      match e with
+      | Overridden ({ txt = lident }, e) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> flident ctx loc lident |> fexpr ctx loc e
+      | _ -> fail loc "rld_overriden")
+;;
 
-  let rld_overriden (T flident) (T fexpr) =
-    T
-      (fun ctx loc e k ->
-        match e with
-        | Overridden ({ txt = lident }, e) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> flident ctx loc lident |> fexpr ctx loc e
-        | _ -> fail loc "rld_overriden")
-  ;;
-
-  (*   let hack0 (T path0) =
+(*   let hack0 (T path0) =
     T
       (fun ctx loc x k ->
         match x.Types.val_type.Types.desc with
@@ -569,28 +565,27 @@ include struct
 
   let __ path = hack1 __ path *)
 
-  let rec typ_constr (T fpath) (T fargs) =
-    let rec helper ctx loc x k =
-      (* Format.printf "typ = %a\n%!" Printtyp.type_expr x; *)
-      match x.Types.desc with
-      | Tconstr (path, args, _) ->
-        ctx.matched <- ctx.matched + 1;
-        k |> fpath ctx loc path |> fargs ctx loc args
-      | Tlink arg -> helper ctx loc arg k
-      | _ -> fail loc "typ_constr"
-    in
-    T helper
-  ;;
+let rec typ_constr (T fpath) (T fargs) =
+  let rec helper ctx loc x k =
+    (* Format.printf "typ = %a\n%!" Printtyp.type_expr x; *)
+    match x.Types.desc with
+    | Tconstr (path, args, _) ->
+      ctx.matched <- ctx.matched + 1;
+      k |> fpath ctx loc path |> fargs ctx loc args
+    | Tlink arg -> helper ctx loc arg k
+    | _ -> fail loc "typ_constr"
+  in
+  T helper
+;;
 
-  let rec typ_arrow (T l) (T r) =
-    let rec helper ctx loc x k =
-      (* Format.printf "typ = %a\n%!" Printtyp.type_expr x; *)
-      match x.Types.desc with
-      | Tarrow (_, tl, tr, _) ->
-        ctx.matched <- ctx.matched + 1;
-        k |> l ctx loc tl |> r ctx loc tr
-      | _ -> fail loc "typ_arrow"
-    in
-    T helper
-  ;;
-end
+let rec typ_arrow (T l) (T r) =
+  let rec helper ctx loc x k =
+    (* Format.printf "typ = %a\n%!" Printtyp.type_expr x; *)
+    match x.Types.desc with
+    | Tarrow (_, tl, tr, _) ->
+      ctx.matched <- ctx.matched + 1;
+      k |> l ctx loc tl |> r ctx loc tr
+    | _ -> fail loc "typ_arrow"
+  in
+  T helper
+;;
