@@ -13,4 +13,7 @@
   Hashtables
   StringConcat
   MonadLaws
-  Ignore))
+  Ignore)
+ (preprocess
+  (pps ppx_inline_test ppxlib.metaquot))
+ (inline_tests))

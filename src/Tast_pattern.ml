@@ -25,6 +25,13 @@ module Format = Caml.Format
 open Format
 open Ast_pattern0
 
+let debug_enabled = false
+
+let log fmt =
+  let open Format in
+  if debug_enabled then kasprintf (printf "%s\n%!") fmt else ifprintf std_formatter fmt
+;;
+
 type ('a, 'b, 'c) t = ('a, 'b, 'c) Ast_pattern0.t
 
 let save_context ctx = ctx.matched
@@ -46,14 +53,30 @@ module Packed = struct
   let parse (T (t, f)) loc x = parse t loc x f
 end
 
-let as__ (T f1) = T (fun ctx loc x k -> k x |> f1 ctx loc x)
-
-let __ =
+let __ : 'a 'b. ('a, 'a -> 'b, 'b) t =
   T
     (fun ctx _loc x k ->
       incr_matched ctx;
       k x)
 ;;
+
+let as__ : 'a 'b 'c. ('a, 'b, 'c) t -> ('a, 'a -> 'b, 'c) t =
+ fun (T f1) ->
+  T
+    (fun ctx loc x k ->
+      let k = f1 ctx loc x (k x) in
+      k)
+;;
+
+let pair (T f1) (T f2) =
+  T
+    (fun ctx loc (x1, x2) k ->
+      let k = f1 ctx loc x1 k in
+      let k = f2 ctx loc x2 k in
+      k)
+;;
+
+let ( ** ) = pair
 
 let __' =
   T
@@ -62,7 +85,7 @@ let __' =
       k { loc; txt = x })
 ;;
 
-let drop =
+let drop : 'a 'b. ('a, 'b, 'b) t =
   T
     (fun ctx _loc _ k ->
       incr_matched ctx;
@@ -112,6 +135,7 @@ let true_ =
 let nil =
   T
     (fun ctx loc x k ->
+      log "trying [] \n%!";
       match x with
       | [] ->
         ctx.matched <- ctx.matched + 1;
@@ -125,10 +149,15 @@ let ( ^:: ) (T f0) (T f1) =
       match x with
       | x0 :: x1 ->
         ctx.matched <- ctx.matched + 1;
+        (* Format.printf "trying elem of cons cell\n%!"; *)
         let k = f0 ctx loc x0 k in
+        (* Format.printf "trying tail of cons cell\n%!"; *)
         let k = f1 ctx loc x1 k in
+        (* Format.printf "trying  cons cell succeeded\n%!"; *)
         k
-      | _ -> fail loc "::")
+      | _ ->
+        (* Format.printf "failing elem of cons cell\n%!"; *)
+        fail loc "::")
 ;;
 
 let none =
@@ -151,16 +180,6 @@ let some (T f0) =
         k
       | _ -> fail loc "Some")
 ;;
-
-let pair (T f1) (T f2) =
-  T
-    (fun ctx loc (x1, x2) k ->
-      let k = f1 ctx loc x1 k in
-      let k = f2 ctx loc x2 k in
-      k)
-;;
-
-let ( ** ) = pair
 
 let triple (T f1) (T f2) (T f3) =
   T
@@ -210,6 +229,7 @@ let map5 (T func) ~f =
 let map0' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (k (f loc)))
 let map1' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a -> k (f loc a)))
 let map2' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a b -> k (f loc a b)))
+let map_result (T func) ~f = T (fun ctx loc x k -> f (func ctx loc x k))
 let alt_option some none = alt (map1 some ~f:(fun x -> Some x)) (map0 none ~f:None)
 
 let many (T f) =
@@ -302,14 +322,27 @@ end
 
 open Typedtree
 
-let eint (T f0) =
+let econst (T f0) =
   T
     (fun ctx loc x k ->
       match x.exp_desc with
-      | Texp_constant (Asttypes.Const_int n) ->
+      | Texp_constant n ->
         ctx.matched <- ctx.matched + 1;
         f0 ctx loc n k
-      | _ -> fail loc (sprintf "eint"))
+      | _ -> fail loc (sprintf "econst"))
+;;
+
+let eint (T f0) =
+  T
+    (fun ctx loc x k ->
+      (* let _ = log "<eint> %a\n%!" MyPrinttyped.expr x in *)
+      match x.exp_desc with
+      | Texp_constant (Asttypes.Const_int n) ->
+        ctx.matched <- ctx.matched + 1;
+        let ans = f0 ctx loc n k in
+        (* log "eint succeeded %a\n%!" MyPrinttyped.expr x; *)
+        ans
+      | _ -> fail loc "eint")
 ;;
 
 let ebool =
@@ -358,13 +391,13 @@ let tpat_any =
 let texp_ident (T fpath) =
   T
     (fun ctx loc x k ->
-      let __ _ =
-        Format.printf "%a\n%!" (Printast.expression 0) (Untypeast.(untype_expression) x)
-      in
+      let __ _ = log "texp_ident %a\n%!" MyPrinttyped.expr x in
       match x.exp_desc with
       | Texp_ident (path, _, _) ->
         ctx.matched <- ctx.matched + 1;
-        fpath ctx loc path k
+        let ans = fpath ctx loc path k in
+        log "texp_ident + %a\n%!" MyPrinttyped.expr x;
+        ans
       | _ -> fail loc "texp_ident")
 ;;
 
@@ -390,10 +423,13 @@ let texp_ident_typ (T fpath) (T ftyp) =
 let texp_apply (T f0) (T args0) =
   T
     (fun ctx loc x k ->
+      (* let __ _ = log "texp_apply %a\n%!" MyPrinttyped.expr x in *)
       match x.exp_desc with
       | Texp_apply (f, args) ->
         ctx.matched <- ctx.matched + 1;
-        k |> f0 ctx loc f |> args0 ctx loc args
+        let ans = k |> f0 ctx loc f |> args0 ctx loc args in
+        (* let _ = log "texp_apply + %a\n%!" MyPrinttyped.expr x in *)
+        ans
       | _ -> fail loc "texp_apply")
 ;;
 
@@ -413,7 +449,7 @@ let texp_apply_nolabelled (T f0) (T args0) =
            in
            args0 ctx loc args k
          with
-        | EarlyExit -> fail loc "texp_apply: None maong the arguments ")
+        | EarlyExit -> fail loc "texp_apply: None among the arguments ")
       | _ -> fail loc "texp_apply")
 ;;
 

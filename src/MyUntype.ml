@@ -5,3 +5,5 @@ include Untypeast
 let untype_expression = default_mapper.expr default_mapper
 
 [%%endif]
+
+let expr = untype_expression

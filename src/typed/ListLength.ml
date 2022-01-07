@@ -18,19 +18,30 @@ The function `Stdlib.List.length` evaluated length of standart OCaml linked list
 ;;
 
 let msg ppf () =
-  Caml.Format.fprintf ppf "Bad measurement of a list (with non-negative size)%!"
+  Caml.Format.fprintf ppf "Bad measurement of a list (with non-negative size)\n%!"
 ;;
 
-let report filename ~loc =
+let msg_long ppf (l, r) =
+  msg ppf ();
+  Caml.Format.fprintf
+    ppf
+    "Between '%a' and '%a'.%!"
+    Pprintast.expression
+    (MyUntype.expr l)
+    Pprintast.expression
+    (MyUntype.expr r)
+;;
+
+let report filename ~loc l r =
   let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg ()
+    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg_long (l, r)
 
     let rdjsonl ppf () =
       RDJsonl.pp
         ppf
         ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
         ~line:loc.loc_start.pos_lnum
-        msg
+        (fun _ () -> ())
         ()
     ;;
   end
@@ -38,54 +49,84 @@ let report filename ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let run _ fallback =
-  let pat =
+open Typedtree
+open Tast_pattern
+
+let pat_list_length () : (expression, 'a, 'a) Tast_pattern.t =
+  texp_ident (path [ "Stdlib"; "List"; "length" ])
+  ||| texp_ident (path [ "Stdlib!"; "List"; "length" ])
+  ||| texp_ident (path [ "Base"; "List"; "length" ])
+  ||| texp_ident (path [ "Base!"; "List"; "length" ])
+;;
+
+let make_pat_op : 'a. string -> (expression, 'a, 'a) t =
+ fun op ->
+  texp_ident (path [ "Stdlib"; op ])
+  ||| texp_ident (path [ "Stdlib!"; op ])
+  ||| texp_ident (path [ "Base!"; op ])
+  ||| texp_ident (path [ "Base"; op ])
+;;
+
+let pat
+    : ( Typedtree.expression, Typedtree.expression -> Typedtree.expression -> 'a, 'a )
+    Tast_pattern.t
+  =
+  let open Tast_pattern in
+  let ops = [ ">=", "<=", 0; "<=", ">=", 0; ">", "<", 0; "=", "=", 0 ] in
+  let single (op, dualop, n) =
     let open Tast_pattern in
-    let ops = [ ">=", "<=", 0; "<=", ">=", 0; ">", "<", 0; "=", "=", 0 ] in
-    let single (op, dualop, n) =
-      let open Tast_pattern in
-      let pat_list_length =
-        texp_ident (path [ "Stdlib"; "List"; "length" ])
-        ||| texp_ident (path [ "Stdlib!"; "List"; "length" ])
-        ||| texp_ident (path [ "Base"; "List"; "length" ])
-        ||| texp_ident (path [ "Base!"; "List"; "length" ])
-      in
-      (* TODO: understand difference between Stdlib and Stdlib! *)
-      let make_pat_op op =
-        texp_ident (path [ "Stdlib"; op ])
-        ||| texp_ident (path [ "Stdlib!"; op ])
-        ||| texp_ident (path [ "Base!"; op ])
-        ||| texp_ident (path [ "Base"; op ])
-      in
-      let pat_op = make_pat_op op in
-      let pat_op2 = make_pat_op dualop in
-      texp_apply2 pat_op (texp_apply1 pat_list_length __) (eint @@ int n)
-      ||| texp_apply2 pat_op2 (eint @@ int n) (texp_apply1 pat_list_length __)
+    (* TODO: understand difference between Stdlib and Stdlib! *)
+    let u () =
+      let f () = make_pat_op op in
+      let len () = as__ (texp_apply1 (pat_list_length ()) drop) in
+      texp_apply2 (f ()) (len ()) (as__ (eint (int n)))
     in
-    List.fold
-      ~init:(single @@ List.hd_exn ops)
-      (List.tl_exn ops)
-      ~f:(fun acc x -> acc ||| single x)
+    let v () =
+      let f () = make_pat_op dualop in
+      let len () = as__ (texp_apply1 (pat_list_length ()) drop) in
+      texp_apply2 (f ()) (as__ (eint (int n))) (len ())
+    in
+    u () ||| v ()
   in
+  List.fold_left
+    (List.tl_exn ops)
+    ~init:(single @@ List.hd_exn ops)
+    ~f:(fun acc x -> acc ||| single x)
+;;
+
+(* let%test _ =
+  Tast_pattern.parse
+    pat
+    Location.none
+    ~on_error:(fun _ -> true)
+    [%expr List.length xs = List.length ys]
+    (fun _ () -> true)
+;; *)
+
+let run _ fallback =
   let open Tast_iterator in
   { fallback with
     expr =
       (fun self expr ->
         let open Typedtree in
         let loc = expr.exp_loc in
-        (* if String.is_substring loc.loc_start.pos_fname ~substring:"exec"
-          then
-            Format.printf
-              "%a\n%!"
-              Pprintast.expression
-              Untypeast.(default_mapper.expr default_mapper expr); *)
         Tast_pattern.parse
           pat
           loc
-          ~on_error:(fun _desc -> ())
           expr
-          (fun _list_to_be_measured ->
-            CollectedLints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc));
-        fallback.expr self expr)
+          (fun e1 e2 () ->
+            let __ _ =
+              Format.printf
+                "FUCK '%a' and '%a'\n%!"
+                MyPrinttyped.expr
+                e1
+                MyPrinttyped.expr
+                e2
+            in
+            CollectedLints.add
+              ~loc
+              (report loc.Location.loc_start.Lexing.pos_fname ~loc e1 e2))
+          ~on_error:(fun _desc () -> fallback.expr self expr)
+          ())
   }
 ;;

@@ -33,6 +33,7 @@ val ( >>| ) : ('a, 'b, 'c) t -> ('d -> 'b) -> ('a, 'd, 'c) t
 
 (** Mapping results of applying pattern-combinator *)
 
+val map : ('a, 'b, 'c) t -> f:('d -> 'b) -> ('a, 'd, 'c) t
 val map0 : ('a, 'b, 'c) t -> f:'d -> ('a, 'd -> 'b, 'c) t
 val map1 : ('a, 'b -> 'c, 'd) t -> f:('b -> 'e) -> ('a, 'e -> 'c, 'd) t
 val map2 : ('a, 'b -> 'c -> 'd, 'e) t -> f:('b -> 'c -> 'f) -> ('a, 'f -> 'd, 'e) t
@@ -52,6 +53,8 @@ val map5
   -> f:('b -> 'c -> 'd -> 'e -> 'f -> 'i)
   -> ('a, 'i -> 'g, 'h) t
 
+val map_result : ('a, 'b, 'c) t -> f:('c -> 'd) -> ('a, 'b, 'd) t
+
 open Typedtree
 
 val int : int -> (int, 'a, 'a) t
@@ -61,6 +64,7 @@ val path : string list -> (Path.t, 'a, 'a) t
 val path_pident : (Ident.t, 'a, 'b) t -> (Path.t, 'a, 'b) t
 val eint : (int, 'a, 'b) t -> (expression, 'a, 'b) t
 val ebool : (expression, bool -> 'a, 'a) t
+val econst : (Asttypes.constant, 'a, 'b) t -> (expression, 'a, 'b) t
 
 [%%if ocaml_version < (4, 11, 0)]
 
@@ -82,8 +86,8 @@ val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
 val tpat_exception : (value_pat, 'a, 'b) t -> (comp_pat, 'a, 'b) t
 val tpat_any : (value_pat, 'a, 'a) t
-
 val pident : (string, 'a, 'b) t -> (Path.t, 'a, 'b) t
+
 (** Trying to parse identifier with a given path. Beware that standard function
   are locted implicitly in Stdlib module. For example
 
