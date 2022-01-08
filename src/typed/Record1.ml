@@ -2,6 +2,7 @@ open Base
 module Format = Caml.Format
 open Zanuda_core
 open Zanuda_core.Utils
+open Tast_pattern
 
 type input = Tast_iterator.iterator
 

@@ -1,0 +1,8 @@
+(library
+ (name Tast_pattern)
+ (modules Tast_pattern MyPrinttyped MyUntype)
+ (wrapped false)
+ (libraries ppxlib)
+ (preprocess
+  (pps ppx_optcomp ppx_inline_test))
+ (inline_tests))

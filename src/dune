@@ -4,26 +4,17 @@
    (:standard -w -3-9-32-33-39 -warn-error -26-27))))
 
 (library
- (name Tast_pattern)
- (modules Tast_pattern MyPrinttyped)
- (wrapped false)
- (libraries ppxlib)
- (preprocess
-  (pps ppx_optcomp ppx_inline_test))
- (inline_tests))
-
-(library
  (name zanuda_core)
  (modules
   Utils
-  MyUntype
+  ; MyUntype
   ;MyPrinttyped
   LINT
   Config
   CollectedLints
   PerDictionary)
  (modules_without_implementation LINT)
- (libraries ppxlib sexplib yojson)
+ (libraries ppxlib sexplib yojson Tast_pattern)
  (preprocess
   (pps ppx_optcomp ppx_sexp_conv ppx_inline_test))
  (inline_tests))

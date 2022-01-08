@@ -1,6 +1,7 @@
 open Base
 open Zanuda_core
 open Zanuda_core.Utils
+open Tast_pattern
 
 type input = Tast_iterator.iterator
 
