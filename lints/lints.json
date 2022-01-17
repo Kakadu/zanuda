@@ -89,7 +89,7 @@
     "level": "deny",
     "impl": "typed",
     "docs":
-      "\n### What it does\nUsing mutable data structures for teaching purposes is usually discouraged. You\n     should try to use standart tree-like maps. If you really want to use hashing\n     consider Hash-Array Mapped Tries (HAMT)\n\n\n##### TODO\nWrite down cases when mutation is really required.\n",
+      "\n### What it does\nUsing mutable data structures for teaching purposes is usually discouraged. Replace \\\nHashtables by standart tree-like maps or consider Hash-Array Mapped Tries (HAMT).\n\n##### How to fix?\nUse mutable `ref`erences and mutable structure fields only if it is really required. Usually, mutability is added for performance reasons. For example,\n\n  * [Effective generalization](https://okmij.org/ftp/ML/generalization.html) in OCaml type checher\n  * Functions, that count number of invocations and/or generate unique names.\n  * Implementing memoization or laziness\n",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
