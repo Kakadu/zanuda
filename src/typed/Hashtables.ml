@@ -63,8 +63,8 @@ let run _ fallback =
     let typ_hashtbl_base =
       typ_constr (path [ "Base"; "Hashtbl"; "t" ]) (drop ^:: drop ^:: nil)
     in
-    let typ_ref = typ_constr (path [ "Stdlib"; "t" ]) (drop ^:: drop ^:: nil) in
-    let typ_ref_base = typ_constr (path [ "Base"; "ref" ]) (drop ^:: drop ^:: nil) in
+    let typ_ref = typ_constr (path [ "Stdlib"; "ref" ]) (drop ^:: nil) in
+    let typ_ref_base = typ_constr (path [ "Base"; "ref" ]) (drop ^:: nil) in
     texp_ident_typ drop (typ_hashtbl ||| typ_hashtbl_base ||| typ_ref ||| typ_ref_base)
   in
   let pat_typ =

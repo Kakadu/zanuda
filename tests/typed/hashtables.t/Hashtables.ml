@@ -10,3 +10,10 @@ let f () =
 
 type _t1 = { xxx : int ref }
 type _t2 = { xxx : int Base.ref }
+
+let last_identity = ref 0
+
+let get_unique_identity_code () =
+  let code = !last_identity in
+  last_identity := code + 1;
+  code
