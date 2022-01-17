@@ -173,3 +173,5 @@ val typ_arrow
   :  (Types.type_expr, 'a, 'b) t
   -> (Types.type_expr, 'b, 'c) t
   -> (Types.type_expr, 'a, 'c) t
+
+val core_typ : (Types.type_expr, 'a, 'b) t -> (core_type, 'a, 'b) t

@@ -286,7 +286,7 @@ let path xs =
   T (helper (List.rev xs))
 ;;
 
-let rec path_of_list xs =
+let path_of_list xs =
   match xs with
   | [] -> failwith "Bad argument: path_of_list"
   | s :: tl ->
@@ -309,14 +309,7 @@ include struct
       Warnings.
         { loc_start = Lexing.dummy_pos; loc_end = Lexing.dummy_pos; loc_ghost = true }
     in
-    parse
-      (path names)
-      noloc
-      ~on_error:(fun _ ->
-        print_endline "some error";
-        false)
-      (path_of_list names)
-      true
+    parse (path names) noloc ~on_error:(fun _ -> false) (path_of_list names) true
   ;;
 end
 
@@ -600,6 +593,7 @@ let rld_overriden (T flident) (T fexpr) =
   ;;
 
   let __ path = hack1 __ path *)
+let rec core_typ (T ftexpr) = T (fun ctx loc x k -> ftexpr ctx loc x.ctyp_type k)
 
 let rec typ_constr (T fpath) (T fargs) =
   let rec helper ctx loc x k =
