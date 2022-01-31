@@ -1,5 +1,5 @@
 (env
- (dev
+ (_
   (flags
    (:standard -w -3-9-32-33-39 -warn-error -26-27))))
 
@@ -7,12 +7,11 @@
  (name zanuda_core)
  (modules
   Utils
-  ; MyUntype
-  ;MyPrinttyped
+  ;
   LINT
   Config
   CollectedLints
-  PerDictionary)
+  LoadDune)
  (modules_without_implementation LINT)
  (libraries ppxlib sexplib yojson Tast_pattern)
  (preprocess
@@ -20,9 +19,9 @@
  (inline_tests))
 
 (executable
- (name mylint)
+ (name main)
  (public_name mylinter)
- (modules mylint)
+ (modules main)
  (libraries
   base
   yojson

@@ -174,10 +174,10 @@ let () =
       process_untyped file;
       CollectedLints.report ()
     | Dir path ->
-      PerDictionary.analyze_dir
-        process_untyped
-        process_cmt_typedtree
-        process_cmti_typedtree
+      LoadDune.analyze_dir
+        ~untyped:process_untyped
+        ~cmt:process_cmt_typedtree
+        ~cmti:process_cmti_typedtree
         path;
       CollectedLints.report ()
   in

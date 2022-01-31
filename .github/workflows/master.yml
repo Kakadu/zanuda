@@ -71,8 +71,9 @@ jobs:
           keep_files: true
           destination_dir: api
 
+      - run: opam exec -- dune build @install --profile=release
       - name: Build linter descriptions...
-        run: mkdir -p _build/_lintinfo && opam exec -- dune exec -- src/mylint.exe -dump-lints _build/_lintinfo/lints.json
+        run: mkdir -p _build/_lintinfo && opam exec -- dune exec mylinter -- -dump-lints _build/_lintinfo/lints.json
 
       - name: Deploy linters' descriptions
         uses: peaceiris/actions-gh-pages@v3

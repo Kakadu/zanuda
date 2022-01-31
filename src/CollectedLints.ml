@@ -2,8 +2,6 @@ open Base
 open Caml.Format
 open Utils
 
-type t = string
-
 let found_Lints : (Location.t * (module LINT.REPORTER)) Queue.t = Queue.create ()
 let clear () = Queue.clear found_Lints
 let is_empty () = Queue.is_empty found_Lints
@@ -55,7 +53,6 @@ let report () =
   in
   Base.Exn.protect
     ~f:(fun () ->
-      (* Format.printf "Total lints found: %d\n%!" (Queue.length found_Lints); *)
       Queue.iter found_Lints ~f:(fun (_loc, ((module M : LINT.REPORTER) as m)) ->
           M.txt Caml.Format.std_formatter ();
           List.iter all_files ~f:(fun (f, ppf, _) -> f m ppf ())))

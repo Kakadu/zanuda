@@ -43,7 +43,7 @@ let fine_module { impl } =
   | _ -> true
 ;;
 
-let analyze_dir analyze_untyped analyze_cmt analyze_cmti path =
+let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti path =
   Unix.chdir path;
   let s =
     let ch = Unix.open_process_in "dune describe" in
