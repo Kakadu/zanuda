@@ -13,7 +13,8 @@
   Hashtables
   StringConcat
   MonadLaws
-  Ignore)
+  Ignore
+  FunctionEstimator)
  (preprocess
   (pps ppx_inline_test ppxlib.metaquot))
  (inline_tests))

@@ -1,0 +1,4 @@
+(library
+ (name test_functions_counting)
+ (wrapped false)
+ (libraries base))

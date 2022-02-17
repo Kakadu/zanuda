@@ -19,6 +19,7 @@ type t =
   ; mutable prefix_to_add : string option
   ; mutable extra_includes : string list
   ; mutable verbose : bool
+  ; mutable print_functions_count : bool
   }
 
 let opts =
@@ -31,6 +32,7 @@ let opts =
   ; prefix_to_add = None
   ; extra_includes = []
   ; verbose = false
+  ; print_functions_count = false
   }
 ;;
 
@@ -60,6 +62,9 @@ let out_rdjsonl () = opts.out_rdjsonl
 (* let set_dump_file s = opts.dump_file <- Some s *)
 let verbose () = opts.verbose
 let set_verbose () = opts.verbose <- true
+
+let set_print_functions_count () = opts.print_functions_count <- true
+let print_functions_count () = opts.print_functions_count
 
 let recover_filepath filepath =
   let filepath =
@@ -94,6 +99,7 @@ let parse_args () =
       , "Dump information about available linters to JSON" )
     ; "-I", Arg.String add_include, "Add extra include path for type checking"
     ; "-v", Arg.Unit set_verbose, "More verbose output"
+    ; "-count-fun", Arg.Unit set_print_functions_count, "Print function counts in files"
     ]
     set_in_file
     "Calling [mylinter FILES] runs untyped checks on specified files. Use [-dir PATH] \

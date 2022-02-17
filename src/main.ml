@@ -29,6 +29,7 @@ let typed_linters =
   ; (module Equality : LINT.TYPED)
   ; (module StringConcat : LINT.TYPED)
   ; (module MonadLaws : LINT.TYPED)
+  ; (module FunctionEstimator : LINT.TYPED)
     (* * *********************** *)
   ]
 ;;
@@ -179,7 +180,9 @@ let () =
         ~cmt:process_cmt_typedtree
         ~cmti:process_cmti_typedtree
         path;
-      CollectedLints.report ()
+      CollectedLints.report ();
+      if Config.print_functions_count ()
+      then TypedLints.FunctionEstimator.printReport ()
   in
   ()
 ;;
