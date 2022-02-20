@@ -22,4 +22,11 @@
  (synopsis "An attempt to create a linter")
  (description
   "Inspired by https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml")
- (depends yojson ppxlib sexplib ppx_inline_test base))
+ (depends
+  yojson
+  ppxlib
+  sexplib
+  ppx_inline_test
+  base
+  (ocamlformat
+   (< 0.20.0))))
