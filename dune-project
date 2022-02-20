@@ -28,5 +28,6 @@
   sexplib
   ppx_inline_test
   base
+  (ppx_blob :with-test)
   (ocamlformat
    (< 0.20.0))))
