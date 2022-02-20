@@ -47,12 +47,19 @@ let run { Compile_common.source_file; _ } (fallback : Ast_iterator.iterator) =
   { fallback with
     structure_item =
       (fun self si ->
+        (* TODO: convert ASTs and use Ast_pattern *)
         match si.pstr_desc with
         | Pstr_eval (_, _) ->
           let loc = si.pstr_loc in
           CollectedLints.add ~loc (report ~filename:source_file ~loc);
           fallback.structure_item self si
         | _ -> fallback.structure_item self si)
+  ; expr =
+      (fun self e ->
+        match e.pexp_desc with
+        | Pexp_extension (_, PStr [ { pstr_desc = Pstr_eval (ein, _) } ]) ->
+          self.expr self ein
+        | _ -> ())
   ; attribute =
       (fun _ attr ->
         (* we don't check inside attributes *)

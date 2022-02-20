@@ -1,0 +1,8 @@
+(library
+ (name test_toplevel_eval)
+ (libraries base)
+ (preprocessor_deps anonymous.rb)
+ (preprocess
+  (pps ppx_blob))
+ (modules test_toplevel_eval)
+ (wrapped false))
