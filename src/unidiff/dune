@@ -1,0 +1,6 @@
+(library
+ (name unidiff)
+ (libraries angstrom)
+ (preprocess
+  (pps ppx_inline_test))
+ (inline_tests))
