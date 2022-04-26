@@ -11,7 +11,7 @@ bug-reports: "https://github.com/Kakadu/mylinter/issues"
 depends: [
   "dune" {>= "2.8"}
   "yojson"
-  "ppxlib"
+  "ppxlib" {< "0.26.0"}
   "sexplib"
   "ppx_inline_test"
   "base"
