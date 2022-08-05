@@ -22,9 +22,7 @@ Some of these cases are reported by this lint.
   |}
 ;;
 
-type input = Ast_iterator.iterator
-
-open Ast_iterator
+type input = Tast_iterator.iterator
 
 let msg ppf () = fprintf ppf "Extranous `@@@@`."
 
@@ -46,17 +44,20 @@ let report ~loc ~filename info =
   (module M : LINT.REPORTER)
 ;;
 
-let run _ (fallback : Ast_iterator.iterator) =
+let run _ fallback =
+  let open Tast_iterator in
   { fallback with
     expr =
       (fun self e ->
-        let open Ppxlib.Ast_pattern in
+        let open Tast_pattern in
         let pm =
-          pexp_apply
-            (pexp_ident (lident (string "@@")))
-            ((nolabel ** pexp_ident __) ^:: (nolabel ** pexp_record __ __) ^:: nil)
+          texp_apply
+            (texp_ident (pident (string "@@")))
+            ((nolabel ** some (texp_ident __))
+            ^:: (nolabel ** some (texp_record __ __))
+            ^:: nil)
         in
-        let loc = e.pexp_loc in
+        let loc = e.exp_loc in
         let filename = loc.Location.loc_start.Lexing.pos_fname in
         let () =
           try
@@ -64,7 +65,7 @@ let run _ (fallback : Ast_iterator.iterator) =
               pm
               Location.none
               e
-              ~on_error:(fun () -> ())
+              ~on_error:(fun _ -> ())
               (fun _ _ _ -> CollectedLints.add ~loc (report ~loc ~filename ()))
           with
           | Location.Error e -> Format.printf "%a\n%!" Location.print_report e

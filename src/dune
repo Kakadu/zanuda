@@ -13,7 +13,7 @@
   CollectedLints
   LoadDune)
  (modules_without_implementation LINT)
- (libraries ppxlib sexplib yojson Tast_pattern)
+ (libraries ppxlib compiler-libs.common sexplib yojson)
  (preprocess
   (pps ppx_optcomp ppx_sexp_conv ppx_inline_test))
  (inline_tests))

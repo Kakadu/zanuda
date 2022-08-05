@@ -69,8 +69,8 @@ let make_pat_op : 'a. string -> (expression, 'a, 'a) t =
 ;;
 
 let pat
-    : ( Typedtree.expression, Typedtree.expression -> Typedtree.expression -> 'a, 'a )
-    Tast_pattern.t
+  : ( Typedtree.expression, Typedtree.expression -> Typedtree.expression -> 'a, 'a )
+  Tast_pattern.t
   =
   let open Tast_pattern in
   let ops = [ ">=", "<=", 0; "<=", ">=", 0; ">", "<", 0; "=", "=", 0 ] in

@@ -49,12 +49,13 @@ In this variant you have less potential for copy-paste mistake
 
 open Parsetree
 open Ast_iterator
+module Iter = Ppxlib.Ast_traverse
 
-type input = Ast_iterator.iterator
+type input = Iter.iter
 
 let msg = "Prefer guard instead of if-then-else in case construction"
 
-let report ~filename ~loc =
+let report ~filename ~loc () =
   let module M = struct
     let txt ppf () = Report.txt ~loc ~filename ppf pp_print_string msg
 
@@ -73,17 +74,31 @@ let report ~filename ~loc =
 ;;
 
 let run _ fallback =
+  let open Tast_iterator in
   { fallback with
     case =
-      (fun self case ->
-        match case.pc_rhs.pexp_desc with
-        | Pexp_ifthenelse (cond, th, el) ->
-          let loc = case.pc_rhs.pexp_loc in
-          let filename = loc.Location.loc_start.Lexing.pos_fname in
-          CollectedLints.add ~loc (report ~filename ~loc);
-          self.expr self cond;
-          self.expr self th;
-          Option.iter ~f:(self.expr self) el
-        | _ -> fallback.case self case)
+      (let foo : type a. Tast_iterator.iterator -> a Typedtree.case -> unit =
+        fun self case ->
+         let pm =
+           let open Tast_pattern in
+           texp_ite __' drop drop
+         in
+         let () =
+           try
+             Tast_pattern.parse
+               pm
+               Location.none
+               case.c_rhs
+               ~on_error:(fun _ -> ())
+               (fun { Location.loc } ->
+                 let filename = loc.Location.loc_start.Lexing.pos_fname in
+                 CollectedLints.add ~loc (report ~loc ~filename ()))
+           with
+           | Location.Error e -> Format.printf "%a\n%!" Location.print_report e
+         in
+         fallback#case self case;
+         ()
+       in
+       foo)
   }
 ;;

@@ -1,5 +1,5 @@
 let xxx = [%blob "a.ts"]
-
+(*
 module _ = struct
   open Protocol_conv_xmlm
 
@@ -47,7 +47,7 @@ module _ = struct
         | _ -> ())
   ;;
 end
-
+*)
 module _ = struct
   (* open Xmlm *)
 
@@ -111,11 +111,18 @@ module _ = struct
     bl
   ;;
 
+  open Base
+  module Format = Caml.Format
+  open Format
+  open Sexplib.Sexp
+
+
+
   type message =
     { src : string
     ; comment : string option
     ; tr : string
-    }
+    } [@@deriving sexp]
 
   type context = string * message list
 
@@ -127,7 +134,7 @@ module _ = struct
       let l, c = Xmlm.pos i in
       invalid_arg (sprintf "parse error: %d %d" l c)
     in
-    let accept s i = if Xmlm.input i = s then () else error () in
+    let accept s i = if Caml.(Xmlm.input i = s) then () else error () in
     let rec i_seq el acc i =
       match Xmlm.peek i with
       | `El_start _ -> i_seq el (el i :: acc) i

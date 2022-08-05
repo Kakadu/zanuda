@@ -54,8 +54,8 @@ let report () =
   Base.Exn.protect
     ~f:(fun () ->
       Queue.iter found_Lints ~f:(fun (_loc, ((module M : LINT.REPORTER) as m)) ->
-          M.txt Caml.Format.std_formatter ();
-          List.iter all_files ~f:(fun (f, ppf, _) -> f m ppf ())))
+        M.txt Caml.Format.std_formatter ();
+        List.iter all_files ~f:(fun (f, ppf, _) -> f m ppf ())))
     ~finally:(fun () ->
       let f (_, ppf, ch) =
         Caml.Format.fprintf ppf "%!";

@@ -72,7 +72,7 @@ let run { Compile_common.source_file; _ } fallback =
                it.expr it vb.pvb_expr;
                List.iter ~f:(it.structure_item it) wher
              with
-            | Found -> CollectedLints.add ~loc (report ~loc ~filename:source_file txt))
+             | Found -> CollectedLints.add ~loc (report ~loc ~filename:source_file txt))
           | _ ->
             (* TODO: support Ppat_as ... *)
             ()

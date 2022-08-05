@@ -17,7 +17,7 @@ depends: [
   "base"
   "angstrom"
   "ppx_blob" {with-test}
-  "ocamlformat" {< "0.20.0"}
+  "ocamlformat" {>= "0.23.0"}
   "odoc" {with-doc}
 ]
 build: [

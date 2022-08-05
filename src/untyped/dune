@@ -1,6 +1,6 @@
 (library
  (name UntypedLints)
- (libraries zanuda_core)
+ (libraries Tast_pattern zanuda_core)
  (modules
   Casing
   GuardInsteadOfIf

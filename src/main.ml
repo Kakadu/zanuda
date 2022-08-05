@@ -28,8 +28,7 @@ let typed_linters =
   ; (module IfBool : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
   ; (module StringConcat : LINT.TYPED)
-  ; (module MonadLaws : LINT.TYPED)
-    (* * *********************** *)
+  ; (module MonadLaws : LINT.TYPED) (* * *********************** *)
   ]
 ;;
 
@@ -134,19 +133,19 @@ let process_untyped filename =
       typed_on_signature info typedtree *)
     in
     with_info (fun info ->
-        if String.is_suffix info.source_file ~suffix:".ml"
-        then process_structure info
-        else if String.is_suffix info.source_file ~suffix:".mli"
-        then process_signature info
-        else (
-          let () =
-            Caml.Format.eprintf
-              "Don't know to do with file '%s'\n%s %d\n%!"
-              info.source_file
-              Caml.__FILE__
-              Caml.__LINE__
-          in
-          Caml.exit 1))
+      if String.is_suffix info.source_file ~suffix:".ml"
+      then process_structure info
+      else if String.is_suffix info.source_file ~suffix:".mli"
+      then process_signature info
+      else (
+        let () =
+          Caml.Format.eprintf
+            "Don't know to do with file '%s'\n%s %d\n%!"
+            info.source_file
+            Caml.__FILE__
+            Caml.__LINE__
+        in
+        Caml.exit 1))
   in
   ()
 ;;
@@ -160,9 +159,9 @@ let () =
       let info =
         List.concat
           [ List.map untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
-                L.describe_itself ())
+              L.describe_itself ())
           ; List.map typed_linters ~f:(fun (module L : LINT.TYPED) ->
-                L.describe_itself ())
+              L.describe_itself ())
           ]
       in
       let ch = Caml.open_out filename in

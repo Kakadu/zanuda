@@ -32,4 +32,4 @@
   angstrom
   (ppx_blob :with-test)
   (ocamlformat
-   (< 0.20.0))))
+   (>= 0.23.0))))

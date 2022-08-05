@@ -78,12 +78,12 @@ module State = struct
   let get_result { st_over_self; st_over_other } =
     let sorted =
       List.sort st_over_self ~compare:(fun (_, path0) (_, path1) ->
-          Path.compare path0 path1)
+        Path.compare path0 path1)
       |> List.group ~break:(fun (_, p1) (_, p2) -> not (Path.same p1 p2))
     in
     let max_seq =
       List.max_elt sorted ~compare:(fun xs ys ->
-          compare (List.length xs) (List.length ys))
+        compare (List.length xs) (List.length ys))
     in
     match max_seq with
     | None -> None
@@ -97,17 +97,17 @@ module State = struct
       let fields =
         List.concat
           [ List.filter_map st_over_self ~f:(function fname, ident_path ->
-                if Path.same ident_path record_path
-                then None
-                else
-                  Some
-                    ( mk_loc (Longident.Lident fname)
-                    , Ast_helper.Exp.(
-                        field
-                          (ident (mk_loc @@ Untypeast.lident_of_path ident_path))
-                          (make_lident fname)) ))
+              if Path.same ident_path record_path
+              then None
+              else
+                Some
+                  ( mk_loc (Longident.Lident fname)
+                  , Ast_helper.Exp.(
+                      field
+                        (ident (mk_loc @@ Untypeast.lident_of_path ident_path))
+                        (make_lident fname)) ))
           ; List.map st_over_other ~f:(function fname, expr ->
-                make_lident fname, MyUntype.untype_expression expr)
+              make_lident fname, MyUntype.untype_expression expr)
           ]
       in
       let record_id_untyped =
@@ -115,8 +115,8 @@ module State = struct
       in
       Option.some
         (match fields with
-        | [] -> record_id_untyped
-        | _ -> Ast_helper.Exp.(record ~loc fields (Some record_id_untyped)))
+         | [] -> record_id_untyped
+         | _ -> Ast_helper.Exp.(record ~loc fields (Some record_id_untyped)))
   ;;
 
   let pp ppf { st_kept; st_over_self; st_over_other } =
@@ -158,26 +158,26 @@ let run _ fallback =
             try
               let ans =
                 Array.fold arr ~init:State.empty ~f:(fun acc (lab_desc, lab_def) ->
-                    Tast_pattern.(
-                      parse
-                        (__ ** rld_kept
-                        |> map1 ~f:(State.add_kept acc)
-                        ||| (label_desc __
-                             ** rld_overriden
-                                  (lident __)
-                                  (as__ (texp_field (texp_ident __) __))
-                            |> map5 ~f:(fun _ field_lhs expr_rhs stru field_rhs ->
-                                   if String.equal field_lhs field_rhs.Types.lbl_name
-                                   then State.add_over_self acc field_rhs.lbl_name stru
-                                   else State.add_over_other acc field_lhs expr_rhs))
-                        ||| (label_desc __ ** rld_overriden (lident __) __
-                            |> map3 ~f:(fun _ (field_lhs : string) field_rhs ->
-                                   State.add_over_other acc field_lhs field_rhs))))
-                      loc
-                      ~on_error:(fun _ () -> acc)
-                      (lab_desc, lab_def)
-                      (fun st () -> st)
-                      ())
+                  Tast_pattern.(
+                    parse
+                      (__ ** rld_kept
+                      |> map1 ~f:(State.add_kept acc)
+                      ||| (label_desc __
+                           ** rld_overriden
+                                (lident __)
+                                (as__ (texp_field (texp_ident __) __))
+                          |> map5 ~f:(fun _ field_lhs expr_rhs stru field_rhs ->
+                               if String.equal field_lhs field_rhs.Types.lbl_name
+                               then State.add_over_self acc field_rhs.lbl_name stru
+                               else State.add_over_other acc field_lhs expr_rhs))
+                      ||| (label_desc __ ** rld_overriden (lident __) __
+                          |> map3 ~f:(fun _ (field_lhs : string) field_rhs ->
+                               State.add_over_other acc field_lhs field_rhs))))
+                    loc
+                    ~on_error:(fun _ () -> acc)
+                    (lab_desc, lab_def)
+                    (fun st () -> st)
+                    ())
               in
               (* Format.printf "State: %a\n%!" State.pp ans; *)
               match State.get_result ans with

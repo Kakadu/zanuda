@@ -98,12 +98,12 @@ let string_of_impl = function
 ;;
 
 let describe_as_clippy_json
-    ?(group = LINT.Correctness)
-    ?(level = LINT.Deny)
-    ?(impl = LINT.Typed)
-    id
-    ~docs
-    : Yojson.Safe.t
+  ?(group = LINT.Correctness)
+  ?(level = LINT.Deny)
+  ?(impl = LINT.Typed)
+  id
+  ~docs
+  : Yojson.Safe.t
   =
   (* List if clippy lints https://github.com/rust-lang/rust-clippy/blob/gh-pages/master/lints.json *)
   `Assoc

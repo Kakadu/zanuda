@@ -7,11 +7,11 @@
  (name demo)
  (package ts_demo)
  (public_name demo)
- (libraries base ppx_protocol_conv_xmlm xmlm)
+ (libraries base xmlm sexplib)
  (preprocessor_deps
   (file a.ts))
  (preprocess
-  (pps ppx_inline_test ppx_protocol_conv ppx_blob)))
+  (pps ppx_inline_test ppx_blob ppx_sexp_conv)))
 
-;(cram
-; (deps ./demo.exe))
+(cram
+ (deps ./demo.exe))
