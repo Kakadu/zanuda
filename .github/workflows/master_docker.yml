@@ -7,7 +7,9 @@ on:
   push:
     branches:
       - 'master'
-
+env:
+  OPAMROOT: /home/opam/.opam
+  OPAMYES: true
 jobs:
   build:
     strategy:
