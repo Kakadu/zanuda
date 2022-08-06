@@ -4,5 +4,5 @@ $ dune build testlib2.cmxa
   $ dune build @lint -p testsuite2 --force
   $ dune build @lint -p testsuite3 --force
 $ echo $PATH
-$ which mylinter
+$ which zanuda
 $ dune build @lint -p testsuite4 --force

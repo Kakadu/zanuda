@@ -1,5 +1,5 @@
   $ dune build
-  $ mylinter -dir .
+  $ zanuda -dir .
   File "ListFusion.ml", line 1, characters 12-48:
   1 | let __ xs = List.map Fun.id (List.map Fun.id xs)
                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

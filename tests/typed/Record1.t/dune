@@ -4,4 +4,4 @@
  (modules Record1))
 
 (cram
- (deps %{bin:mylinter}))
+ (deps %{bin:zanuda}))

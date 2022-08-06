@@ -6,10 +6,10 @@ description:
 maintainer: ["kakadu@pm.me"]
 authors: ["Kakadu"]
 license: "LGPL-3.0-only"
-homepage: "https://github.com/Kakadu/mylinter"
-bug-reports: "https://github.com/Kakadu/mylinter/issues"
+homepage: "https://github.com/Kakadu/zanuda"
+bug-reports: "https://github.com/Kakadu/zanuda/issues"
 depends: [
-  "dune" {>= "2.8"}
+  "dune" {>= "3.4"}
   "yojson"
   "ppxlib" {< "0.26.0"}
   "sexplib"
@@ -35,4 +35,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/Kakadu/mylinter.git"
+dev-repo: "git+https://github.com/Kakadu/zanuda.git"

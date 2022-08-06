@@ -20,7 +20,7 @@
 
 (executable
  (name main)
- (public_name mylinter)
+ (public_name zanuda)
  (modules main)
  (libraries
   base
@@ -33,4 +33,4 @@
   UntypedLints)
  (preprocess
   (pps ppx_inline_test))
- (package mylinter))
+ (package zanuda))

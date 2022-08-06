@@ -3,4 +3,4 @@
  (modules StringConcat))
 
 (cram
- (deps %{bin:mylinter.exe}))
+ (deps %{bin:zanuda.exe}))

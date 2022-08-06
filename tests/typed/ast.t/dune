@@ -5,4 +5,4 @@
  (modules_without_implementation Parsetree))
 
 (cram
- (deps %{bin:mylinter.exe}))
+ (deps %{bin:zanuda.exe}))

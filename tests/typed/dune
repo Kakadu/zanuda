@@ -3,4 +3,4 @@
  (modules exec1))
 
 (cram
- (deps %{bin:mylinter}))
+ (deps %{bin:zanuda}))

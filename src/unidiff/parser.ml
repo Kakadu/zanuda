@@ -1,10 +1,10 @@
 (*
 commit:
   https://github.com/<owner>/<repo>/commit/<commit>.diff
-  wget https://github.com/Kakadu/mylinter/commit/e4d35c2.diff
+  wget https://github.com/Kakadu/zanuda/commit/e4d35c2.diff
 
 pull:
-   wget https://github.com/Kakadu/mylinter/commit/e4d35c2.diff
+   wget https://github.com/Kakadu/zanuda/commit/e4d35c2.diff
 *)
 
 (*

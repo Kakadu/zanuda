@@ -1,11 +1,11 @@
-(lang dune 2.8)
+(lang dune 3.4)
 
 (cram enable)
 
 (generate_opam_files true)
 
 (source
- (github Kakadu/mylinter))
+ (github Kakadu/zanuda))
 
 (license LGPL-3.0-only)
 
@@ -13,12 +13,10 @@
 
 (maintainers "kakadu@pm.me")
 
-; TODO: invent fancy name
-
-(name mylinter)
+(name zanuda)
 
 (package
- (name mylinter)
+ (name zanuda)
  (synopsis "An attempt to create a linter")
  (description
   "Inspired by https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml")

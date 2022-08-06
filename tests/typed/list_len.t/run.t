@@ -1,5 +1,5 @@
   $ dune build
-  $ mylinter -dir .
+  $ zanuda -dir .
   File "list_len.ml", line 3, characters 12-31:
   3 | let __ xs = List.length xs <= 0
                   ^^^^^^^^^^^^^^^^^^^

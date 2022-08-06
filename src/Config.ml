@@ -96,6 +96,6 @@ let parse_args () =
     ; "-v", Arg.Unit set_verbose, "More verbose output"
     ]
     set_in_file
-    "Calling [mylinter FILES] runs untyped checks on specified files. Use [-dir PATH] \
+    "Calling [zanuda FILES] runs untyped checks on specified files. Use [-dir PATH] \
      switch to check dune-based project"
 ;;

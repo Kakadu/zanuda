@@ -1,5 +1,5 @@
   $ dune build
-  $ mylinter -dir .
+  $ zanuda -dir .
   File "Hashtables.ml", line 3, characters 22-23:
   3 |   if None = None then h else h
                             ^

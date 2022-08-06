@@ -6,7 +6,7 @@
  ;  (lint
  ;   (action
  ;    (run
- ;     mylinter
+ ;     zanuda
  ;     %{input-file}
  ;     -ordjsonl
  ;     /tmp/out.rdjsonl
@@ -15,7 +15,7 @@
  )
 
 (cram
- (deps %{bin:mylinter}))
+ (deps %{bin:zanuda}))
 
 (cram
  (deps %{workspace_root}/utils/mylint.exe))

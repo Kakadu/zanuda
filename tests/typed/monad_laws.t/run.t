@@ -1,5 +1,5 @@
   $ dune build
-  $ mylinter -dir .
+  $ zanuda -dir .
   File "laws.ml", line 5, characters 12-35:
   5 | let foo x = x >>= fun y -> return y
                   ^^^^^^^^^^^^^^^^^^^^^^^
