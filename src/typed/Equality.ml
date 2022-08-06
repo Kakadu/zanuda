@@ -59,6 +59,7 @@ let report filename ~loc kind =
   (module M : LINT.REPORTER)
 ;;
 
+(* TODO: Maybe forbid an equality on algebraic data types too ? *)
 let run _ fallback =
   let pat =
     let open Tast_pattern in
