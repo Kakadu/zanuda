@@ -15,7 +15,11 @@
  (modules_without_implementation LINT)
  (libraries ppxlib compiler-libs.common sexplib yojson)
  (preprocess
-  (pps ppx_optcomp ppx_sexp_conv ppx_inline_test))
+  (pps
+   ppx_optcomp
+   ppx_sexp_conv
+   ppx_inline_test ; implies dependecy on base
+   ))
  (inline_tests))
 
 (executable
@@ -23,7 +27,6 @@
  (public_name zanuda)
  (modules main)
  (libraries
-  base
   yojson
   ppxlib
   compiler-libs.common

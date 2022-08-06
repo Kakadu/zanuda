@@ -25,9 +25,10 @@
   (ppxlib
    (< 0.26.0))
   sexplib
-  ppx_inline_test
+  ppx_inline_test ; implies dependecy on base
   ppx_assert
-  base
+  (base :with-test)
+  stdune
   angstrom
   (ppx_blob :with-test)
   (ocamlformat

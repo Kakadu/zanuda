@@ -15,7 +15,8 @@ depends: [
   "sexplib"
   "ppx_inline_test"
   "ppx_assert"
-  "base"
+  "base" {with-test}
+  "stdune"
   "angstrom"
   "ppx_blob" {with-test}
   "ocamlformat" {>= "0.23.0"}
