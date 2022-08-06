@@ -11,7 +11,7 @@ bug-reports: "https://github.com/Kakadu/zanuda/issues"
 depends: [
   "dune" {>= "3.4"}
   "yojson"
-  "ppxlib" {< "0.26.0"}
+  "ppxlib" {>= "0.25.1" & < "0.27.0"}
   "sexplib"
   "ppx_inline_test"
   "ppx_assert"
