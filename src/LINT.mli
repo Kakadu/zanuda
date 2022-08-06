@@ -36,7 +36,7 @@ end
 (* In this design we can't define a linter that processes both parsetree and typedtree. Is it important? *)
 
 module type UNTYPED = sig
-  type input = Tast_iterator.iterator
+  type input = Ast_iterator.iterator
 
   include GENERAL with type input := input
 

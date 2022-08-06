@@ -5,9 +5,7 @@ open Utils
 
 let untyped_linters =
   let open UntypedLints in
-  [ (module GuardInsteadOfIf : LINT.UNTYPED)
-  ; (module Dollar : LINT.UNTYPED)
-  ; (module Casing : LINT.UNTYPED)
+  [ (module Casing : LINT.UNTYPED)
   ; (module ParsetreeHasDocs : LINT.UNTYPED)
   ; (module ToplevelEval : LINT.UNTYPED)
   ; (module VarShouldNotBeUsed : LINT.UNTYPED)
@@ -28,6 +26,8 @@ let typed_linters =
   ; (module IfBool : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
   ; (module StringConcat : LINT.TYPED)
+  ; (module UntypedLints.Dollar : LINT.TYPED)
+  ; (module UntypedLints.GuardInsteadOfIf : LINT.TYPED)
   ; (module MonadLaws : LINT.TYPED) (* * *********************** *)
   ]
 ;;
