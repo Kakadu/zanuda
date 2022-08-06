@@ -1,4 +1,4 @@
-name: Build Master
+name: Build Master in docker
 
 on:
   pull_request:
@@ -15,19 +15,10 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-        ocaml-compiler:
-          #- 4.10.x
-          #- ocaml-variants.4.11.2+flambda
-          #- ocaml-variants.4.12.0+options,ocaml-option-flambda
-          #- 4.13.0+trunk
-          #- ocaml-variants.4.13.0+options,ocaml-option-flambda
-          - ocaml-variants.4.14.0+options,ocaml-option-flambda
-        opam-disable-sandboxing:
-          - true
-        dune-cache:
-          - true
 
     runs-on: ${{ matrix.os }}
+    container:
+      image: ocaml/opam:ubuntu-18.04-ocaml-4.14
 
     steps:
       - name: Cancel Previous Runs
@@ -43,13 +34,13 @@ jobs:
         with:
           fetch-depth: 0                      # fix me later
 
-      - name: Use OCaml ${{ matrix.ocaml-compiler }}
-        #uses: ocaml/setup-ocaml@v2
-        uses: ocaml/setup-ocaml@5319ab427f3840efb109b436a4e6f047dcd9db9f
-          # working around issue with depext and opam 2.1
-        with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          dune-cache: true
+      # - name: Use OCaml ${{ matrix.ocaml-compiler }}
+      #   #uses: ocaml/setup-ocaml@v2
+      #   uses: ocaml/setup-ocaml@5319ab427f3840efb109b436a4e6f047dcd9db9f
+      #     # working around issue with depext and opam 2.1
+      #   with:
+      #     ocaml-compiler: ${{ matrix.ocaml-compiler }}
+      #     dune-cache: true
 
       - name: Installing dependencies
         run: |
