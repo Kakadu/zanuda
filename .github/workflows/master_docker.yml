@@ -47,6 +47,7 @@ jobs:
 
       - name: Installing dependencies
         run: |
+          opam install . --depext-only --with-test --with-doc
           opam install . --deps-only --with-test --with-doc
 
       - name: Building...
