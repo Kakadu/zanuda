@@ -28,6 +28,7 @@
    (< 0.26.0))
   sexplib
   ppx_inline_test
+  ppx_assert
   base
   angstrom
   (ppx_blob :with-test)

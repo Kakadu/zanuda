@@ -296,22 +296,28 @@ let path_of_list xs =
       ~f:(fun acc x -> Path.Pdot (acc, x))
 ;;
 
-include struct
-  let names = [ "Stdlib!"; "List"; "length" ]
+let%test_module " " =
+  (module struct
+    let names = [ "Stdlib!"; "List"; "length" ]
 
-  (* let () = Format.printf "%a" Path.print (path_of_list names) *)
-  let%test _ =
-    String.equal "Stdlib!/3.List.length" (asprintf "%a" Path.print (path_of_list names))
-  ;;
+    let%test_unit _ =
+      let old = !Clflags.unique_ids in
+      Clflags.unique_ids := false;
+      [%test_eq: string]
+        "Stdlib!.List.length"
+        (asprintf "%a" Path.print (path_of_list names));
+      Clflags.unique_ids := old
+    ;;
 
-  let%test _ =
-    let noloc =
-      Warnings.
-        { loc_start = Lexing.dummy_pos; loc_end = Lexing.dummy_pos; loc_ghost = true }
-    in
-    parse (path names) noloc ~on_error:(fun _ -> false) (path_of_list names) true
-  ;;
-end
+    let%test _ =
+      let noloc =
+        Warnings.
+          { loc_start = Lexing.dummy_pos; loc_end = Lexing.dummy_pos; loc_ghost = true }
+      in
+      parse (path names) noloc ~on_error:(fun _ -> false) (path_of_list names) true
+    ;;
+  end)
+;;
 
 open Typedtree
 

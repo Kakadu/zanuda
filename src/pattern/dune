@@ -9,5 +9,5 @@
  (wrapped false)
  (libraries ppxlib)
  (preprocess
-  (pps ppx_optcomp ppx_inline_test))
+  (pps ppx_optcomp ppx_inline_test ppx_assert))
  (inline_tests))
