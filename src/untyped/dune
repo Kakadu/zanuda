@@ -7,4 +7,9 @@
   ParsetreeHasDocs
   ToplevelEval
   Dollar
-  VarShouldNotBeUsed))
+  VarShouldNotBeUsed
+  License
+  ;
+  )
+ (preprocess
+  (pps ppxlib.metaquot)))

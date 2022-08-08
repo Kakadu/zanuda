@@ -19,6 +19,7 @@ type t =
   ; mutable prefix_to_add : string option
   ; mutable extra_includes : string list
   ; mutable verbose : bool
+  ; enabled_lints : string Hash_set.t
   }
 
 let opts =
@@ -31,6 +32,7 @@ let opts =
   ; prefix_to_add = None
   ; extra_includes = []
   ; verbose = false
+  ; enabled_lints = Hash_set.create (module String)
   }
 ;;
 
@@ -51,6 +53,7 @@ let prefix_to_cut () = opts.prefix_to_cut
 let prefix_to_add () = opts.prefix_to_add
 (* let dump_file () = opts.dump_file *)
 
+let enabled_lints () = opts.enabled_lints
 let outfile () = opts.outfile
 let out_golint () = opts.outgolint
 let out_rdjsonl () = opts.out_rdjsonl
@@ -81,7 +84,7 @@ let recover_filepath filepath =
 
 let parse_args () =
   let open Caml in
-  Arg.parse
+  let standard_args =
     [ "-o", Arg.String set_out_file, "Set Markdown output file"
     ; "-dir", Arg.String set_in_dir, "Set root directory of dune project"
     ; "-ogolint", Arg.String set_out_golint, "Set output file in golint format"
@@ -95,6 +98,20 @@ let parse_args () =
     ; "-I", Arg.String add_include, "Add extra include path for type checking"
     ; "-v", Arg.Unit set_verbose, "More verbose output"
     ]
+  in
+  let extra_args =
+    Hash_set.fold
+      ~init:[]
+      ~f:(fun acc x ->
+        assert (x <> "");
+        ( sprintf "-no-%s" x
+        , Arg.Unit (fun () -> Hash_set.remove opts.enabled_lints x)
+        , " Disable checking for this lint" )
+        :: acc)
+      opts.enabled_lints
+  in
+  Arg.parse
+    (standard_args @ List.rev extra_args)
     set_in_file
     "Calling [zanuda FILES] runs untyped checks on specified files. Use [-dir PATH] \
      switch to check dune-based project"

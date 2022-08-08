@@ -3,6 +3,8 @@ open Base
 open Zanuda_core
 open Utils
 
+let per_file_linters = [ (module UntypedLints.License : LINT.TYPED) ]
+
 let untyped_linters =
   let open UntypedLints in
   [ (module Casing : LINT.UNTYPED)
@@ -32,6 +34,31 @@ let typed_linters =
   ]
 ;;
 
+(* prepare for disabling some lints *)
+let () =
+  let h = Config.enabled_lints () in
+  List.iter untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
+    assert (not (Hash_set.mem h L.lint_id));
+    Hash_set.add h L.lint_id);
+  List.iter typed_linters ~f:(fun (module L : LINT.TYPED) ->
+    assert (not (Hash_set.mem h L.lint_id));
+    Hash_set.add h L.lint_id);
+  List.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
+    assert (not (Hash_set.mem h L.lint_id));
+    Hash_set.add h L.lint_id);
+  ()
+;;
+
+let process_per_file_linters info parsetree =
+  let hash = Config.enabled_lints () in
+  let is_enabled = Hash_set.mem hash in
+  List.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
+    if is_enabled L.lint_id
+    then
+      let open Tast_iterator in
+      (L.run info default_iterator).structure default_iterator parsetree)
+;;
+
 (* TODO: Functions below are a little bit copy-pasty. Rework them *)
 let build_iterator ~init ~compose ~f xs =
   let o = List.fold_left ~f:(fun acc lint -> compose lint acc) ~init xs in
@@ -39,25 +66,34 @@ let build_iterator ~init ~compose ~f xs =
 ;;
 
 let untyped_on_structure info =
+  let hash = Config.enabled_lints () in
+  let is_enabled = Hash_set.mem hash in
   build_iterator
     ~f:(fun o -> o.Ast_iterator.structure o)
-    ~compose:(fun (module L : LINT.UNTYPED) -> L.run info)
+    ~compose:(fun (module L : LINT.UNTYPED) acc ->
+      if is_enabled L.lint_id then L.run info acc else acc)
     ~init:Ast_iterator.default_iterator
     untyped_linters
 ;;
 
 let untyped_on_signature info =
+  let hash = Config.enabled_lints () in
+  let is_enabled = Hash_set.mem hash in
   build_iterator
     ~f:(fun o -> o.Ast_iterator.signature o)
-    ~compose:(fun (module L : LINT.UNTYPED) -> L.run info)
+    ~compose:(fun (module L : LINT.UNTYPED) acc ->
+      if is_enabled L.lint_id then L.run info acc else acc)
     ~init:Ast_iterator.default_iterator
     untyped_linters
 ;;
 
 let typed_on_structure info =
+  let hash = Config.enabled_lints () in
+  let is_enabled = Hash_set.mem hash in
   build_iterator
     ~f:(fun o -> o.Tast_iterator.structure o)
-    ~compose:(fun (module L : LINT.TYPED) -> L.run info)
+    ~compose:(fun (module L : LINT.TYPED) acc ->
+      if is_enabled L.lint_id then L.run info acc else acc)
     ~init:Tast_iterator.default_iterator
     typed_linters
 ;;
@@ -83,7 +119,9 @@ let with_info filename f =
 let process_cmt_typedtree filename typedtree =
   if Config.verbose () then printfn "Analyzing cmt: %s" filename;
   (* Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree; *)
-  with_info filename (fun info -> typed_on_structure info typedtree)
+  with_info filename (fun info ->
+    process_per_file_linters info typedtree;
+    typed_on_structure info typedtree)
 ;;
 
 let process_cmti_typedtree filename typedtree =
@@ -94,6 +132,8 @@ let process_cmti_typedtree filename typedtree =
   (* Format.printf "Typedtree MLI:\n%a\n%!" Printtyped.interface typedtree; *)
   with_info filename (fun info -> typed_on_signature info typedtree)
 ;;
+
+module Migr = Ppxlib_ast.Selected_ast.Of_ocaml
 
 let process_untyped filename =
   Clflags.error_style := Some Misc.Error_style.Contextual;
@@ -110,27 +150,11 @@ let process_untyped filename =
   let () =
     let process_structure info =
       let parsetree = Compile_common.parse_impl info in
-      untyped_on_structure info parsetree;
-      try
-        (* let typedtree, _ = Compile_common.typecheck_impl info parsetree in
-        typed_on_structure info typedtree;  *)
-        ()
-      with
-      | Env.Error e ->
-        Caml.Format.eprintf "%a\n%!" Env.report_error e;
-        Caml.exit 1
+      untyped_on_structure info parsetree
     in
     let process_signature info =
       let parsetree = Compile_common.parse_intf info in
       untyped_on_signature info parsetree
-      (* let typedtree =
-        try Compile_common.typecheck_intf info parsetree with
-        | Env.Error err ->
-          Format.eprintf "%a\n%!" Env.report_error err;
-          Format.eprintf "%s\n%!" info.Compile_common.source_file;
-          exit 1
-      in
-      typed_on_signature info typedtree *)
     in
     with_info (fun info ->
       if String.is_suffix info.source_file ~suffix:".ml"
