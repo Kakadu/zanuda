@@ -119,7 +119,7 @@ let panic ~loc ~filename mode =
        report
          ~loc
          ~filename
-         {|Second item in file should be a documentation comment with corrent license information. For example:
+         {|Second item in file should be a documentation comment with correct license information. For example:
            (** SPDX-License-Identifier: LGPL-3.0-or-later *)|})
 ;;
 

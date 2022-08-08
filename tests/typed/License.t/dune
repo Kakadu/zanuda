@@ -1,4 +1,19 @@
 (library
  (name test_license)
  (wrapped false)
- (modules good bad bad2))
+ (libraries asdf)
+ (modules
+  good
+  bad
+  bad2
+  bad3
+  ;
+  ))
+
+(executable
+ (name REPL)
+ (modules REPL))
+
+(alias
+ (name default)
+ (deps ./REPL.exe test_license.cmxa))
