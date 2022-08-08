@@ -1,4 +1,4 @@
 (library
  (name test_license)
  (wrapped false)
- (modules good bad))
+ (modules good bad bad2))

@@ -1,6 +1,6 @@
 (library
  (name UntypedLints)
- (libraries Tast_pattern zanuda_core)
+ (libraries Tast_pattern zanuda_core angstrom)
  (modules
   Casing
   GuardInsteadOfIf
@@ -12,4 +12,5 @@
   ;
   )
  (preprocess
-  (pps ppxlib.metaquot)))
+  (pps ppxlib.metaquot ppx_expect))
+ (inline_tests))
