@@ -15,6 +15,7 @@ depends: [
   "sexplib"
   "ppx_inline_test"
   "ppx_assert"
+  "ppx_expect"
   "base" {with-test}
   "stdune"
   "angstrom"

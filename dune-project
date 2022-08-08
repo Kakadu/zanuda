@@ -29,6 +29,7 @@
   sexplib
   ppx_inline_test ; implies dependecy on base
   ppx_assert
+  ppx_expect
   (base :with-test)
   stdune
   angstrom
