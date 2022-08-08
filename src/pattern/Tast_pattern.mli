@@ -175,3 +175,7 @@ val typ_arrow
   -> (Types.type_expr, 'a, 'c) t
 
 val core_typ : (Types.type_expr, 'a, 'b) t -> (core_type, 'a, 'b) t
+
+(* Structure *)
+val tstr_attribute : (attribute, 'a, 'b) t -> (structure_item, 'a, 'b) t
+val tstr_docattr : (string, 'a, 'b) t -> (structure_item, 'a, 'b) t

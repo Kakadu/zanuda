@@ -625,3 +625,35 @@ let rec typ_arrow (T l) (T r) =
   in
   T helper
 ;;
+
+(* Structure *)
+
+let tstr_attribute (T fattr) =
+  T
+    (fun ctx loc str k ->
+      match str.str_desc with
+      | Tstr_attribute attr ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fattr ctx loc attr
+      | _ -> fail loc "rld_overriden")
+;;
+
+let tstr_docattr (T f) =
+  T
+    (fun ctx loc subj k ->
+      let open Parsetree in
+      match subj.str_desc with
+      | Tstr_attribute
+          { attr_payload =
+              Parsetree.PStr
+                [ { pstr_desc =
+                      Pstr_eval
+                        ( { pexp_desc = Pexp_constant (Pconst_string (docstr, _, None)) }
+                        , _ )
+                  }
+                ]
+          } ->
+        ctx.matched <- ctx.matched + 1;
+        k |> f ctx loc docstr
+      | _ -> fail loc "tstr_docattr")
+;;
