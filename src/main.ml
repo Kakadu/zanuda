@@ -49,7 +49,7 @@ let () =
   ()
 ;;
 
-let process_per_file_linters info parsetree =
+let process_per_file_linters_str info parsetree =
   let hash = Config.enabled_lints () in
   let is_enabled = Hash_set.mem hash in
   List.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
@@ -57,6 +57,16 @@ let process_per_file_linters info parsetree =
     then
       let open Tast_iterator in
       (L.run info default_iterator).structure default_iterator parsetree)
+;;
+
+let process_per_file_linters_sig info parsetree =
+  let hash = Config.enabled_lints () in
+  let is_enabled = Hash_set.mem hash in
+  List.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
+    if is_enabled L.lint_id
+    then
+      let open Tast_iterator in
+      (L.run info default_iterator).signature default_iterator parsetree)
 ;;
 
 (* TODO: Functions below are a little bit copy-pasty. Rework them *)
@@ -120,7 +130,7 @@ let process_cmt_typedtree filename typedtree =
   if Config.verbose () then printfn "Analyzing cmt: %s" filename;
   (* Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree; *)
   with_info filename (fun info ->
-    process_per_file_linters info typedtree;
+    process_per_file_linters_str info typedtree;
     typed_on_structure info typedtree)
 ;;
 
@@ -130,7 +140,9 @@ let process_cmti_typedtree filename typedtree =
     let () = printfn "Analyzing cmti: %s" filename in
     printfn "%a" Printtyped.interface typedtree); *)
   (* Format.printf "Typedtree MLI:\n%a\n%!" Printtyped.interface typedtree; *)
-  with_info filename (fun info -> typed_on_signature info typedtree)
+  with_info filename (fun info ->
+    process_per_file_linters_sig info typedtree;
+    typed_on_signature info typedtree)
 ;;
 
 module Migr = Ppxlib_ast.Selected_ast.Of_ocaml

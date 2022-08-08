@@ -635,7 +635,24 @@ let tstr_attribute (T fattr) =
       | Tstr_attribute attr ->
         ctx.matched <- ctx.matched + 1;
         k |> fattr ctx loc attr
-      | _ -> fail loc "rld_overriden")
+      | _ -> fail loc "tstr_attribute")
+;;
+
+let tsig_attribute (T fattr) =
+  T
+    (fun ctx loc str k ->
+      match str.sig_desc with
+      | Tsig_attribute attr ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fattr ctx loc attr
+      | _ -> fail loc "tsig_attribute")
+;;
+
+let attribute (T fname) (T fpayload) =
+  T
+    (fun ctx loc attr k ->
+      let open Parsetree in
+      k |> fname ctx loc attr.attr_name.txt |> fpayload ctx loc attr.attr_payload)
 ;;
 
 let tstr_docattr (T f) =
@@ -656,4 +673,24 @@ let tstr_docattr (T f) =
         ctx.matched <- ctx.matched + 1;
         k |> f ctx loc docstr
       | _ -> fail loc "tstr_docattr")
+;;
+
+let tsig_docattr (T f) =
+  T
+    (fun ctx loc subj k ->
+      let open Parsetree in
+      match subj.sig_desc with
+      | Tsig_attribute
+          { attr_payload =
+              Parsetree.PStr
+                [ { pstr_desc =
+                      Pstr_eval
+                        ( { pexp_desc = Pexp_constant (Pconst_string (docstr, _, None)) }
+                        , _ )
+                  }
+                ]
+          } ->
+        ctx.matched <- ctx.matched + 1;
+        k |> f ctx loc docstr
+      | _ -> fail loc "tsig_docattr")
 ;;

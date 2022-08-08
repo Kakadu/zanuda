@@ -1,3 +1,13 @@
+(** Copyright 2021-2022, Dmitrii Kosarev a.k.a. Kakadu  *)
+
+(** SPDX-License-Identifier: LGPL-3.0-only *)
+
+(*
+  Checking that every file starts from SPDX copyright and license information.
+  N.B. ppx could add extra attributes that complicate this check a little bit
+
+  TODO: support double licensing (AND keyword)
+*)
 open Caml.Format
 open Zanuda_core
 open Utils
@@ -60,10 +70,13 @@ let describe_itself () =
   describe_as_clippy_json
     lint_id
     ~impl:LINT.Untyped
-    ~docs:{|
+    ~docs:
+      {|
 ### What it does
+Ensures that every files start from license and copyright information. The description is expected in SPDX format.
 
 ### Why is this bad?
+These annotation allow automatization tools to check code for license compliance.
   |}
 ;;
 
@@ -124,48 +137,101 @@ let panic ~loc ~filename mode =
 ;;
 
 let run info fallback =
-  let pm () =
-    let open Tast_pattern in
-    tstr_docattr __
-  in
   let open Typedtree in
   let extract_string h1 =
-    Tast_pattern.parse (pm ()) h1.str_loc h1 ~on_error:(fun _ -> None) (fun s -> Some s)
+    let open Tast_pattern in
+    let pm = tstr_docattr __ in
+    parse pm h1.str_loc h1 ~on_error:(fun _ -> None) (fun s -> Some s)
   in
-  (* print_endline "check license"; *)
-  (* TODO: use angstrom *)
+  let extract_string_sig h1 =
+    let open Tast_pattern in
+    let pm = tsig_docattr __ in
+    parse pm h1.sig_loc h1 ~on_error:(fun _ -> None) (fun s -> Some s)
+  in
+  let is_ocaml_ppx_context item =
+    let open Tast_pattern in
+    let pm = tstr_attribute (attribute (string "ocaml.ppx.context") drop) in
+    parse pm item.str_loc item ~on_error:(fun _ -> false) true
+  in
+  let is_ocaml_ppx_context_sig item =
+    let open Tast_pattern in
+    let pm = tsig_attribute (attribute (string "ocaml.ppx.context") drop) in
+    parse pm item.sig_loc item ~on_error:(fun _ -> false) true
+  in
   let filename = info.Compile_common.source_file in
   let loc = Location.in_file filename in
   let open Tast_iterator in
   { fallback with
-    structure =
-      (fun _ { str_items = items } ->
-        let wrap h1 mode =
+    signature =
+      (fun _ { sig_items = items } ->
+        let wrap item mode =
           let verifier, bad_spec =
             match mode with
             | `First -> verify_line1, Bad_copyright_info
             | `Second -> verify_line2, Bad_license_info
           in
-          match extract_string h1 with
+          match extract_string_sig item with
           | None ->
-            let loc = h1.str_loc in
+            let loc = item.sig_loc in
             let filename = loc.Location.loc_start.Lexing.pos_fname in
             panic ~loc ~filename bad_spec
           | Some s when not (verifier s) ->
-            let loc = h1.str_loc in
+            let loc = item.sig_loc in
             let filename = loc.Location.loc_start.Lexing.pos_fname in
             panic ~loc ~filename bad_spec
           | Some _ -> ()
         in
         let () =
-          match items with
-          | h1 :: _ -> wrap h1 `First
-          | [] -> panic ~loc ~filename No_license_at_all
+          let rec loop = function
+            | h :: tl when is_ocaml_ppx_context_sig h -> loop tl
+            | h :: _ -> wrap h `First
+            | [] -> panic ~loc ~filename No_license_at_all
+          in
+          loop items
         in
         let () =
-          match items with
-          | _ :: h2 :: _ -> wrap h2 `Second
-          | [ _ ] | [] -> panic ~loc ~filename No_license_at_all
+          let rec loop = function
+            | h :: tl when is_ocaml_ppx_context_sig h -> loop tl
+            | _ :: h :: _ -> wrap h `Second
+            | [ _ ] | [] -> panic ~loc ~filename No_license_at_all
+          in
+          loop items
+        in
+        ())
+  ; structure =
+      (fun _ { str_items = items } ->
+        let wrap item mode =
+          let verifier, bad_spec =
+            match mode with
+            | `First -> verify_line1, Bad_copyright_info
+            | `Second -> verify_line2, Bad_license_info
+          in
+          match extract_string item with
+          | None ->
+            let loc = item.str_loc in
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            panic ~loc ~filename bad_spec
+          | Some s when not (verifier s) ->
+            let loc = item.str_loc in
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            panic ~loc ~filename bad_spec
+          | Some _ -> ()
+        in
+        let () =
+          let rec loop = function
+            | h :: tl when is_ocaml_ppx_context h -> loop tl
+            | h :: _ -> wrap h `First
+            | [] -> panic ~loc ~filename No_license_at_all
+          in
+          loop items
+        in
+        let () =
+          let rec loop = function
+            | h :: tl when is_ocaml_ppx_context h -> loop tl
+            | _ :: h :: _ -> wrap h `Second
+            | [ _ ] | [] -> panic ~loc ~filename No_license_at_all
+          in
+          loop items
         in
         ())
   }

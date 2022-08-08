@@ -5,3 +5,5 @@
 open List
 
 let _ = concat
+
+let foo = 5

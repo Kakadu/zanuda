@@ -1,5 +1,5 @@
-  $ dune build @default
-$ tree _build/default
+  $ dune build @default ./REPL.exe
+$ tree _build/default -a
   $ zanuda -dir .
   File "REPL.ml", line 1, characters 0-9:
   1 | open List

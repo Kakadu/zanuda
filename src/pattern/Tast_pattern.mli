@@ -178,4 +178,12 @@ val core_typ : (Types.type_expr, 'a, 'b) t -> (core_type, 'a, 'b) t
 
 (* Structure *)
 val tstr_attribute : (attribute, 'a, 'b) t -> (structure_item, 'a, 'b) t
+val tsig_attribute : (attribute, 'a, 'b) t -> (signature_item, 'a, 'b) t
+
+val attribute
+  :  (string, 'a, 'b) t
+  -> (Parsetree.payload, 'b, 'c) t
+  -> (attribute, 'a, 'c) t
+
 val tstr_docattr : (string, 'a, 'b) t -> (structure_item, 'a, 'b) t
+val tsig_docattr : (string, 'a, 'b) t -> (signature_item, 'a, 'b) t

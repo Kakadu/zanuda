@@ -2,4 +2,6 @@
  (name asdf)
  (modules asdf)
  ;
- )
+ (preprocess
+  (pps ppx_inline_test))
+ (inline_tests))
