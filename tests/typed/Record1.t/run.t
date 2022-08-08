@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -dir .
+  $ zanuda -no-top_file_license -dir .
   File "Record1.ml", line 4, characters 11-34:
   4 | let f2 r = { x=r.x; y=r.y; z=r.z }
                  ^^^^^^^^^^^^^^^^^^^^^^^

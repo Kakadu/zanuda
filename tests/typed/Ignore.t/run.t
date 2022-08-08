@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -dir .
+  $ zanuda -no-top_file_license -dir .
   File "Ignore.ml", line 2, characters 2-29:
   2 |   ignore (List.map ((+)1) xs);
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^

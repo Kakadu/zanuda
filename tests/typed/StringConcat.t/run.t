@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -dir .
+  $ zanuda -no-top_file_license -dir .
   File "StringConcat.ml", line 2, characters 1-10:
   2 |  a ^ b ^ c
        ^^^^^^^^^
