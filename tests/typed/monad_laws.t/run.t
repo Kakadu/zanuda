@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -no-top_file_license -dir .
+  $ zanuda  -no-check-filesystem -no-top_file_license -dir .
   File "laws.ml", line 5, characters 12-35:
   5 | let foo x = x >>= fun y -> return y
                   ^^^^^^^^^^^^^^^^^^^^^^^

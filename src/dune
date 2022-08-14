@@ -11,6 +11,8 @@
   LINT
   Config
   CollectedLints
+  Lint_filesystem
+  Dune_project
   LoadDune)
  (modules_without_implementation LINT)
  (libraries ppxlib compiler-libs.common sexplib yojson)

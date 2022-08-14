@@ -20,6 +20,7 @@ type t =
   ; mutable extra_includes : string list
   ; mutable verbose : bool
   ; enabled_lints : string Hash_set.t
+  ; mutable check_filesystem : bool
   }
 
 let opts =
@@ -33,6 +34,7 @@ let opts =
   ; extra_includes = []
   ; verbose = false
   ; enabled_lints = Hash_set.create (module String)
+  ; check_filesystem = true
   }
 ;;
 
@@ -51,12 +53,12 @@ let set_prefix_to_add s = opts.prefix_to_add <- Some s
 let includes () = opts.extra_includes
 let prefix_to_cut () = opts.prefix_to_cut
 let prefix_to_add () = opts.prefix_to_add
-(* let dump_file () = opts.dump_file *)
-
+let is_check_filesystem () = opts.check_filesystem
 let enabled_lints () = opts.enabled_lints
 let outfile () = opts.outfile
 let out_golint () = opts.outgolint
 let out_rdjsonl () = opts.out_rdjsonl
+let unset_check_filesystem () = opts.check_filesystem <- false
 
 (* let infile () = opts.infile *)
 (* let set_in_file s = opts.infile <- s *)
@@ -101,7 +103,11 @@ let parse_args () =
   in
   let extra_args =
     Hash_set.fold
-      ~init:[]
+      ~init:
+        [ ( "-no-check-filesystem"
+          , Arg.Unit unset_check_filesystem
+          , " Disable checking structure of a project" )
+        ]
       ~f:(fun acc x ->
         assert (x <> "");
         ( sprintf "-no-%s" x

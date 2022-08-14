@@ -1,41 +1,7 @@
 open Base
 open Caml.Format
 open Utils
-
-type module_ =
-  { name : string
-  ; impl : string option
-  ; intf : string option
-  ; cmt : string option
-  ; cmti : string option
-  }
-[@@deriving sexp]
-
-type executables =
-  { names : string list
-  ; modules : module_ list
-  ; requires : string list
-  ; include_dirs : string list
-  }
-[@@deriving sexp]
-
-module Library = struct
-  type t =
-    { name : string
-    ; uid : string
-    ; local : bool
-    ; requires : string list
-    ; source_dir : string
-    ; modules : module_ list
-    ; include_dirs : string list
-    }
-  [@@deriving sexp]
-end
-
-type t =
-  | Executables of executables
-  | Library of Library.t
-[@@deriving sexp]
+open Dune_project
 
 let fine_module { impl } =
   match impl with
@@ -53,6 +19,7 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
   in
   let db = [%of_sexp: t list] s in
   (* List.iter db ~f:(fun x -> Format.printf "%a\n%!" Sexplib.Sexp.pp_hum (sexp_of_t x)); *)
+  Lint_filesystem.check db;
   let get_library name =
     List.find_map db ~f:(function
       | Library l when String.equal name l.uid -> Some l
