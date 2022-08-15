@@ -23,7 +23,11 @@ let on_module { impl; intf } =
 ;;
 
 let on_library { Library.modules } = List.iter on_module modules
-let on_executables { modules } = List.iter on_module modules
+
+let on_executables { modules = _ } =
+  (* List.iter on_module modules *)
+  ()
+;;
 
 let check db =
   if Config.is_check_filesystem ()
