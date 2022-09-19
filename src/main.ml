@@ -148,18 +148,20 @@ let process_cmti_typedtree filename typedtree =
 module Migr = Ppxlib_ast.Selected_ast.Of_ocaml
 
 let process_untyped filename =
-  Clflags.error_style := Some Misc.Error_style.Contextual;
-  Clflags.include_dirs := Config.includes () @ Clflags.include_dirs.contents;
-  let with_info f =
-    Compile_common.with_info
-      ~native:false
-      ~source_file:filename
-      ~tool_name:"asdf" (* TODO: pass right tool name *)
-      ~output_prefix:"asdf"
-      ~dump_ext:"asdf"
-      f
-  in
-  let () =
+  if not (Caml.Sys.file_exists filename)
+  then Format.eprintf "Error: file %s doesn't exist. Continuing\n%!" filename
+  else (
+    Clflags.error_style := Some Misc.Error_style.Contextual;
+    Clflags.include_dirs := Config.includes () @ Clflags.include_dirs.contents;
+    let with_info f =
+      Compile_common.with_info
+        ~native:false
+        ~source_file:filename
+        ~tool_name:"asdf" (* TODO: pass right tool name *)
+        ~output_prefix:"asdf"
+        ~dump_ext:"asdf"
+        f
+    in
     let process_structure info =
       let parsetree = Compile_common.parse_impl info in
       untyped_on_structure info parsetree
@@ -181,9 +183,7 @@ let process_untyped filename =
             Caml.__FILE__
             Caml.__LINE__
         in
-        Caml.exit 1))
-  in
-  ()
+        Caml.exit 1)))
 ;;
 
 let () =

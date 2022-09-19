@@ -53,6 +53,7 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
          | Some source_filename, Some cmt_filename ->
            let build_dir = "_build/default/" in
            let wrap =
+             (* Format.printf "checking for prefix %S in %s\n%!" build_dir cmt_filename; *)
              if String.is_prefix ~prefix:build_dir cmt_filename
              then
                if Caml.Sys.file_exists cmt_filename
@@ -69,8 +70,8 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
                else
                  fun _ ->
                  eprintf
-                   "File '%s' doesn't exist. Maybe some of source files are not compiled?"
-                   source_filename
+                   "File '%s' doesn't exist. Maybe some of source files are not compiled?\n"
+                   cmt_filename
              else
                fun f ->
                let cmt = Cmt_format.read cmt_filename in
