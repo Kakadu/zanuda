@@ -4,3 +4,7 @@
   1 | 1+1;;
       ^^^
   Alert zanuda-linter: Toplevel eval not recommended
+  File "test_toplevel_eval.ml", line 5, characters 6-32:
+  5 | [%%if ocaml_version < (4, 11, 2)]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Toplevel eval not recommended

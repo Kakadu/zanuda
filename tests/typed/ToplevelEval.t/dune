@@ -3,6 +3,6 @@
  (libraries base)
  (preprocessor_deps anonymous.rb)
  (preprocess
-  (pps ppx_blob))
+  (pps ppx_blob ppx_optcomp))
  (modules test_toplevel_eval)
  (wrapped false))
