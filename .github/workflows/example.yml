@@ -55,10 +55,10 @@ jobs:
           opam exec -- dune runtest
 
       - name: Install linter
-        run: opam pin add https://github.com/Kakadu/mylinter.git
+        run: opam pin add https://github.com/Kakadu/zanuda.git
 
       - name: Build linter descriptions...
-        run: mkdir -p _build/_lintinfo && opam exec -- mylinter -dir . -ordjsonl _build/default/review.json
+        run: mkdir -p _build/_lintinfo && opam exec -- zanuda -dir . -ordjsonl _build/default/review.json
 
       - uses: reviewdog/action-setup@v1
         with:
