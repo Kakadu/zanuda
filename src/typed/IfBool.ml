@@ -67,7 +67,7 @@ let run _ fallback =
     let ops =
       texp_apply2 (texp_ident (path [ "Stdlib"; "&&" ])) ebool drop
       ||| texp_apply2 (texp_ident (path [ "Stdlib"; "&&" ])) drop ebool
-      |> map1 ~f:(fun _ -> Format.asprintf "Conjunction with boolean smells smells bad")
+      |> map1 ~f:(fun _ -> Format.asprintf "Conjunction with boolean smells bad")
     in
     ite ||| ops
   in
@@ -89,5 +89,12 @@ let run _ fallback =
               (report loc.Location.loc_start.Lexing.pos_fname ~loc s))
           ();
         fallback.expr self expr)
+  ; module_expr =
+      (fun self me ->
+        let open Parsetree in
+        let is_merlin_hide attr = String.equal "merlin.hide" attr.attr_name.txt in
+        if List.exists me.mod_attributes ~f:is_merlin_hide
+        then fallback.module_expr self me
+        else ())
   }
 ;;

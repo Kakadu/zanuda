@@ -7,3 +7,10 @@ let __ f x  = if f x then f x else false
 let rec foo1 r = function
   | _::xs -> foo1 (r && true) xs
   | _ ->  (r && false)
+
+type substring =
+  { name : int
+  ; offset : int
+  ; length : int option
+  }
+[@@deriving fields]

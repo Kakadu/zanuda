@@ -18,10 +18,10 @@
   File "IfBool.ml", line 8, characters 18-29:
   8 |   | _::xs -> foo1 (r && true) xs
                         ^^^^^^^^^^^
-  Alert zanuda-linter: Conjunction with boolean smells smells bad
+  Alert zanuda-linter: Conjunction with boolean smells bad
   
   File "IfBool.ml", line 9, characters 10-22:
   9 |   | _ ->  (r && false)
                 ^^^^^^^^^^^^
-  Alert zanuda-linter: Conjunction with boolean smells smells bad
+  Alert zanuda-linter: Conjunction with boolean smells bad
   
