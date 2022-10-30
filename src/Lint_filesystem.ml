@@ -34,6 +34,7 @@ let check db =
   then
     List.iter
       (function
+       | Build_context _ | Root _ -> ()
        | Executables es -> on_executables es
        | Library l -> on_library l)
       db

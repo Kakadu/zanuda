@@ -81,6 +81,7 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
   in
   let loop_database () =
     List.iter db ~f:(function
+      | Build_context _ | Root _ -> ()
       | Executables { modules; requires } ->
         let extra_paths =
           requires

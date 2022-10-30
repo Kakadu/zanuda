@@ -33,4 +33,6 @@ end
 type t =
   | Executables of executables
   | Library of Library.t
+  | Root of string
+  | Build_context of string
 [@@deriving sexp]
