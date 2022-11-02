@@ -127,8 +127,10 @@ let with_info filename f =
 ;;
 
 let process_cmt_typedtree filename typedtree =
-  if Config.verbose () then printfn "Analyzing cmt: %s" filename;
-  (* Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree; *)
+  if Config.verbose ()
+  then (
+    printfn "Analyzing cmt: %s" filename;
+    Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree);
   with_info filename (fun info ->
     process_per_file_linters_str info typedtree;
     typed_on_structure info typedtree)

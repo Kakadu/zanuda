@@ -60,11 +60,7 @@ let report filename ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let no_ident ident e =
-  (* Format.printf
-    "no_ident: %a\n"
-    Pprintast.expression
-    Untypeast.(default_mapper.expr default_mapper e); *)
+let no_ident ident c =
   let exception Found in
   let open Tast_iterator in
   let open Typedtree in
@@ -75,11 +71,21 @@ let no_ident ident e =
           (* TODO: rewrite with FCPM *)
           match e.exp_desc with
           | Texp_ident (Path.Pident id, _, _) when Ident.equal id ident -> raise Found
+          | Texp_function { param } when Ident.equal ident param -> ()
           | _ -> default_iterator.expr self e)
+    ; case =
+        (fun (type a) self (c : a case) ->
+          match c.c_lhs.pat_desc with
+          | Tpat_value v ->
+            (match (v :> pattern) with
+             | { pat_desc = Tpat_var (id, _) } ->
+               if Ident.equal ident id then () else default_iterator.case self c
+             | _ -> default_iterator.case self c)
+          | _ -> default_iterator.case self c)
     }
   in
   try
-    it.expr it e;
+    it.case it c;
     true
   with
   | Found -> false
@@ -105,7 +111,7 @@ let run _ fallback =
             match ident with
             | Path.Pident id ->
               if String.equal argname (Ident.name id)
-                 && List.for_all cases ~f:(fun { c_rhs } -> no_ident id c_rhs)
+                 && List.for_all cases ~f:(no_ident id)
               then
                 CollectedLints.add
                   ~loc
