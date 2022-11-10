@@ -6,20 +6,23 @@ let on_module { impl; intf } =
   | Some m, _ when String.(ends_with (lowercase_ascii m) ~suffix:"ast.ml") -> ()
   | None, Some _ | Some _, Some _ -> ()
   | Some ml, None ->
-    CollectedLints.add
-      ~loc:Location.none
-      (module struct
-        let msg ppf file =
-          Format.fprintf ppf "File '%s' doesn't have corresponding .mli interface" file
-        ;;
+    let filename = Config.recover_filepath ml in
+    if not (String.ends_with ~suffix:".ml-gen" filename)
+    then
+      CollectedLints.add
+        ~loc:Location.none
+        (module struct
+          let msg ppf file =
+            Format.fprintf ppf "File '%s' doesn't have corresponding .mli interface" file
+          ;;
 
-        let txt ppf () = Format.fprintf ppf "%a\n" msg ml
+          let txt ppf () = Format.fprintf ppf "%a\n" msg ml
 
-        let rdjsonl ppf () =
-          let filename = Config.recover_filepath ml in
-          Utils.RDJsonl.pp ppf ~filename ~line:1 msg filename
-        ;;
-      end)
+          let rdjsonl ppf () =
+            let filename = Config.recover_filepath ml in
+            Utils.RDJsonl.pp ppf ~filename ~line:1 msg filename
+          ;;
+        end)
 ;;
 
 let on_library { Library.modules } = List.iter on_module modules
