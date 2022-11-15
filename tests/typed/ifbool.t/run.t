@@ -25,3 +25,13 @@
                 ^^^^^^^^^^^^
   Alert zanuda-linter: Conjunction with boolean smells bad
   
+  File "IfBool.ml", line 11, characters 5-14:
+  11 | type substring =
+            ^^^^^^^^^
+  Alert zanuda-linter: Conjunction with boolean smells bad
+  
+  File "IfBool.ml", line 11, characters 5-14:
+  11 | type substring =
+            ^^^^^^^^^
+  Alert zanuda-linter: Conjunction with boolean smells bad
+  

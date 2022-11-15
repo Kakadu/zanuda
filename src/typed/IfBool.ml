@@ -92,9 +92,10 @@ let run _ fallback =
   ; module_expr =
       (fun self me ->
         let open Parsetree in
-        let is_merlin_hide attr = String.equal "merlin.hide" attr.attr_name.txt in
-        if List.exists me.mod_attributes ~f:is_merlin_hide
+        (* let is_merlin_hide attr = String.equal "merlin.hide" attr.attr_name.txt in *)
+        (* if List.exists me.mod_attributes ~f:is_merlin_hide
         then fallback.module_expr self me
-        else ())
+        else () *)
+        fallback.module_expr self me)
   }
 ;;
