@@ -5,6 +5,7 @@
  (flags
   (:standard
    ;-dsource
+   ;
    ))
  (preprocess
   (pps

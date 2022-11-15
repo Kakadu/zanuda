@@ -16,3 +16,30 @@ let expr ppf e =
     ; str_type = []
     }
 ;;
+
+let me ppf me =
+  let open Typedtree in
+  implementation
+    ppf
+    { str_items =
+        [ { str_desc =
+              Tstr_module
+                { mb_id = None
+                ; mb_name = Location.mknoloc None
+                ; mb_expr = me
+                ; mb_attributes = []
+                ; mb_presence = Types.Mp_present
+                ; mb_loc = me.mod_loc
+                }
+          ; str_loc = me.mod_loc
+          ; str_env = me.mod_env
+          }
+        ]
+    ; str_final_env = me.mod_env
+    ; str_type = []
+    }
+;;
+
+let attrs ppf attrs =
+  Pprintast.expression ppf (Ast_helper.Exp.constant (Pconst_integer ("1", None)) ~attrs)
+;;

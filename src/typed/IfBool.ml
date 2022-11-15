@@ -53,6 +53,8 @@ let report filename ~loc e =
   (module M : LINT.REPORTER)
 ;;
 
+let do_check = ref true
+
 let run _ fallback =
   let pat =
     let open Tast_pattern in
@@ -71,31 +73,38 @@ let run _ fallback =
     in
     ite ||| ops
   in
+  let is_merlin_hide attr =
+    let open Parsetree in
+    String.equal "merlin.hide" attr.attr_name.txt
+  in
   let open Tast_iterator in
   { fallback with
     expr =
       (fun self expr ->
-        let open Typedtree in
-        let __ _ = Format.eprintf "%a\n%!" MyPrinttyped.expr expr in
-        let loc = expr.exp_loc in
-        Tast_pattern.parse
-          pat
-          loc
-          ~on_error:(fun _desc () -> ())
-          expr
-          (fun s () ->
-            CollectedLints.add
-              ~loc
-              (report loc.Location.loc_start.Lexing.pos_fname ~loc s))
-          ();
+        (if !do_check
+        then
+          let open Typedtree in
+          let __ _ = Format.eprintf "%a\n%!" MyPrinttyped.expr expr in
+          let loc = expr.exp_loc in
+          Tast_pattern.parse
+            pat
+            loc
+            ~on_error:(fun _desc () -> ())
+            expr
+            (fun s () ->
+              CollectedLints.add
+                ~loc
+                (report loc.Location.loc_start.Lexing.pos_fname ~loc s))
+            ());
         fallback.expr self expr)
-  ; module_expr =
-      (fun self me ->
-        let open Parsetree in
-        (* let is_merlin_hide attr = String.equal "merlin.hide" attr.attr_name.txt in *)
-        (* if List.exists me.mod_attributes ~f:is_merlin_hide
-        then fallback.module_expr self me
-        else () *)
-        fallback.module_expr self me)
+  ; structure_item =
+      (fun self si ->
+        match si.str_desc with
+        | Tstr_include { incl_attributes; _ }
+          when List.exists incl_attributes ~f:is_merlin_hide ->
+          do_check := false;
+          fallback.structure_item self si;
+          do_check := true
+        | _ -> fallback.structure_item self si)
   }
 ;;
