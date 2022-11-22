@@ -23,7 +23,14 @@ Constructions `failwith "should not happen"` smells. Maybe techniques from https
 |}
 ;;
 
-let msg ppf () = Caml.Format.fprintf ppf "Using failwith unsafely%!"
+let msg ppf () =
+  Caml.Format.fprintf
+    ppf
+    "Using `failwith` (or `assert false`) usually is a clue that a corner case is not \
+     being handled properly. To report errors we recommend using error monad instead. In \
+     princliple, these construction are OK for temporary work-in-progress code, but in \
+     release they should be eliminated%!"
+;;
 
 let report filename ~loc =
   let module M = struct
@@ -47,6 +54,7 @@ let run _ fallback =
     let open Tast_pattern in
     texp_ident (path [ "Stdlib"; "failwith" ])
     ||| texp_ident (path [ "Base"; "failwith" ])
+    ||| texp_assert_false ()
   in
   let open Tast_iterator in
   { fallback with

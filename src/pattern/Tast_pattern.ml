@@ -419,6 +419,16 @@ let texp_ident_typ (T fpath) (T ftyp) =
       | _ -> fail loc "texp_ident_typ")
 ;;
 
+let texp_assert (T fexp) =
+  T
+    (fun ctx loc x k ->
+      match x.exp_desc with
+      | Texp_assert e ->
+        ctx.matched <- ctx.matched + 1;
+        fexp ctx loc e k
+      | _ -> fail loc "texp_assert")
+;;
+
 let texp_apply (T f0) (T args0) =
   T
     (fun ctx loc x k ->
@@ -451,6 +461,19 @@ let texp_apply_nolabelled (T f0) (T args0) =
          | EarlyExit -> fail loc "texp_apply: None among the arguments ")
       | _ -> fail loc "texp_apply")
 ;;
+
+let texp_construct (T fpath) (T fcd) (T fargs) =
+  T
+    (fun ctx loc x k ->
+      match x.exp_desc with
+      | Texp_construct (path, cd, args) ->
+        ctx.matched <- ctx.matched + 1;
+        let k = fpath ctx loc path.txt k in
+        k |> fcd ctx loc cd |> fargs ctx loc args
+      | _ -> fail loc (sprintf "texp_construct"))
+;;
+
+let texp_assert_false () = texp_assert (texp_construct (lident (string "false")) drop nil)
 
 let nolabel =
   T

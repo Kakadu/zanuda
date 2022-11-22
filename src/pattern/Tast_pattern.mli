@@ -101,6 +101,8 @@ val texp_ident_typ
   -> (Types.type_expr, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
+val texp_assert : (expression, 'a, 'b) t -> (expression, 'a, 'b) t
+
 val texp_apply
   :  (expression, 'a, 'b) t
   -> ((Asttypes.arg_label * expression option) list, 'b, 'c) t
@@ -156,6 +158,7 @@ val texp_field
   -> (Types.label_description, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
+val texp_assert_false : unit -> (expression, 'a, 'a) t
 val label_desc : (string, 'a, 'b) t -> (Types.label_description, 'a, 'b) t
 val rld_kept : (record_label_definition, 'a, 'a) t
 
