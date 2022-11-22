@@ -46,6 +46,7 @@ let run _ fallback =
   let pat =
     let open Tast_pattern in
     texp_ident (path [ "Stdlib"; "failwith" ])
+    ||| texp_ident (path [ "Base"; "failwith" ])
   in
   let open Tast_iterator in
   { fallback with
