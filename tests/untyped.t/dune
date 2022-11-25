@@ -46,7 +46,11 @@
 
 (library
  (name test_startingWildcard)
- (modules startingWildcard)
+ (modules
+  ;   parser1
+  startingWildcard
+  ;
+  )
  (package testsuite4)
  (lint
   (action
@@ -57,6 +61,11 @@
     /tmp/out.rdjsonl
     -ws
     %{workspace_root}))))
+
+; (menhir
+;  (modules parser1)
+;  (flags --explain)
+;  (infer true))
 
 (cram
  (deps %{workspace_root}/utils/mylint.exe))

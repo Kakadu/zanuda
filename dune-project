@@ -35,5 +35,6 @@
   angstrom
   (ppx_blob :with-test)
   (ppx_fields_conv :with-test)
+  ;(menhir :with-test)
   (ocamlformat
    (>= 0.23.0))))

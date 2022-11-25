@@ -20,3 +20,4 @@ $ dune build testlib2.cmxa
 $ echo $PATH
 $ which zanuda
 $ dune build @lint -p testsuite4 --force
+$ cat _build/default/parser1.ml

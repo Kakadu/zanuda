@@ -22,3 +22,10 @@ let __ () = ()
 
 (* let f2 () = __ () *)
 let __ () = ()
+
+let _menhir_action_1 = ()
+include struct
+  let _menhir_run_0  = function
+      | None -> _menhir_action_1 ()
+      | _ -> ()
+end

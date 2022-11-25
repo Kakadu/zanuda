@@ -78,6 +78,7 @@ let check_occurances_exn txt e =
 let is_name_suspicious txt =
   (not (String.is_prefix txt ~prefix:"_menhir_action_"))
   && (not (String.is_prefix txt ~prefix:"_menhir_cell"))
+  && (not (String.is_prefix txt ~prefix:"_menhir_lexer"))
   && String.is_prefix txt ~prefix:"_"
 ;;
 
@@ -107,7 +108,7 @@ let run { Compile_common.source_file; _ } fallback =
         let open Parsetree in
         let loop_vb wher vb =
           match vb.pvb_pat.ppat_desc with
-          | Ppat_var { txt; loc } when String.is_prefix txt ~prefix:"_" ->
+          | Ppat_var { txt; loc } when is_name_suspicious txt ->
             (try
                let it = occurs_check txt in
                it.expr it vb.pvb_expr;
