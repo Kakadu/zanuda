@@ -4,6 +4,7 @@ open Zanuda_core
 open Utils
 
 let is_camel_case s = String.(lowercase s <> s)
+let is_good_name s = String.is_prefix s ~prefix:"_menhir_cell1_" || not (is_camel_case s)
 let lint_id = "camel_cased_types"
 let lint_source = LINT.FPCourse
 
@@ -52,7 +53,7 @@ let run _ fallback =
         let open Parsetree in
         let tname = tdecl.ptype_name.txt in
         let loc = tdecl.ptype_loc in
-        if is_camel_case tname
+        if not (is_good_name tname)
         then (
           let filename = loc.Location.loc_start.Lexing.pos_fname in
           CollectedLints.add ~loc (report ~loc ~filename tname));
