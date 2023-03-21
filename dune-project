@@ -36,7 +36,8 @@
   ppx_assert
   ppx_expect
   stdune
-  angstrom
+  (angstrom
+   (>= 0.15.0))
   (base :with-test)
   (ppx_blob :with-test)
   (ppx_fields_conv :with-test)
