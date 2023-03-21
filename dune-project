@@ -17,7 +17,7 @@
 
 (package
  (name zanuda)
- (synopsis "An attempt to create a linter")
+ (synopsis "OCaml linter experiment")
  (description
   "Inspired by https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml")
  (depends
@@ -30,9 +30,9 @@
   ppx_inline_test ; implies dependecy on base
   ppx_assert
   ppx_expect
-  (base :with-test)
   stdune
   angstrom
+  (base :with-test)
   (ppx_blob :with-test)
   (ppx_fields_conv :with-test)
   ;(menhir :with-test)
