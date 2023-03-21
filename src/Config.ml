@@ -3,7 +3,8 @@ open Caml.Format
 
 type mode =
   | Unspecified
-  | Dump of string
+  | Dump_json of string
+  | Dump_text
   | File of string
   | Dir of string
 
@@ -38,11 +39,17 @@ let opts =
   }
 ;;
 
+(** Modes *)
+
 let mode () = opts.mode
 let set_mode m = opts.mode <- m
-let set_dump_file s = set_mode (Dump s)
+let set_dump_file s = set_mode (Dump_json s)
+let set_dump_text () = set_mode Dump_text
 let set_in_file s = set_mode (File s)
 let set_in_dir s = set_mode (Dir s)
+
+(** Other switches *)
+
 let add_include s = opts.extra_includes <- s :: opts.extra_includes
 let set_out_file s = opts.outfile <- Some s
 let set_out_golint s = opts.outgolint <- Some s
@@ -83,17 +90,22 @@ let recover_filepath filepath =
 let parse_args () =
   let open Caml in
   let standard_args =
-    [ "-o", Arg.String set_out_file, "Set Markdown output file"
-    ; "-dir", Arg.String set_in_dir, "Set root directory of dune project"
-    ; "-ogolint", Arg.String set_out_golint, "Set output file in golint format"
-    ; "-ordjsonl", Arg.String set_out_rdjsonl, "Set output file in rdjsonl format"
-    ; "-ws", Arg.String set_workspace, "Set dune workspace root"
-    ; "-del-prefix", Arg.String set_prefix_to_cut, "Set prefix to cut from file names"
-    ; "-add-prefix", Arg.String set_prefix_to_add, "Set prefix to reprend to file names"
+    [ "-o", Arg.String set_out_file, "[FILE] Set Markdown output file"
+    ; "-dump", Arg.Unit set_dump_text, "Dump info about available lints to terminal"
     ; ( "-dump-lints"
       , Arg.String set_dump_file
-      , "Dump information about available linters to JSON" )
+      , "[FILE] Dump information about available lints to JSON" )
+    ; "-dir", Arg.String set_in_dir, "[FILE] Set root directory of dune project"
+    ; "-ogolint", Arg.String set_out_golint, "Set output file in golint format"
+    ; "-ordjsonl", Arg.String set_out_rdjsonl, "Set output file in rdjsonl format"
+    ; ( "-del-prefix"
+      , Arg.String set_prefix_to_cut
+      , "Set prefix to cut from pathes in OUTPUT file" )
+    ; ( "-add-prefix"
+      , Arg.String set_prefix_to_add
+      , "Set prefix to prepend to pathes in OUTPUT file" )
     ; "-I", Arg.String add_include, "Add extra include path for type checking"
+      (* ; "-ws", Arg.String set_workspace, "[FILE] Set dune workspace root" *)
     ; "-v", Arg.Unit set_verbose, "More verbose output"
     ]
   in
@@ -115,5 +127,5 @@ let parse_args () =
   Arg.parse
     (standard_args @ List.rev extra_args)
     set_in_file
-    "Use [-dir PATH] switch to check dune-based project"
+    "Use -dir [PATH] to check dune-based project"
 ;;

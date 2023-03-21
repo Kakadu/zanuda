@@ -6,7 +6,7 @@ The tools accpts a directory where [dune](https://dune.rtfd.io)-based project is
 
     linter -dir <DIR>
 
-It parses the output of `dune describe` to get information about the files in the project. After that it applies lints in that files, one by one. Everything is tested with OCaml 4.12.1
+It parses the output of `dune describe` to get information about the files in the project. After that it applies lints in that files, one by one. Everything is tested with OCaml 4.14.1
 
 ##### Source tree mapping
 
@@ -18,7 +18,7 @@ Main executable:
   * `LINT.mli` -- module type which every lint should implement
   * `src/CollectedLints.ml` -- storing lints found in the file
 
-Library implementing first class pattern matching on OCaml 3.12.1's typedtree
+Library implementing first class pattern matching on OCaml 4.14.1's typedtree
   * `src/pattern/`
 
 Typed lints implemented. They analyze OCaml's TypedTree

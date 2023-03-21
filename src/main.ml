@@ -193,7 +193,14 @@ let () =
   let () =
     match Config.mode () with
     | Config.Unspecified -> ()
-    | Dump filename ->
+    | Dump_text ->
+      let f (module L : LINT.GENERAL) =
+        Format.printf "\n\n## Lint '%s'\n\n%s\n" L.lint_id L.documentation
+      in
+      List.iter ~f (untyped_linters :> (module LINT.GENERAL) list);
+      List.iter ~f (typed_linters :> (module LINT.GENERAL) list);
+      exit 0
+    | Dump_json filename ->
       let info =
         List.concat
           [ List.map untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->

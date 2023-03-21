@@ -6,9 +6,27 @@
 
 Mostly inspired by [How possible is a clippy-like linter for OCaml?](https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml)
 
-Lints: https://kakadu.github.io/zanuda
+Lints: https://kakadu.github.io/zanuda/lints/index.html
 
 API: https://kakadu.github.io/mylinter/api/ is currently empty
+
+##### Usage 
+
+Examples of 'zanuda' usage could be found in the 'tests' directory. But in short:
+
+* Compile your dune project and run this linter via
+
+    ````
+    dune build . @runtest -j3
+    zanuda -dir .
+    ````
+
+    It will report found issues using OCaml's alerts
+
+* You could read the documentation about supported lints via `zanuda -dump`. CI runs regularly uploads [information about available lints](https://kakadu.github.io/zanuda/lints/index.html) to Gihub Pages.
+
+* You could run linter and dump the results in short JSON form. They could be processed later, for example as review comment via GitHub API. (This reporting is not implemented yet.)
+
 
 ##### See also
 
