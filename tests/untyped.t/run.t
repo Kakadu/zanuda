@@ -3,8 +3,8 @@
 $ dune build testlib2.cmxa
   $ dune build @lint -p testsuite2 --force
   $ dune build @lint -p testsuite3 --force
-  $ dune build @lint -p testsuite4 --force
-  (cd _build/default && /home/kakadu/asp/zanuda/_build/install/default/bin/zanuda startingWildcard.ml -ordjsonl /tmp/out.rdjsonl -ws .)
+# In the output below it prints a full path to invocation of 'zanuda'. We are removing these lines to make tests portable
+  $ dune build @lint -p testsuite4 --force --display=quiet 2>&1 | tail -n +2
   File "startingWildcard.ml", line 1, characters 8-12:
   1 | let rec _foo x = _foo x
               ^^^^

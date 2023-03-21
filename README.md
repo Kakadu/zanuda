@@ -13,7 +13,7 @@ Lints: https://kakadu.github.io/zanuda/lints/index.html
 
 API: https://kakadu.github.io/mylinter/api/ is currently empty
 
-##### Usage 
+##### Usage
 
 Examples of 'zanuda' usage could be found in the 'tests' directory. But in short:
 
@@ -40,7 +40,11 @@ Examples of 'zanuda' usage could be found in the 'tests' directory. But in short
 
 
 
-##### Developing
+##### Developping
+
+Current dependecies:
+
+    opam install ppx_fields_conv ppx_blob base angstrom ppx_expect ppx_assert sexplib --yes
 
 Running a single test:
 

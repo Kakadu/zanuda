@@ -13,8 +13,8 @@ let cbool2 =
 ;;
 let __ _menhir_action_05 = _menhir_action_05
 let __ _menhir_cell1_RULECOMPONENT = _menhir_cell1_RULECOMPONENT
-let f1 () = 
-  let _menhir_action_05 = 1 in 
+let f1 () =
+  let _menhir_action_05 = 1 in
   _menhir_action_05
 
 (** Should not give a warning *)
