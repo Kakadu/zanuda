@@ -25,7 +25,7 @@
   (ppxlib
    (and
     (>= 0.25.1)
-    (< 0.27.0)))
+    (<= 0.28.0)))
   sexplib
   ppx_inline_test ; implies dependecy on base
   ppx_assert
