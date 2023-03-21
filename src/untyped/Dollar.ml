@@ -23,7 +23,7 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
 ;;
 
-type input = Tast_iterator.iterator
+type input = Ast_iterator.iterator
 
 let msg ppf () = fprintf ppf "Extranous `@@@@`."
 
@@ -46,19 +46,17 @@ let report ~loc ~filename info =
 ;;
 
 let run _ fallback =
-  let open Tast_iterator in
+  let open Ast_iterator in
   { fallback with
     expr =
       (fun self e ->
-        let open Tast_pattern in
+        let open Ppxlib.Ast_pattern in
         let pm =
-          texp_apply
-            (texp_ident (pident (string "@@")))
-            ((nolabel ** some (texp_ident __))
-             ^:: (nolabel ** some (texp_record __ __))
-             ^:: nil)
+          pexp_apply
+            (pexp_ident (lident (string "@@")))
+            ((nolabel ** pexp_ident __) ^:: (nolabel ** pexp_record __ __) ^:: nil)
         in
-        let loc = e.exp_loc in
+        let loc = e.pexp_loc in
         let filename = loc.Location.loc_start.Lexing.pos_fname in
         let () =
           try

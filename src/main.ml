@@ -11,6 +11,7 @@ let untyped_linters =
   ; (module ParsetreeHasDocs : LINT.UNTYPED)
   ; (module ToplevelEval : LINT.UNTYPED)
   ; (module VarShouldNotBeUsed : LINT.UNTYPED)
+  ; (module UntypedLints.Dollar : LINT.UNTYPED)
   ]
 ;;
 
@@ -28,7 +29,6 @@ let typed_linters =
   ; (module IfBool : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
   ; (module StringConcat : LINT.TYPED)
-  ; (module UntypedLints.Dollar : LINT.TYPED)
   ; (module UntypedLints.GuardInsteadOfIf : LINT.TYPED)
   ; (module MonadLaws : LINT.TYPED) (* * *********************** *)
   ]
@@ -78,12 +78,14 @@ let build_iterator ~init ~compose ~f xs =
 let untyped_on_structure info =
   let hash = Config.enabled_lints () in
   let is_enabled = Hash_set.mem hash in
-  build_iterator
-    ~f:(fun o -> o.Ast_iterator.structure o)
-    ~compose:(fun (module L : LINT.UNTYPED) acc ->
-      if is_enabled L.lint_id then L.run info acc else acc)
-    ~init:Ast_iterator.default_iterator
-    untyped_linters
+  fun stru ->
+    build_iterator
+      ~f:(fun o -> o.Ast_iterator.structure o)
+      ~compose:(fun (module L : LINT.UNTYPED) acc ->
+        if is_enabled L.lint_id then L.run info acc else acc)
+      ~init:Ast_iterator.default_iterator
+      untyped_linters
+      (Ppxlib_ast.Selected_ast.Of_ocaml.copy_structure stru)
 ;;
 
 let untyped_on_signature info =
