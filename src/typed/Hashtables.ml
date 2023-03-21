@@ -9,11 +9,8 @@ type input = Tast_iterator.iterator
 let lint_source = LINT.FPCourse
 let lint_id = "mutable_hashtables"
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Using mutable data structures for teaching purposes is usually discouraged. Replace \
 Hashtables by standart tree-like maps or consider Hash-Array Mapped Tries (HAMT).
@@ -25,7 +22,10 @@ Use mutable `ref`erences and mutable structure fields only if it is really requi
   * Functions, that count number of invocations and/or generate unique names.
   * Implementing memoization or laziness
 |}
+  |> Stdlib.String.trim
 ;;
+
+let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 
 let msg ppf () =
   Format.fprintf

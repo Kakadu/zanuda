@@ -62,22 +62,22 @@ include (
 
 let%test _ = verify_line1 " Copyright 2021-2022, Kakadu and contributors  "
 let%test _ = verify_line2 " SPDX-License-Identifier: LGPL-3.0-or-later  "
-
 let lint_id = "top_file_license"
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~impl:LINT.Untyped
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Ensures that every files start from license and copyright information. The description is expected in SPDX format.
 
 ### Why is this bad?
 These annotation allow automatization tools to check code for license compliance.
   |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
 ;;
 
 type input = Tast_iterator.iterator

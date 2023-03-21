@@ -8,18 +8,19 @@ let is_good_name s = String.is_prefix s ~prefix:"_menhir_cell1_" || not (is_came
 let lint_id = "camel_cased_types"
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~impl:LINT.Untyped
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Checks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp`) popular in Python and Haskell.
 
 ### Why is this bad?
 Wrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Modules names' in standard library are in camel case but in most Janestreet libraries (ppxlib, base) they are in snake case too.
   |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
 ;;
 
 type input = Ast_iterator.iterator

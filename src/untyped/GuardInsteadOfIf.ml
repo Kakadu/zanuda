@@ -6,12 +6,8 @@ open Utils
 let lint_id = "use_guard_instead_of_if"
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~impl:LINT.Untyped
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Pattern matching guards are not very common in mainstream languages so it easy to forget about them for OCaml wannabies.
 This lint looks for if-then-else expressions in right hand sides of pattern matching, and recommends to use pattern guards.
@@ -45,6 +41,11 @@ match ... with
 
 In this variant you have less potential for copy-paste mistake
   |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
 ;;
 
 open Parsetree

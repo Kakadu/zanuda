@@ -10,13 +10,8 @@ let group = LINT.Perf
 let level = LINT.Warn
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~group
-    ~level
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Concatenating multiple strings at once (`a^b^c`) has a perfomance issue. OCaml needs to allocate memory for the result of
 `a^b` and after that it needs to allocate memory for a result of concatenation `a^b` and `c`, i.e. it allocates unneeded memory for intermediate results. (The same issue arises in left-associative concatenation of lists).
@@ -27,6 +22,11 @@ Use [function](https://github.com/ocaml/ocaml/blob/4.14/stdlib/string.ml#L72) `v
 
 Or rewrite using printf: `Format.printf "%s%s%s" a b c`.
 |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
 let msg ppf () =

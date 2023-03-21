@@ -8,18 +8,19 @@ let is_camel_case s = String.(lowercase s <> s)
 let lint_id = "camel_extra_dollar"
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~impl:LINT.Untyped
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 The `@@` operator is used for writing less parentheses in expression. Code like `f (g (h x))` could be rewritten as
 `f @@ g (h x)`. But is some cases it is not required, like `print_int @@ 1`.
 Some of these cases are reported by this lint.
 
   |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
 ;;
 
 type input = Tast_iterator.iterator
@@ -54,8 +55,8 @@ let run _ fallback =
           texp_apply
             (texp_ident (pident (string "@@")))
             ((nolabel ** some (texp_ident __))
-            ^:: (nolabel ** some (texp_record __ __))
-            ^:: nil)
+             ^:: (nolabel ** some (texp_record __ __))
+             ^:: nil)
         in
         let loc = e.exp_loc in
         let filename = loc.Location.loc_start.Lexing.pos_fname in

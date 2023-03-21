@@ -9,18 +9,18 @@ let group = LINT.Suspicious
 let level = LINT.Allow
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~group
-    ~level
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 The usage of 'Stdlib.failwith' in production code could be error-prone. The constructions `failwith "not implemented"` should be implemented sooner or later.
 
 Constructions `failwith "should not happen"` smells. Maybe techniques from https://doi.org/10.1145/3299711.3242755 could help.
 |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
 let msg ppf () =

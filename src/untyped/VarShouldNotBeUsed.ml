@@ -6,18 +6,19 @@ open Utils
 let lint_id = "var_should_not_be_used"
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~impl:LINT.Untyped
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Report identifier starting with '_' and used later
 
 ### Why is this bad?
 OCaml compiler has a tendency to report warning 26 about unused variables. Usually this warning could be supressed by adding '_' in the beginning of identifier to make it look like wildcard variable. But if that identifier is used later it contradicts the purpose of adding undescore in the beginnning.
   |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
 ;;
 
 type input = Ast_iterator.iterator

@@ -9,13 +9,8 @@ let lint_source = LINT.FPCourse
 let group = LINT.Style
 let level = LINT.Allow
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~group
-    ~level
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Proposes to rewrite 'fun x -> match x with ...' to `function`.
 
@@ -39,6 +34,11 @@ And this piece of code is discouraged:
     | (x::xs) -> ... x ... xs ... arg
 ```
 |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
 let msg ppf () = Caml.Format.fprintf ppf "Using `function` is recommended%!"

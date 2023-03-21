@@ -59,10 +59,6 @@ let outfile () = opts.outfile
 let out_golint () = opts.outgolint
 let out_rdjsonl () = opts.out_rdjsonl
 let unset_check_filesystem () = opts.check_filesystem <- false
-
-(* let infile () = opts.infile *)
-(* let set_in_file s = opts.infile <- s *)
-(* let set_dump_file s = opts.dump_file <- Some s *)
 let verbose () = opts.verbose
 let set_verbose () = opts.verbose <- true
 
@@ -119,6 +115,5 @@ let parse_args () =
   Arg.parse
     (standard_args @ List.rev extra_args)
     set_in_file
-    "Calling [zanuda FILES] runs untyped checks on specified files. Use [-dir PATH] \
-     switch to check dune-based project"
+    "Use [-dir PATH] switch to check dune-based project"
 ;;

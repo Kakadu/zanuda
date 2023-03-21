@@ -9,21 +9,21 @@ type input = Tast_iterator.iterator
 let lint_source = LINT.FPCourse
 let lint_id = "monad_laws_simplify"
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does?
 Warns if monadic code could be simplified.
 
 ### Monad laws
   1) **return x >>= f === f x** for any  f and x
-  2) **m >>= retunr === m** for any monadic value m
+  2) **m >>= return === m** for any monadic value m
   3) **(m >>= g) >>= k  ===  m >>= fun x -> ((g x) >>= k)** for any monadic values m,g,k
 
 |}
+  |> Stdlib.String.trim
 ;;
+
+let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 
 let msg ppf () =
   Caml.Format.fprintf
@@ -57,7 +57,7 @@ let run _ fallback =
             (tpat_var __)
             none
             (texp_apply1 (texp_ident (pident (string "return"))) (texp_ident (pident __)))
-         ^:: nil)
+          ^:: nil)
     (* TODO: invent monads to be able to check two identifiers during the matching *)
   in
   let open Tast_iterator in

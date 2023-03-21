@@ -9,13 +9,8 @@ let group = LINT.Perf
 let level = LINT.Warn
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~group
-    ~level
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 
 Performs List fusion (a.k.a. deforestation) for OCaml lists.
@@ -26,6 +21,11 @@ When you performing bunch of list operations, for example `List.map f (List.map 
 the intermediate lists that are created glut a lot of memory. It's recommended to rewrite the code using 'free thorems'.
 See the original paper [P.Wadler "Deforestation: transforming programs to eliminate trees" (1990)](https://homepages.inf.ed.ac.uk/wadler/topics/deforestation.html) for more details.
 |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
 type kind =
@@ -84,9 +84,9 @@ let run _ fallback =
     texp_apply_nolabelled list_map (drop ^:: texp_apply list_map drop ^:: nil)
     |> map0 ~f:MapMap
     ||| (texp_apply_nolabelled list_filter (drop ^:: texp_apply list_map drop ^:: nil)
-        |> map0 ~f:FilterMap)
+         |> map0 ~f:FilterMap)
     ||| (texp_apply list_concat ((nolabel ** some (texp_apply list_map drop)) ^:: nil)
-        |> map0 ~f:ConcatMap)
+         |> map0 ~f:ConcatMap)
   in
   let open Tast_iterator in
   { fallback with

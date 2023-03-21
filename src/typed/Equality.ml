@@ -9,18 +9,18 @@ type input = Tast_iterator.iterator
 let lint_source = LINT.Camelot
 let lint_id = "use_match_instead_of_equality"
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 For most algebraic datatypes it's better to use pattern matching then equality `(=)`. This lint reports that for
 standard lists, options and bools.
 
 Adopted from camelot's lint list.
-  |}
+|}
+  |> Stdlib.String.trim
 ;;
+
+let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 
 type kind =
   | Option

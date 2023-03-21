@@ -9,18 +9,18 @@ let group = LINT.Suspicious
 let level = LINT.Deny
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~group
-    ~level
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Catching all possible exceptions with wildcard considered as antipattern
 
 See also https://en.wikipedia.org/wiki/Error_hiding
 |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
 let msg ppf () = Caml.Format.fprintf ppf "Antipattern: error swallowing%!"

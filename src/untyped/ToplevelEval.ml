@@ -6,15 +6,16 @@ open Utils
 let lint_id = "no_toplevel_eval"
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~impl:LINT.Untyped
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Adding toplevel evaluation statements is not recommended because it forces to add `;;`. Rewrite using `let () = ...`
   |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
 ;;
 
 open Parsetree

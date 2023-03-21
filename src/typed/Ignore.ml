@@ -11,13 +11,8 @@ let group = LINT.Suspicious
 let level = LINT.Allow
 let lint_source = LINT.FPCourse
 
-let describe_itself () =
-  describe_as_clippy_json
-    lint_id
-    ~group
-    ~level
-    ~docs:
-      {|
+let documentation =
+  {|
 ### What it does
 Using 'Stdlib.ignore' is discouraged. It's better to rewrite it with let.
 
@@ -25,6 +20,11 @@ Using 'Stdlib.ignore' is discouraged. It's better to rewrite it with let.
 
 Let's look at expression 'ignore (f x)'. If in the future the function 'f' will accept one more argument or change return type the code above may become buggy, because the function will not be fully applied and executead (although the warning may be raised here if this warning is not masked). It's recommended to rewrite the code as 'let (_ : int) = f x in ...` where 'int' is an example of return type of the function 'f'.
 |}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
 let msg ppf e0 =
