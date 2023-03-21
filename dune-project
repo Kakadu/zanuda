@@ -21,6 +21,10 @@
  (description
   "Inspired by https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml")
  (depends
+  (ocaml
+   (and
+    (>= 4.14)
+    (< 5.0)))
   yojson
   (ppxlib
    (and

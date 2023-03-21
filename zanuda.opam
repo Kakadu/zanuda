@@ -10,6 +10,7 @@ homepage: "https://github.com/Kakadu/zanuda"
 bug-reports: "https://github.com/Kakadu/zanuda/issues"
 depends: [
   "dune" {>= "3.4"}
+  "ocaml" {>= "4.14" & < "5.0"}
   "yojson"
   "ppxlib" {>= "0.25.1" & <= "0.28.0"}
   "sexplib"
