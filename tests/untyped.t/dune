@@ -47,7 +47,7 @@
 (library
  (name test_startingWildcard)
  (modules
-  ;   parser1
+  parser1
   startingWildcard
   ;
   )
@@ -62,10 +62,10 @@
     -ws
     %{workspace_root}))))
 
-; (menhir
-;  (modules parser1)
-;  (flags --explain)
-;  (infer true))
+(menhir
+ (modules parser1)
+ (flags --explain)
+ (infer true))
 
 (cram
  (deps %{workspace_root}/utils/mylint.exe))

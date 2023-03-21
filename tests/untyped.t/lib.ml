@@ -5,3 +5,6 @@ type myAst = MyAst
 
 let () =  () ;;
 1+1;;
+
+
+type _menhir_cell_NONTERM = MyAst

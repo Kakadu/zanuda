@@ -7,3 +7,5 @@ let is_empty2 xs = List.length xs = 0
 let tautology1 xs = List.length xs >= 0
 
 let not_empty xs = List.length xs > 0
+
+type _menhir_cell1_NONTERM = int 
