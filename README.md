@@ -1,6 +1,9 @@
-[![Build Master](https://github.com/Kakadu/mylinter/actions/workflows/master.yml/badge.svg?branch=master)](https://github.com/Kakadu/mylinter/actions/workflows/master.yml)
+[![Build Master](https://github.com/Kakadu/zanuda/actions/workflows/master_docker.yml/badge.svg?branch=master)](https://github.com/Kakadu/zanuda/actions/workflows/master_docker.yml)
+[![License](https://img.shields.io/badge/license-LGPL-blue)](https://github.com/JetBrains-Research/spla/blob/master/LICENSE.md)
+[![Lints docs](https://img.shields.io/badge/Documentation-lints-yellowgreen)](https://kakadu.github.io/zanuda/lints/index.html)
+[![API docs](https://img.shields.io/badge/Documentation-API-yellowgreen)](https://kakadu.github.io/zanuda/api/index.html)
 
-[![](http://github-actions.40ants.com/Kakadu/mylinter/matrix.svg)](https://github.com/Kakadu/mylinter)
+[![](http://github-actions.40ants.com/Kakadu/zanuda/matrix.svg)](https://github.com/Kakadu/zanuda)
 
 #### An OCaml linter experiment
 
