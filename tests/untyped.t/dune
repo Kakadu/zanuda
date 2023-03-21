@@ -59,8 +59,9 @@
     %{input-file}
     -ordjsonl
     /tmp/out.rdjsonl
-    -ws
-    %{workspace_root}))))
+    ;-ws
+    ;%{workspace_root}
+    ))))
 
 (menhir
  (modules parser1)
