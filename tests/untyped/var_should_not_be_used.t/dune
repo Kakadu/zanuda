@@ -1,0 +1,11 @@
+(library
+ (name test_var_should_not_be_used)
+ (wrapped false)
+ (modules lib)
+ (flags
+  (:standard
+   ;
+   )))
+
+(cram
+ (deps %{bin:zanuda.exe}))

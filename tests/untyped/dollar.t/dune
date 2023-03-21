@@ -1,0 +1,11 @@
+(library
+ (name test_dollar)
+ (wrapped false)
+ (modules dollar)
+ (flags
+  (:standard
+   ;
+   )))
+
+(cram
+ (deps %{bin:zanuda.exe}))

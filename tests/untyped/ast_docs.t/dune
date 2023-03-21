@@ -1,0 +1,9 @@
+(library
+ (name test_dollar)
+ (wrapped false)
+ ; (modules stuff)
+ (modules_without_implementation ast)
+ (flags
+  (:standard
+   ;
+   )))
