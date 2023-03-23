@@ -1,3 +1,7 @@
+(** Copyright 2021-2023, Kakadu. *)
+
+(** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
 open Base
 module Format = Caml.Format
 open Zanuda_core
@@ -62,9 +66,9 @@ let run _ fallback =
       texp_ite ebool drop drop
       |> map1 ~f:(Format.asprintf "Executing 'if %b' smells bad")
       ||| (texp_ite drop ebool drop
-           |> map1 ~f:(Format.asprintf "Executing 'if ... then %b' smells bad"))
+          |> map1 ~f:(Format.asprintf "Executing 'if ... then %b' smells bad"))
       ||| (texp_ite drop drop (some ebool)
-           |> map1 ~f:(Format.asprintf "Executing 'if ... then .. else %b' smells bad"))
+          |> map1 ~f:(Format.asprintf "Executing 'if ... then .. else %b' smells bad"))
     in
     let ops =
       texp_apply2 (texp_ident (path [ "Stdlib"; "&&" ])) ebool drop
@@ -82,20 +86,20 @@ let run _ fallback =
     expr =
       (fun self expr ->
         (if !do_check
-         then
-           let open Typedtree in
-           let __ _ = Format.eprintf "%a\n%!" MyPrinttyped.expr expr in
-           let loc = expr.exp_loc in
-           Tast_pattern.parse
-             pat
-             loc
-             ~on_error:(fun _desc () -> ())
-             expr
-             (fun s () ->
-               CollectedLints.add
-                 ~loc
-                 (report loc.Location.loc_start.Lexing.pos_fname ~loc s))
-             ());
+        then
+          let open Typedtree in
+          let __ _ = Format.eprintf "%a\n%!" MyPrinttyped.expr expr in
+          let loc = expr.exp_loc in
+          Tast_pattern.parse
+            pat
+            loc
+            ~on_error:(fun _desc () -> ())
+            expr
+            (fun s () ->
+              CollectedLints.add
+                ~loc
+                (report loc.Location.loc_start.Lexing.pos_fname ~loc s))
+            ());
         fallback.expr self expr)
   ; structure_item =
       (fun self si ->

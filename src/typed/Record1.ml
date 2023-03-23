@@ -1,3 +1,7 @@
+(** Copyright 2021-2023, Kakadu. *)
+
+(** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
 open Base
 module Format = Caml.Format
 open Zanuda_core
@@ -161,18 +165,18 @@ let run _ fallback =
                   Tast_pattern.(
                     parse
                       (__ ** rld_kept
-                       |> map1 ~f:(State.add_kept acc)
-                       ||| (label_desc __
-                            ** rld_overriden
-                                 (lident __)
-                                 (as__ (texp_field (texp_ident __) __))
-                            |> map5 ~f:(fun _ field_lhs expr_rhs stru field_rhs ->
-                                 if String.equal field_lhs field_rhs.Types.lbl_name
-                                 then State.add_over_self acc field_rhs.lbl_name stru
-                                 else State.add_over_other acc field_lhs expr_rhs))
-                       ||| (label_desc __ ** rld_overriden (lident __) __
-                            |> map3 ~f:(fun _ (field_lhs : string) field_rhs ->
-                                 State.add_over_other acc field_lhs field_rhs))))
+                      |> map1 ~f:(State.add_kept acc)
+                      ||| (label_desc __
+                           ** rld_overriden
+                                (lident __)
+                                (as__ (texp_field (texp_ident __) __))
+                          |> map5 ~f:(fun _ field_lhs expr_rhs stru field_rhs ->
+                               if String.equal field_lhs field_rhs.Types.lbl_name
+                               then State.add_over_self acc field_rhs.lbl_name stru
+                               else State.add_over_other acc field_lhs expr_rhs))
+                      ||| (label_desc __ ** rld_overriden (lident __) __
+                          |> map3 ~f:(fun _ (field_lhs : string) field_rhs ->
+                               State.add_over_other acc field_lhs field_rhs))))
                     loc
                     ~on_error:(fun _ () -> acc)
                     (lab_desc, lab_def)

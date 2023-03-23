@@ -1,3 +1,7 @@
+(** Copyright 2021-2023, Kakadu. *)
+
+(** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
 type ('a, 'b, 'c) t
 
 (** Matches a value against a pattern. *)

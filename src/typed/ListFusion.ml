@@ -1,3 +1,7 @@
+(** Copyright 2021-2023, Kakadu. *)
+
+(** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
 open Base
 open Zanuda_core
 open Zanuda_core.Utils
@@ -84,9 +88,9 @@ let run _ fallback =
     texp_apply_nolabelled list_map (drop ^:: texp_apply list_map drop ^:: nil)
     |> map0 ~f:MapMap
     ||| (texp_apply_nolabelled list_filter (drop ^:: texp_apply list_map drop ^:: nil)
-         |> map0 ~f:FilterMap)
+        |> map0 ~f:FilterMap)
     ||| (texp_apply list_concat ((nolabel ** some (texp_apply list_map drop)) ^:: nil)
-         |> map0 ~f:ConcatMap)
+        |> map0 ~f:ConcatMap)
   in
   let open Tast_iterator in
   { fallback with
