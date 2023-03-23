@@ -78,14 +78,12 @@ let build_iterator ~init ~compose ~f xs =
 let untyped_on_structure info =
   let hash = Config.enabled_lints () in
   let is_enabled = Hash_set.mem hash in
-  fun stru ->
-    build_iterator
-      ~f:(fun o -> o.Ast_iterator.structure o)
-      ~compose:(fun (module L : LINT.UNTYPED) acc ->
-        if is_enabled L.lint_id then L.run info acc else acc)
-      ~init:Ast_iterator.default_iterator
-      untyped_linters
-      (Ppxlib_ast.Selected_ast.Of_ocaml.copy_structure stru)
+  build_iterator
+    ~f:(fun o -> o.Ast_iterator.structure o)
+    ~compose:(fun (module L : LINT.UNTYPED) acc ->
+      if is_enabled L.lint_id then L.run info acc else acc)
+    ~init:Ast_iterator.default_iterator
+    untyped_linters
 ;;
 
 let untyped_on_signature info =

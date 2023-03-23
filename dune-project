@@ -27,10 +27,10 @@
     (< 5.0)))
   (yojson
    (>= 2.0.0))
-  (ppxlib
-   (and
-    (>= 0.25.1)
-    (<= 0.28.0)))
+  ; (ppxlib
+  ;  (and
+  ;   (>= 0.25.1)
+  ;   (<= 0.28.0)))
   sexplib
   ppx_inline_test ; implies dependecy on base
   ppx_assert

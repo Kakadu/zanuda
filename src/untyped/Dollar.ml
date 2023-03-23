@@ -50,24 +50,27 @@ let run _ fallback =
   { fallback with
     expr =
       (fun self e ->
-        let open Ppxlib.Ast_pattern in
-        let pm =
-          pexp_apply
-            (pexp_ident (lident (string "@@")))
-            ((nolabel ** pexp_ident __) ^:: (nolabel ** pexp_record __ __) ^:: nil)
-        in
-        let loc = e.pexp_loc in
-        let filename = loc.Location.loc_start.Lexing.pos_fname in
         let () =
-          try
-            parse
-              pm
-              Location.none
-              e
-              ~on_error:(fun _ -> ())
-              (fun _ _ _ -> CollectedLints.add ~loc (report ~loc ~filename ()))
-          with
-          | Location.Error e -> Format.printf "%a\n%!" Location.print_report e
+          match e.pexp_desc with
+          | Parsetree.Pexp_apply
+              ( { pexp_desc = Pexp_ident { txt = Lident "@@" } }
+              , [ (Nolabel, { pexp_desc = Pexp_ident _ })
+                ; (Nolabel, { pexp_desc = Pexp_ident _ })
+                ] )
+          | Pexp_apply
+              ( { pexp_desc = Pexp_ident { txt = Lident "@@" } }
+              , [ (Nolabel, { pexp_desc = Pexp_ident _ })
+                ; (Nolabel, { pexp_desc = Pexp_constant _ })
+                ] )
+          | Pexp_apply
+              ( { pexp_desc = Pexp_ident { txt = Lident "@@" } }
+              , [ (Nolabel, { pexp_desc = Pexp_ident _ })
+                ; (Nolabel, { pexp_desc = Pexp_record _ })
+                ] ) ->
+            let loc = e.pexp_loc in
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            CollectedLints.add ~loc (report ~loc ~filename ())
+          | _ -> ()
         in
         fallback.expr self e)
   }
