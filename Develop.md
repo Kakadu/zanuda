@@ -2,11 +2,11 @@
 
 ##### Main
 
-The tools accpts a directory where [dune](https://dune.rtfd.io)-based project is build
+The tool accepts a directory where [dune](https://dune.rtfd.io)-based project is located and was built
 
-    linter -dir <DIR>
+    zanuda -dir <DIR>
 
-It parses the output of `dune describe` to get information about the files in the project. After that it applies lints in that files, one by one. Everything is tested with OCaml 4.14.1
+It parses the output of `dune describe` to get information about the files in the project. After that it applies lints on these files, one by one. Everything is tested with OCaml 4.14.1, and kind of specialized for this version of compiler, because we implemented Typedtree-specific first class patterns.
 
 ##### Source tree mapping
 
@@ -18,11 +18,11 @@ Main executable:
   * `LINT.mli` -- module type which every lint should implement
   * `src/CollectedLints.ml` -- storing lints found in the file
 
-Library implementing first class pattern matching on OCaml 4.14.1's typedtree
+A library implementing first class pattern matching on OCaml 4.14.1's typedtree
   * `src/pattern/`
 
-Typed lints implemented. They analyze OCaml's TypedTree
+Typed lints that has been implemented. They analyze OCaml's TypedTree
   * `src/typed/`
 
-Untyped lints analyze OCaml's ParseTree (highly likely be a legacy).
+Untyped lints analyze OCaml's ParseTree. They are needed in rare cases, for example, compiler desugars `@@` before construction of typedtree.
   * `src/untyped/`
