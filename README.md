@@ -5,11 +5,11 @@
 
 [![](http://github-actions.40ants.com/Kakadu/zanuda/matrix.svg)](https://github.com/Kakadu/zanuda)
 
-#### An OCaml linter experiment
+## An OCaml linter experiment
 
 Inspired by:
-    * [How possible is a clippy-like linter for OCaml?](https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml)
-    * My experience in teaching OCaml at my local university.
+* [How possible is a clippy-like linter for OCaml?](https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml)
+* My experience in teaching OCaml at my local university.
 
 At the moment most of implemented lints are inspired by me teaching experience. But I'm aware that there are other linters like [Camelot](https://github.com/upenn-cis1xx/camelot) for OCaml and [Clippy](https://github.com/rust-lang/rust-clippy) Rust.
 
