@@ -16,6 +16,7 @@ depends: [
   "ppx_inline_test"
   "ppx_assert"
   "ppx_expect"
+  "bisect_ppx"
   "stdune"
   "angstrom" {>= "0.15.0"}
   "base" {with-test}

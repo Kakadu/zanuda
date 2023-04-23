@@ -10,4 +10,6 @@
  (libraries ppxlib)
  (preprocess
   (pps ppx_optcomp ppx_inline_test ppx_assert))
+ (instrumentation
+  (backend bisect_ppx))
  (inline_tests))

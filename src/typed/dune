@@ -18,4 +18,6 @@
   Tuple_matching)
  (preprocess
   (pps ppx_inline_test ppxlib.metaquot))
+ (instrumentation
+  (backend bisect_ppx))
  (inline_tests))

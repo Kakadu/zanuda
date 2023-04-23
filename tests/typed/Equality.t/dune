@@ -1,4 +1,6 @@
 (library
  (name test_Equality)
  (wrapped false)
- (modules Equality))
+ (modules Equality)
+ (instrumentation
+  (backend bisect_ppx)))

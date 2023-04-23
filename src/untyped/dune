@@ -13,4 +13,6 @@
   )
  (preprocess
   (pps ppxlib.metaquot ppx_expect))
+ (instrumentation
+  (backend bisect_ppx))
  (inline_tests))
