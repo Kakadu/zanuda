@@ -1,0 +1,6 @@
+# Run this command to always ignore formatting commits in `git blame`
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Rename many modules to snake_case
+6e75c5a2b460294d97b50055c4d7ed565a6e3984
+
