@@ -2,18 +2,18 @@
  (name TypedLints)
  (libraries zanuda_core Tast_pattern)
  (modules
-  ListLength
-  Failwith
   ExcTryWithWildcard
-  Record1
-  ProposeFunction
-  ListFusion
-  IfBool
   Equality
+  Failwith
   Hashtables
-  StringConcat
+  If_bool
+  List_fusion
+  List_length
+  Monad_laws
+  Record1
+  Propose_function
+  String_concat
   String_concat_fold
-  MonadLaws
   Ignore)
  (preprocess
   (pps ppx_inline_test ppxlib.metaquot))

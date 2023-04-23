@@ -21,21 +21,22 @@ let untyped_linters =
 
 let typed_linters =
   let open TypedLints in
-  [ (* * *********************** *)
-    (module Failwith : LINT.TYPED)
-  ; (module Hashtables : LINT.TYPED)
-  ; (module ListLength : LINT.TYPED)
-  ; (module ProposeFunction : LINT.TYPED)
-  ; (module ExcTryWithWildcard : LINT.TYPED)
-  ; (module Record1 : LINT.TYPED)
-  ; (module Ignore : LINT.TYPED)
-  ; (module ListFusion : LINT.TYPED)
-  ; (module IfBool : LINT.TYPED)
+  [ (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
+    (module ExcTryWithWildcard : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
-  ; (module StringConcat : LINT.TYPED)
+  ; (module Failwith : LINT.TYPED)
+  ; (module If_bool : LINT.TYPED)
+  ; (module Ignore : LINT.TYPED)
+  ; (module Hashtables : LINT.TYPED)
+  ; (module List_fusion : LINT.TYPED)
+  ; (module List_length : LINT.TYPED)
+  ; (module Monad_laws : LINT.TYPED)
+  ; (module Propose_function : LINT.TYPED)
+  ; (module Record1 : LINT.TYPED)
+  ; (module String_concat : LINT.TYPED)
   ; (module String_concat_fold : LINT.TYPED)
   ; (module UntypedLints.GuardInsteadOfIf : LINT.TYPED)
-  ; (module MonadLaws : LINT.TYPED) (* * *********************** *)
+    (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
   ]
 ;;
 
