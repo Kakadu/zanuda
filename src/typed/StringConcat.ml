@@ -11,20 +11,24 @@ type input = Tast_iterator.iterator
 
 let lint_id = "string_concat"
 let group = LINT.Perf
-let level = LINT.Warn
+let level = LINT.Allow
 let lint_source = LINT.FPCourse
 
 let documentation =
   {|
 ### What it does
-Concatenating multiple strings at once (`a^b^c`) has a perfomance issue. OCaml needs to allocate memory for the result of
-`a^b` and after that it needs to allocate memory for a result of concatenation `a^b` and `c`, i.e. it allocates unneeded memory for intermediate results. (The same issue arises in left-associative concatenation of lists).
+Concatenating multiple strings at once (`a^b^c`) has a perfomance issue. OCaml needs to allocate
+memory for the result of
+`a^b` and after that it needs to allocate memory for a result of concatenation `a^b` and `c`,
+i.e. it allocates unneeded memory for intermediate results.
+(The same issue arises in left-associative concatenation of lists).
 
 
 ### How to fix
+We can rewrite using `asprintf`/`sprintf`: `Format.asprintf "%s%s%s" a b c`. Internally, it will
 Use [function](https://github.com/ocaml/ocaml/blob/4.14/stdlib/string.ml#L72) `val concat: string -> string list -> string` from standard library.
 
-Or rewrite using printf: `Format.printf "%s%s%s" a b c`.
+
 |}
   |> Stdlib.String.trim
 ;;

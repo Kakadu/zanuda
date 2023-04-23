@@ -9,6 +9,7 @@ open Utils
 
 let lint_id = "var_should_not_be_used"
 let lint_source = LINT.FPCourse
+let level = LINT.Warn
 
 let documentation =
   {|

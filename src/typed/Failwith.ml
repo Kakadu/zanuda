@@ -12,6 +12,7 @@ let lint_id = "exc_failwith"
 let group = LINT.Suspicious
 let level = LINT.Allow
 let lint_source = LINT.FPCourse
+let level = LINT.Warn
 
 let documentation =
   {|

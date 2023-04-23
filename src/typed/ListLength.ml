@@ -11,6 +11,7 @@ type input = Tast_iterator.iterator
 
 let lint_id = "list_length_comparisons"
 let lint_source = LINT.FPCourse
+let level = LINT.Warn
 
 let documentation =
   {|

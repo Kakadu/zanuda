@@ -12,6 +12,7 @@ type input = Tast_iterator.iterator
 
 let lint_source = LINT.FPCourse
 let lint_id = "mutable_hashtables"
+let level = LINT.Warn
 
 let documentation =
   {|

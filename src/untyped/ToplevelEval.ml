@@ -9,6 +9,7 @@ open Utils
 
 let lint_id = "no_toplevel_eval"
 let lint_source = LINT.FPCourse
+let level = LINT.Warn
 
 let documentation =
   {|

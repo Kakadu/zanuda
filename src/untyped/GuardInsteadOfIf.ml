@@ -9,6 +9,7 @@ open Utils
 
 let lint_id = "use_guard_instead_of_if"
 let lint_source = LINT.FPCourse
+let level = LINT.Warn
 
 let documentation =
   {|

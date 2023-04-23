@@ -11,6 +11,7 @@ open Format
 type input = Tast_iterator.iterator
 
 let lint_source = LINT.FPCourse
+let level = LINT.Warn
 let lint_id = "monad_laws_simplify"
 
 let documentation =

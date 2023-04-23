@@ -62,8 +62,10 @@ include (
 
 let%test _ = verify_line1 " Copyright 2021-2022, Kakadu and contributors  "
 let%test _ = verify_line2 " SPDX-License-Identifier: LGPL-3.0-or-later  "
+
 let lint_id = "top_file_license"
 let lint_source = LINT.FPCourse
+let level = LINT.Warn
 
 let documentation =
   {|

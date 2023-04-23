@@ -38,8 +38,11 @@ module type GENERAL = sig
 
   (** Linter id. Should be unique *)
   val lint_id : string
+
   (** How this lint appeared. *)
   val lint_source : lint_source
+
+  val level : level
 
   (** Run this lint and save result in global store {!CollectedLints}. *)
   val run : Compile_common.info -> input -> input

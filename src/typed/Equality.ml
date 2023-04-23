@@ -12,6 +12,7 @@ type input = Tast_iterator.iterator
 
 let lint_source = LINT.Camelot
 let lint_id = "use_match_instead_of_equality"
+let level = LINT.Warn
 
 let documentation =
   {|

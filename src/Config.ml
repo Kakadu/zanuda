@@ -25,6 +25,7 @@ type t =
   ; mutable extra_includes : string list
   ; mutable verbose : bool
   ; enabled_lints : string Hash_set.t
+  ; mutable skip_level_allow : bool
   ; mutable check_filesystem : bool
   }
 
@@ -39,6 +40,7 @@ let opts =
   ; extra_includes = []
   ; verbose = false
   ; enabled_lints = Hash_set.create (module String)
+  ; skip_level_allow = true
   ; check_filesystem = true
   }
 ;;
@@ -72,6 +74,7 @@ let out_rdjsonl () = opts.out_rdjsonl
 let unset_check_filesystem () = opts.check_filesystem <- false
 let verbose () = opts.verbose
 let set_verbose () = opts.verbose <- true
+let set_skip_level_allow b = opts.skip_level_allow <- b
 
 let recover_filepath filepath =
   let filepath =
@@ -89,6 +92,15 @@ let recover_filepath filepath =
     | None -> filepath
   in
   filepath
+;;
+
+let is_enabled () =
+  let hash = enabled_lints () in
+  fun (module M : LINT.GENERAL) ->
+    (* Format.printf "is_enabled of %s\n%!" M.lint_id; *)
+    match M.level with
+    | LINT.Allow when opts.skip_level_allow -> false
+    | _ -> Hash_set.mem hash M.lint_id
 ;;
 
 let parse_args () =
@@ -111,6 +123,9 @@ let parse_args () =
     ; "-I", Arg.String add_include, "Add extra include path for type checking"
       (* ; "-ws", Arg.String set_workspace, "[FILE] Set dune workspace root" *)
     ; "-v", Arg.Unit set_verbose, "More verbose output"
+    ; ( "-skip-level-allow"
+      , Arg.Bool set_skip_level_allow
+      , "[bool] Skip lints with level = Allow" )
     ]
   in
   let extra_args =

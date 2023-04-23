@@ -9,6 +9,7 @@ open Utils
 
 let lint_id = "no_docs_parsetree"
 let lint_source = LINT.FPCourse
+let level = LINT.Warn
 
 let documentation =
   {|

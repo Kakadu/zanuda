@@ -33,6 +33,7 @@ let typed_linters =
   ; (module IfBool : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
   ; (module StringConcat : LINT.TYPED)
+  ; (module StringConcat2 : LINT.TYPED)
   ; (module UntypedLints.GuardInsteadOfIf : LINT.TYPED)
   ; (module MonadLaws : LINT.TYPED) (* * *********************** *)
   ]
@@ -54,20 +55,18 @@ let () =
 ;;
 
 let process_per_file_linters_str info parsetree =
-  let hash = Config.enabled_lints () in
-  let is_enabled = Hash_set.mem hash in
-  List.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
-    if is_enabled L.lint_id
+  let is_enabled = Config.is_enabled () in
+  List.iter per_file_linters ~f:(fun ((module L : LINT.TYPED) as lint) ->
+    if is_enabled (lint :> (module LINT.GENERAL))
     then
       let open Tast_iterator in
       (L.run info default_iterator).structure default_iterator parsetree)
 ;;
 
 let process_per_file_linters_sig info parsetree =
-  let hash = Config.enabled_lints () in
-  let is_enabled = Hash_set.mem hash in
-  List.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
-    if is_enabled L.lint_id
+  let is_enabled = Config.is_enabled () in
+  List.iter per_file_linters ~f:(fun ((module L : LINT.TYPED) as lint) ->
+    if is_enabled (lint :> (module LINT.GENERAL))
     then
       let open Tast_iterator in
       (L.run info default_iterator).signature default_iterator parsetree)
@@ -102,12 +101,11 @@ let untyped_on_signature info =
 ;;
 
 let typed_on_structure info =
-  let hash = Config.enabled_lints () in
-  let is_enabled = Hash_set.mem hash in
+  let is_enabled = Config.is_enabled () in
   build_iterator
     ~f:(fun o -> o.Tast_iterator.structure o)
-    ~compose:(fun (module L : LINT.TYPED) acc ->
-      if is_enabled L.lint_id then L.run info acc else acc)
+    ~compose:(fun ((module L : LINT.TYPED) as lint) acc ->
+      if is_enabled (lint :> (module LINT.GENERAL)) then L.run info acc else acc)
     ~init:Tast_iterator.default_iterator
     typed_linters
 ;;

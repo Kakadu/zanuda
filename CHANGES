@@ -1,4 +1,13 @@
-## 1.0.0
+## Working version
+
+### Changed
+
+- #12: Split 'string_concat' lint to check separately patterns 'a^b^c' (level=Allow) and 'List.fold_left (^)' (level=Warn).
+  (reported by @edwintorok)
+- Add command line switch '-skip-level-allow <bool>' to enable/disable lints with level=Allow. False has higher priority than per-lint command line switch (for example, `-no-string_concat`)
+
+
+## 1.0.0 (24-03-2023)
 
 ### Changed
 

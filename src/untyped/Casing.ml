@@ -11,6 +11,7 @@ let is_camel_case s = String.(lowercase s <> s)
 let is_good_name s = String.is_prefix s ~prefix:"_menhir_cell1_" || not (is_camel_case s)
 let lint_id = "camel_cased_types"
 let lint_source = LINT.FPCourse
+let level = LINT.Warn
 
 let documentation =
   {|
