@@ -12,6 +12,7 @@
   Equality
   Hashtables
   StringConcat
+  String_concat_fold
   MonadLaws
   Ignore)
  (preprocess

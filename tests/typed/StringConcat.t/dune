@@ -1,5 +1,9 @@
 (library
  (name test_string_concat)
+ (flags
+  (:standard
+   ;-dtypedtree
+   ))
  (modules StringConcat))
 
 (cram

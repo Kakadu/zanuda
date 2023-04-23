@@ -1,12 +1,7 @@
 let f a b c =
  a ^ b ^ c
 
+[@@@ocaml.warning "-5"]
 
-(*
-module Interpret (M : sig end) = struct
-  let g data = "(" ^ data ^ ")"
-  let variable_to_string = function
-    | [data] -> "(" ^ data ^ ")"
-    | _ -> ""
-end
- *)
+let _ = List.fold_left (^)
+let _ = ListLabels.fold_left ~f:(^)

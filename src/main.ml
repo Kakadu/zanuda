@@ -33,7 +33,7 @@ let typed_linters =
   ; (module IfBool : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
   ; (module StringConcat : LINT.TYPED)
-  ; (module StringConcat2 : LINT.TYPED)
+  ; (module String_concat_fold : LINT.TYPED)
   ; (module UntypedLints.GuardInsteadOfIf : LINT.TYPED)
   ; (module MonadLaws : LINT.TYPED) (* * *********************** *)
   ]

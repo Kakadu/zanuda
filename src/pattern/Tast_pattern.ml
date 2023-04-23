@@ -489,6 +489,16 @@ let nolabel =
       | _ -> fail loc "nolabel")
 ;;
 
+let labelled (T fstr) =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Asttypes.Labelled s ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fstr ctx loc s
+      | _ -> fail loc "labelled")
+;;
+
 let texp_apply1 f x = texp_apply f ((nolabel ** some x) ^:: nil)
 let texp_apply2 f x y = texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
 
