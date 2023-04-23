@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - 'master'
+
 env:
   OPAMROOT: /home/opam/.opam
   OPAMYES: true
@@ -55,10 +56,6 @@ jobs:
         run: |
           opam exec -- dune build
 
-      - name: Running tests...
-        run: |
-          opam exec -- dune runtest
-
       - name: Build API documentation
         run: opam exec -- dune build @doc
 
@@ -84,6 +81,23 @@ jobs:
           publish_dir: _build/_lintinfo
           keep_files: true
           destination_dir: lints
+
+      # - name: Running tests...
+      #   run: |
+      #     opam exec -- dune runtest --instrument-with bisect_ppx
+      #   env:
+      #     BISECT_DIR: ${{ runner.temp }}/_bisect_ppx_data
+      #     BISECT_FILE: ${{ runner.temp }}/_bisect_ppx_data/data
+
+      - name: Send coverage report to Coveralls
+        run: |
+          git config --global --add safe.directory /__w/zanuda/zanuda
+          opam exec -- make test_coverage
+          opam exec -- bisect-ppx-report send-to Coveralls --coverage-path $BISECT_DIR
+        env:
+          BISECT_DIR: /tmp/zanudacov
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST_NUMBER: ${{ github.event.number }}
 
       # - name: Deploy linters' descriptions to another repo
       #   uses: peaceiris/actions-gh-pages@v3

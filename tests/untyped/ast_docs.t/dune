@@ -3,6 +3,8 @@
  (wrapped false)
  ; (modules stuff)
  (modules_without_implementation ast)
+ (instrumentation
+  (backend bisect_ppx))
  (flags
   (:standard
    ;

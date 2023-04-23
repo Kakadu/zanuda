@@ -22,6 +22,8 @@
    ppx_sexp_conv
    ppx_inline_test ; implies dependecy on base
    ))
+ (instrumentation
+  (backend bisect_ppx))
  (inline_tests))
 
 (executable
@@ -38,4 +40,6 @@
   UntypedLints)
  (preprocess
   (pps ppx_inline_test))
+ (instrumentation
+  (backend bisect_ppx))
  (package zanuda))

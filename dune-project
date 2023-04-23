@@ -35,6 +35,7 @@
   ppx_inline_test ; implies dependecy on base
   ppx_assert
   ppx_expect
+  bisect_ppx
   stdune
   (angstrom
    (>= 0.15.0))

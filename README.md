@@ -2,8 +2,12 @@
 [![License](https://img.shields.io/badge/license-LGPL-blue)](https://github.com/JetBrains-Research/spla/blob/master/LICENSE.md)
 [![Lints docs](https://img.shields.io/badge/Implemented-lints-yellowgreen)](https://kakadu.github.io/zanuda/lints/index.html)
 [![API docs](https://img.shields.io/badge/Documentation-API-yellowgreen)](https://kakadu.github.io/zanuda/api/index.html)
+[![Coverage][coveralls-img]][coveralls]
 
 [![](http://github-actions.40ants.com/Kakadu/zanuda/matrix.svg)](https://github.com/Kakadu/zanuda)
+
+[coveralls]: https://coveralls.io/github/Kakadu/zanuda?branch=master
+[coveralls-img]: https://img.shields.io/coveralls/Kakadu/zanuda/master.svg
 
 ## An OCaml linter experiment
 
