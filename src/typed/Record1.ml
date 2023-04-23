@@ -12,7 +12,7 @@ type input = Tast_iterator.iterator
 
 let lint_id = "record_1"
 let group = LINT.Suspicious
-let level = LINT.Allow
+let level = LINT.Warn
 let lint_source = LINT.FPCourse
 
 let documentation =

@@ -11,7 +11,7 @@ type input = Tast_iterator.iterator
 let lint_id = "propose_function"
 let lint_source = LINT.FPCourse
 let group = LINT.Style
-let level = LINT.Allow
+let level = LINT.Warn
 
 let documentation =
   {|
