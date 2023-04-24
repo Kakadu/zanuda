@@ -14,19 +14,12 @@ let group = LINT.Style
 let level = LINT.Warn
 
 let documentation =
-  {| 
-The following code is recommended:
+  {|
+### What it does
+Using match with single tuple is discouraged. It's better to rewrite it with `let (a, b) = scru in rhs`.
 
-```ocaml
-  let (a,b) = scru in rhs
-```
-
-And this piece of code is discouraged:
-
-```ocaml
-  match scru with 
-  | (a,b) -> rhs
-```
+#### Explanation
+It's recommended to rewrite the code as 'let ... in` because is more clearly.
 |}
   |> Stdlib.String.trim
 ;;
@@ -35,7 +28,7 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
-let msg ppf () = Caml.Format.fprintf ppf "Using `in` is recommended%!"
+let msg ppf () = Caml.Format.fprintf ppf "Using `let ... in` is recommended%!"
 
 let report filename ~loc =
   let module M = struct
@@ -54,20 +47,19 @@ let report filename ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let with_Tpat_tuple cs =
-  let open Typedtree in
-  match cs.c_lhs.pat_desc with
-  | Tpat_value v ->
-    (match (v :> pattern) with
-     | { pat_desc = Tpat_tuple _ } -> true
-     | _ -> false)
-  | _ -> false
-;;
-
 let run _ fallback =
   let pat =
     let open Tast_pattern in
-    texp_match (texp_ident drop) __
+    texp_match (texp_ident drop) (__ ^:: nil)
+  in
+  let with_Tpat_tuple cs =
+    let open Typedtree in
+    match cs.c_lhs.pat_desc with
+    | Tpat_value v ->
+      (match (v :> pattern) with
+       | { pat_desc = Tpat_tuple _ } -> true
+       | _ -> false)
+    | _ -> false
   in
   let open Tast_iterator in
   { fallback with
@@ -79,13 +71,13 @@ let run _ fallback =
           pat
           loc
           expr
-          (fun cases () ->
-            match cases with
-            | [ cs ] when with_Tpat_tuple cs ->
+          (fun case () ->
+            if with_Tpat_tuple case
+            then
               CollectedLints.add
                 ~loc
                 (report loc.Location.loc_start.Lexing.pos_fname ~loc)
-            | _ -> ())
+            else ())
           ~on_error:(fun _desc () -> fallback.expr self expr)
           ())
   }
