@@ -14,7 +14,8 @@
   Propose_function
   String_concat
   String_concat_fold
-  Ignore)
+  Ignore
+  Tuple_matching)
  (preprocess
   (pps ppx_inline_test ppxlib.metaquot))
  (inline_tests))
