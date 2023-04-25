@@ -50,7 +50,7 @@ let report filename ~loc =
 let run _ fallback =
   let pat =
     let open Tast_pattern in
-    texp_match (texp_ident drop) (__ ^:: nil)
+    texp_match drop (__ ^:: nil)
   in
   let with_Tpat_tuple cs =
     let open Typedtree in
