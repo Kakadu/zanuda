@@ -20,7 +20,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     container:
-      image: ocaml/opam:ubuntu-18.04-ocaml-4.14
+      image: ocaml/opam:ubuntu-lts-ocaml-4.14
       options: --user root               # dirty hack
 
     steps:
