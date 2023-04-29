@@ -71,10 +71,13 @@ jobs:
           destination_dir: api
 
       - run: opam exec -- dune build @install --profile=release
+
       - name: Build linter descriptions...
+        if: github.ref == 'refs/heads/master'
         run: mkdir -p _build/_lintinfo && opam exec -- dune exec zanuda -- -dump-lints _build/_lintinfo/lints.json
 
       - name: Deploy linters' descriptions
+        if: github.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
