@@ -207,5 +207,16 @@
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
     }
+  },
+  {
+    "id": "tuple_matching",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\nUsing match with single tuple is discouraged. It's better to rewrite it with `let (a, b) = scru in rhs`.\n\n#### Explanation\nIt's recommended to rewrite the code as 'let ... in` because is more clearly.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
   }
 ]
