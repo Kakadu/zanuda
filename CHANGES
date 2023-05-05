@@ -7,6 +7,7 @@
 - Add command line switch '-skip-level-allow <bool>' to enable/disable lints
   with level=Allow. False has higher priority than per-lint command line switch
   (for example, `-no-string_concat`)
+- #16: Calculate test coverage.
 
 
 ## 1.0.0 (24-03-2023)

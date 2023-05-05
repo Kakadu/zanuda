@@ -24,7 +24,8 @@ uninstall:
 	dune uninstall
 
 clean:
-	dune clean
+	@dune clean
+	@$(RM) -r _coverage
 
 TEST_COV_D = /tmp/zanudacov
 
