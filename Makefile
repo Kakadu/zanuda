@@ -29,8 +29,9 @@ clean:
 
 TEST_COV_D = /tmp/zanudacov
 
-.PHONY: test_coverage
-test_coverage:
+.PHONY: test_coverage coverage
+test_coverage: coverage
+coverage:
 	if [ -d $(TEST_COV_D) ]; then rm -r $(TEST_COV_D); fi
 	mkdir -p $(TEST_COV_D)
 	BISECT_FILE=$(TEST_COV_D)/zanuda dune runtest --no-print-directory \

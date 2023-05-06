@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-top_file_license -dir .
+  $ zanuda  -no-check-filesystem -no-top_file_license -dir . -ordjsonl /dev/null
   File "StringConcat.ml", line 6, characters 8-26:
   6 | let _ = List.fold_left (^)
               ^^^^^^^^^^^^^^^^^^

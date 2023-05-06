@@ -77,7 +77,7 @@ let run _ fallback =
       (fun self expr ->
         let open Typedtree in
         let loc = expr.exp_loc in
-        let __ _ =
+        (*         let __ _ =
           if String.is_substring loc.loc_start.pos_fname ~substring:"StringConcat"
           then (
             let u = Untypeast.(default_mapper.expr default_mapper expr) in
@@ -89,7 +89,7 @@ let run _ fallback =
               u
               MyPrinttyped.expr
               expr)
-        in
+        in *)
         Tast_pattern.parse
           pat
           loc

@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -no-check-filesystem -no-top_file_license -dir .
+  $ zanuda -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "lib.ml", line 1, characters 8-12:
   1 | let rec _foo x = _foo x
               ^^^^

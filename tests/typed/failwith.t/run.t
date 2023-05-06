@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-top_file_license -dir .
+  $ zanuda  -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "Failwith.ml", line 1, characters 12-20:
   1 | let foo _ = failwith "not implemented"
                   ^^^^^^^^

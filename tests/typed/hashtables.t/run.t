@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-top_file_license -dir .
+  $ zanuda  -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "Hashtables.ml", line 3, characters 22-23:
   3 |   if None = None then h else h
                             ^

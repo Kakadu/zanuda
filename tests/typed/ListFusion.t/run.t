@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-top_file_license -dir .
+  $ zanuda  -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "ListFusion.ml", line 1, characters 12-48:
   1 | let __ xs = List.map Fun.id (List.map Fun.id xs)
                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
