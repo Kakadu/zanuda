@@ -69,43 +69,31 @@ jobs:
 
       - run: opam exec -- dune build @install --profile=release
 
-      - name: Build linter descriptions...
-        if: github.ref == 'refs/heads/master'
-        run: mkdir -p _build/_lintinfo && opam exec -- dune exec zanuda -- -dump-lints _build/_lintinfo/lints.json
-
-      - name: Deploy linters' descriptions
-        if: github.ref == 'refs/heads/master'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _build/_lintinfo
-          keep_files: true
-          destination_dir: lints
-
-      # - name: Running tests...
-      #   run: |
-      #     opam exec -- dune runtest --instrument-with bisect_ppx
-      #   env:
-      #     BISECT_DIR: ${{ runner.temp }}/_bisect_ppx_data
-      #     BISECT_FILE: ${{ runner.temp }}/_bisect_ppx_data/data
+      - name: Running tests in release...
+        run: |
+          opam exec -- dune test --profile=release
 
       - name: Send coverage report to Coveralls
+        if: github.event_name != 'pull_request'
         run: |
           git config --global --add safe.directory /__w/zanuda/zanuda
-          opam exec -- make test_coverage
+          opam exec -- make coverage
           opam exec -- bisect-ppx-report send-to Coveralls --coverage-path $BISECT_DIR
         env:
           BISECT_DIR: /tmp/zanudacov
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PULL_REQUEST_NUMBER: ${{ github.event.number }}
 
-      # - name: Deploy linters' descriptions to another repo
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     personal_token: ${{ secrets.PERSONAL_TOKEN }}
-      #     publish_dir: _build/_lintinfo
-      #     external_repository: Kakadu/kakadu.github.io
-      #     destination_dir: zanuda
-      #     publish_branch: master
-      #     keep_files: true
-      #     enable_jekyll: true
+
+      - name: Build linter descriptions...
+        if: github.event_name != 'pull_request'
+        run: mkdir -p _build/_lintinfo && opam exec -- dune exec zanuda -- -dump-lints _build/_lintinfo/lints.json
+
+      - name: Deploy linters' descriptions
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: _build/_lintinfo
+          keep_files: true
+          destination_dir: lints
