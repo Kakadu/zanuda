@@ -11,7 +11,7 @@ type module_ =
   ; cmt : string option
   ; cmti : string option
   }
-[@@deriving sexp]
+[@@deriving of_sexp]
 
 type executables =
   { names : string list
@@ -19,7 +19,7 @@ type executables =
   ; requires : string list
   ; include_dirs : string list
   }
-[@@deriving sexp]
+[@@deriving of_sexp]
 
 module Library = struct
   type t =
@@ -31,7 +31,7 @@ module Library = struct
     ; modules : module_ list
     ; include_dirs : string list
     }
-  [@@deriving sexp]
+  [@@deriving of_sexp]
 end
 
 type t =
@@ -39,4 +39,4 @@ type t =
   | Library of Library.t
   | Root of string
   | Build_context of string
-[@@deriving sexp]
+[@@deriving of_sexp]

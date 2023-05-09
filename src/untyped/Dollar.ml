@@ -8,7 +8,7 @@ open Format
 open Zanuda_core
 open Utils
 
-let is_camel_case s = String.(lowercase s <> s)
+(* let is_camel_case s = String.(lowercase s <> s) *)
 let lint_id = "camel_extra_dollar"
 let lint_source = LINT.FPCourse
 let level = LINT.Warn
