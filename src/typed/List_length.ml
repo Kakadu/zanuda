@@ -47,8 +47,8 @@ let report filename ~loc l r =
         ppf
         ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
         ~line:loc.loc_start.pos_lnum
-        (fun _ () -> ())
-        ()
+        msg_long
+        (l, r)
     ;;
   end
   in
