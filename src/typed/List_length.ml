@@ -121,14 +121,14 @@ let run _ fallback =
           loc
           expr
           (fun e1 e2 () ->
-            let __ _ =
+            (* let __ _ =
               Format.printf
-                "FUCK '%a' and '%a'\n%!"
+                "List_length DEBUG: '%a' and '%a'\n%!"
                 MyPrinttyped.expr
                 e1
                 MyPrinttyped.expr
                 e2
-            in
+            in *)
             CollectedLints.add
               ~loc
               (report loc.Location.loc_start.Lexing.pos_fname ~loc e1 e2))
