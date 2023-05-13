@@ -72,6 +72,17 @@ module type TYPED = sig
 end
 
 module type REPORTER = sig
+  (** *)
+
+  (** Report lint info as text. Useful to print to terminal. *)
   val txt : Format.formatter -> unit -> unit
+
+  (** Report lint info as RDJSONL format.
+
+    Originally, it was used with ReviewDog tool to publish Github review.
+    But nowadays we are abandoning it.
+
+    @deprecated
+  *)
   val rdjsonl : Format.formatter -> unit -> unit
 end
