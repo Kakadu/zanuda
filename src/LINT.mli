@@ -2,22 +2,25 @@
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
-(** A type of lint's impelementation. Typed and untyped lints inspect OCaml's Typedtree/Parsetree respectively. *)
+(** A type of lint's impelementation.
+    Typed and untyped lints inspect OCaml's Parsetree/Typedtree respectively.
+    In Clippy it corresponds to {{: https://doc.rust-lang.org/nightly/clippy/development/lint_passes.html } early and late} lint passes.
+    *)
 type impl =
-  | Typed
   | Untyped
+  | Typed
 
-(** Group of lints. The same as Rust's Clippy *)
+(** Group of lints. The same as {{: https://doc.rust-lang.org/nightly/clippy }Rust's Clippy} *)
 type group =
-  | Style
-  | Correctness
-  | Perf
+  | Style (** Code that should be written in a more idiomatic way *)
+  | Correctness (** Code that is outright wrong or useless *)
+  | Perf (** Code that can be written to run faster *)
   | Restriction
   | Deprecated
-  | Pedantic
+  | Pedantic (** Lints which are rather strict or might have false positives *)
   | Complexity
   | Suspicious
-  | Nursery
+  | Nursery (** New lints that are still under development *)
 
 (** Level of lints. The same as Rust's Clippy *)
 type level =
