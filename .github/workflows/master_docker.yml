@@ -56,17 +56,6 @@ jobs:
         run: |
           opam exec -- dune build
 
-      - name: Build API documentation
-        run: opam exec -- dune build @doc
-
-      - name: Deploy API documentation
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_build/default/_doc/_html
-          keep_files: true
-          destination_dir: api
-
       - run: opam exec -- dune build @install --profile=release
 
       - name: Running tests in release...
@@ -87,7 +76,9 @@ jobs:
 
       - name: Build linter descriptions...
         if: github.event_name != 'pull_request'
-        run: mkdir -p _build/_lintinfo && opam exec -- dune exec zanuda -- -dump-lints _build/_lintinfo/lints.json
+        run: |
+          mkdir -p _build/_lintinfo
+          opam exec -- dune exec zanuda -- -dump-lints _build/_lintinfo/lints.json
 
       - name: Deploy linters' descriptions
         if: github.event_name != 'pull_request'
@@ -97,3 +88,16 @@ jobs:
           publish_dir: _build/_lintinfo
           keep_files: true
           destination_dir: lints
+
+      - name: Build API documentation
+        if: github.event_name != 'pull_request'
+        run: opam exec -- dune build @doc
+
+      - name: Deploy API documentation
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_build/default/_doc/_html
+          keep_files: true
+          destination_dir: api
