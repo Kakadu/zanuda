@@ -15,7 +15,8 @@
   String_concat
   String_concat_fold
   Ignore
-  Tuple_matching)
+  Tuple_matching
+  Mutually_rec_types)
  (preprocess
   (pps ppx_inline_test ppxlib.metaquot))
  (instrumentation
