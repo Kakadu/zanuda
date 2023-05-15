@@ -37,6 +37,7 @@ let typed_linters =
   ; (module String_concat_fold : LINT.TYPED)
   ; (module UntypedLints.GuardInsteadOfIf : LINT.TYPED)
   ; (module Tuple_matching : LINT.TYPED)
+  ; (module Mutually_rec_types : LINT.TYPED)
     (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
   ]
 ;;
