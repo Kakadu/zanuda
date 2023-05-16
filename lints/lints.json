@@ -218,5 +218,16 @@
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
     }
+  },
+  {
+    "id": "mutually_rec_types",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\nUsing `and` where there is no mutual recursion is discouraged.\n\n#### Explanation\nThe keyword `and` should be used only to declare mutually recursive types or functions.\nIncorrect use of `and` can lead to confusion.\nIt's recommended to rewrite type declarations without `and` where mutual recursion is not required.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
   }
 ]
