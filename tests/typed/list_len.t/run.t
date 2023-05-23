@@ -1,5 +1,10 @@
   $ dune build
   $ zanuda  -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  File "list_len.ml", line 1, characters 12-30:
+  1 | let __ xs = List.length xs < 0
+                  ^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Bad measurement of a list (with non-negative size)
+  Between 'List.length xs' and '0'.
   File "list_len.ml", line 3, characters 12-31:
   3 | let __ xs = List.length xs <= 0
                   ^^^^^^^^^^^^^^^^^^^
@@ -27,6 +32,11 @@
   Between '0' and 'List.length xs'.
   File "list_len.ml", line 13, characters 12-30:
   13 | let __ xs = 0 = List.length xs
+                   ^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Bad measurement of a list (with non-negative size)
+  Between '0' and 'List.length xs'.
+  File "list_len.ml", line 15, characters 12-30:
+  15 | let __ xs = 0 > List.length xs
                    ^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Bad measurement of a list (with non-negative size)
   Between '0' and 'List.length xs'.

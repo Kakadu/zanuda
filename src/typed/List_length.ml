@@ -78,7 +78,7 @@ let pat
   Tast_pattern.t
   =
   let open Tast_pattern in
-  let ops = [ ">=", "<=", 0; "<=", ">=", 0; ">", "<", 0; "=", "=", 0 ] in
+  let ops = [ ">=", "<=", 0; "<=", ">=", 0; ">", "<", 0; "<", ">", 0; "=", "=", 0 ] in
   let single (op, dualop, n) =
     let open Tast_pattern in
     (* TODO: understand difference between Stdlib and Stdlib! *)
