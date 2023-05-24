@@ -1,6 +1,4 @@
-[@@@ocaml.warnerror "-26-32-33-69"]
-
-let lookup line_of_pos parsed ~file ~line =
+(* let lookup line_of_pos parsed ~file ~line =
   (* Format.printf "Parsed stuff:@[%a@]\n%!" [%show: Types.file_info list] parsed; *)
   let open Types in
   match
@@ -26,8 +24,8 @@ let lookup line_of_pos parsed ~file ~line =
            then pos
            else (
              match k with
-             | `Leave | `Add -> loop (cur + 1) tl
-             | `Del -> loop cur tl)
+             | Leave | Add -> loop (cur + 1) tl
+             | Del -> loop cur tl)
          | [] -> assert false
        in
        let pos = loop ci.fresh lines + 2 in
@@ -38,20 +36,20 @@ let lookup line_of_pos parsed ~file ~line =
          (match line_of_pos pos with
           | None -> "<unknown>"
           | Some n -> string_of_int n))
-;;
+;; *)
 
 type cfg =
   { mutable from : string option
-  ; mutable file : string
+  ; mutable file : string option
   ; mutable line : int option
   }
 
-let cfg = { from = None; file = ""; line = None }
+let cfg = { from = None; file = None; line = None }
 
 let () =
   Arg.parse
     [ "-", Arg.Unit (fun () -> cfg.from <- None), " use stdin"
-    ; "-f", Arg.String (fun s -> cfg.file <- s), " lookup for file"
+    ; "-f", Arg.String (fun s -> cfg.file <- Some s), " lookup for file"
     ; "-l", Arg.Int (fun n -> cfg.line <- Some n), " lookup for line in a file"
     ]
     (fun _ -> assert false)
@@ -66,9 +64,13 @@ let () =
   in
   match Diff_parser.parse_string input with
   | Result.Ok parsed ->
+    (* Format.printf "Parsed stuff:@[%a@]\n%!" [%show: Types.file_info list] parsed; *)
     (match cfg with
-     | { line = None } -> ()
-     | { file; line = Some line } ->
-       lookup (Diff_parser.make_lines_index input) parsed ~file ~line)
-  | Error s -> Printf.eprintf "parsing failed: %s\n" s
+     | { file = Some file; line = Some line } ->
+       (match Diff_parser.lookup parsed ~file ~line with
+        | Some diff_pos ->
+          Format.printf "Got something. It should be at %d line in diff\n" diff_pos
+        | None -> Format.eprintf "Couldn't find it.\n")
+     | _ -> Format.eprintf "File or line was not initialized\n")
+  | Error s -> Format.eprintf "Parsing failed: %s\n" s
 ;;

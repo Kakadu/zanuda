@@ -45,3 +45,26 @@
   (menhir :with-test)
   (ocamlformat
    (>= 0.23.0))))
+
+(package
+ (name reviewer)
+ (synopsis "Creator of review for GitHub PR")
+ (description
+  "The tool for creating review in GitHub Pull Requests by zanuda's report")
+ (depends
+  (ocaml
+   (and
+    (>= 4.14)
+    (< 5.0)))
+  ppx_inline_test
+  ppx_show
+  ppx_expect
+  curly
+  stdio
+  yojson
+  stdune
+  (angstrom
+   (>= 0.15.0))
+  (base :with-test)
+  (ocamlformat
+   (>= 0.23.0))))
