@@ -4,26 +4,20 @@
    (:standard -w -9-27-32))))
 
 (executable
+ (package reviewer)
  (name main)
+ (public_name reviewer)
  (modules main)
- (libraries curly yojson))
+ (libraries diff_parser curly))
 
 (library
  (name diff_parser)
  (modules types line_parser diff_parser)
  (wrapped false)
- (libraries
-  opal
-  ;mparser
-  angstrom
-  stdio
-  yojson
-  ppx_show.runtime
-  camlp-streams)
+ (libraries angstrom stdio yojson ppx_show.runtime)
  (inline_tests)
- (preprocessor_deps blob1.diff)
  (preprocess
-  (pps ppx_inline_test ppx_blob ppx_show ppx_expect)))
+  (pps ppx_inline_test ppx_show ppx_expect)))
 
 (executable
  (name parser)
@@ -31,15 +25,3 @@
  (libraries diff_parser)
  (preprocess
   (pps ppx_show)))
-
-; (copy_files ./old)
-
-(cram
- (deps
-  (source_tree old)
-  (source_tree new)
-  ./blob1.diff
-  ./main.exe
-  ./parser.exe
-  ;
-  ))

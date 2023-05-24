@@ -7,7 +7,14 @@ type chunk_info =
 [@@deriving show]
 
 type pos = int [@@deriving show]
-type chunk = chunk_info * ([ `Add | `Del | `Leave ] * string * pos) list [@@deriving show]
+
+type kind =
+  | Add
+  | Del
+  | Leave
+[@@deriving show]
+
+type chunk = chunk_info * (kind * string * pos) list [@@deriving show]
 
 type file_info =
   { old_file : string

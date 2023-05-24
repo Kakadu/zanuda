@@ -1,0 +1,2 @@
+(cram
+ (deps %{project_root}/review/parser.exe))
