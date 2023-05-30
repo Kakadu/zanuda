@@ -69,7 +69,10 @@ let () =
      | { file = Some file; line = Some line } ->
        (match Diff_parser.lookup parsed ~file ~line with
         | Some diff_pos ->
-          Format.printf "Got something. It should be at %d line in diff\n" diff_pos
+          Format.printf
+            "Got something. It should be at %d lines below from the first chunk header \
+             of file in diff\n"
+            diff_pos
         | None -> Format.eprintf "Couldn't find it.\n")
      | _ -> Format.eprintf "File or line was not initialized\n")
   | Error s -> Format.eprintf "Parsing failed: %s\n" s

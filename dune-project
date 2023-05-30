@@ -57,7 +57,7 @@
     (>= 4.14)
     (< 5.0)))
   ppx_inline_test
-  ppx_show
+  (ppx_show :with-test)
   ppx_expect
   curly
   stdio
