@@ -9,12 +9,6 @@ let _example () =
   | Error e -> Format.printf "Failed: %a" Curly.Error.pp e
 ;;
 
-(* let your_token =
-  match Sys.getenv "TOKEN" with
-  | s -> s
-  | exception Not_found -> failwith "Setup token using env TOKEN"
-;; *)
-
 type info =
   { mutable commit_id : string option
   ; mutable pull_number : int option
@@ -207,5 +201,6 @@ let () =
     ; "-list_reviews", Arg.Unit (fun () -> list_reviews info), " "
     ]
     (fun _ -> assert false)
-    "Use -owner [OWNER] -repo [REPO NAME] -pr_number [PR NUMBER] -commit [HASH] -token [READ-WRITE TOKEN] -irdjsonl [PATH] -review to create review"
+    "Use -owner [OWNER] -repo [REPO NAME] -pr_number [PR NUMBER] -commit [HASH] -token \
+     [READ-WRITE TOKEN] -irdjsonl [PATH] -review to create review"
 ;;
