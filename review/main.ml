@@ -188,19 +188,22 @@ let () =
     [ "-commit", Arg.String (fun s -> info.commit_id <- Some s), " "
     ; "-review_id", Arg.Int (fun s -> info.review_id <- Some s), " "
     ; "-pr_number", Arg.Int (fun s -> info.pull_number <- Some s), " "
-    ; "-repo", Arg.String (fun s -> info.repo <- Some s), " "
-    ; "-owner", Arg.String (fun s -> info.owner <- Some s), " "
+    ; "-repo", Arg.String (fun s -> info.repo <- Some s), " GitHub repository"
+    ; "-owner", Arg.String (fun s -> info.owner <- Some s), " Owner of that repository"
     ; ( "-irdjsonl"
       , Arg.String (fun s -> info.in_rdjsonl <- Some s)
-      , "Set input file in rdjsonl format" )
-    ; "-token", Arg.String (fun s -> info.token <- Some s), " "
+      , " Set input file in rdjsonl format" )
+    ; "-token", Arg.String (fun s -> info.token <- Some s), " An access token"
       (* *** *** *** *** *** *** *** *** *)
     ; "-disreview", Arg.Unit (fun () -> dismiss_review info), " "
-    ; "-review", Arg.Unit (fun () -> create_review info), " "
+    ; "-review", Arg.Unit (fun () -> create_review info), " Create a review"
     ; "-submit_review", Arg.Unit (fun () -> submit_review info), " "
+      (* TODO(Kakadu): is submit_review required?? *)
     ; "-list_reviews", Arg.Unit (fun () -> list_reviews info), " "
     ]
-    (fun _ -> assert false)
+    (fun s ->
+      Printf.eprintf "Anonymous arguments %S is not supported\n" s;
+      exit 1)
     "Use -owner [OWNER] -repo [REPO NAME] -pr_number [PR NUMBER] -commit [HASH] -token \
      [READ-WRITE TOKEN] -irdjsonl [PATH] -review to create review"
 ;;
