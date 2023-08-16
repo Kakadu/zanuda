@@ -14,7 +14,7 @@
  (name diff_parser)
  (modules types line_parser diff_parser)
  (wrapped false)
- (libraries angstrom stdio yojson ppx_show.runtime)
+ (libraries angstrom yojson ppx_show.runtime)
  (inline_tests)
  (preprocess
   (pps ppx_inline_test ppx_show ppx_expect)))

@@ -56,11 +56,30 @@ let () =
     " "
 ;;
 
+(* A piece from stdio library *)
+let input_all t =
+  let chunk_size = 10000 in
+  let buffer = Buffer.create chunk_size in
+  let rec loop () =
+    Stdlib.Buffer.add_channel buffer t 10000;
+    loop ()
+  in
+  try loop () with
+  | End_of_file -> Buffer.contents buffer
+;;
+
+let read_all filename =
+  let ch = open_in filename in
+  let rez = input_all ch in
+  close_in ch;
+  rez
+;;
+
 let () =
   let input =
     match cfg.from with
-    | None -> Stdio.(In_channel.input_all stdin)
-    | Some file -> Stdio.(In_channel.read_all file)
+    | None -> input_all stdin
+    | Some file -> read_all file
   in
   match Diff_parser.parse_string input with
   | Result.Ok parsed ->

@@ -12,10 +12,9 @@ depends: [
   "dune" {>= "3.4"}
   "ocaml" {>= "4.14" & < "5.0"}
   "ppx_inline_test"
-  "ppx_show" {with-test}
+  "ppx_show"
   "ppx_expect"
   "curly"
-  "stdio"
   "yojson"
   "stdune"
   "angstrom" {>= "0.15.0"}
