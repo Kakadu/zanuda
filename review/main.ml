@@ -71,10 +71,10 @@ let create_review info =
             in_rdjsonl
             |> Yojson.Basic.seq_from_file
             |> Seq.filter_map (fun json ->
-                 let msg, file, line = parse_json json in
-                 match Diff_parser.lookup parsed ~file ~line with
-                 | Some diff_pos -> Some (make_comment file diff_pos msg)
-                 | None -> None)
+              let msg, file, line = parse_json json in
+              match Diff_parser.lookup parsed ~file ~line with
+              | Some diff_pos -> Some (make_comment file diff_pos msg)
+              | None -> None)
             |> List.of_seq
           in
           let url =
@@ -185,9 +185,10 @@ let submit_review info =
 
 let () =
   Arg.parse
-    [ "-commit", Arg.String (fun s -> info.commit_id <- Some s), " "
-    ; "-review_id", Arg.Int (fun s -> info.review_id <- Some s), " "
-    ; "-pr_number", Arg.Int (fun s -> info.pull_number <- Some s), " "
+    [ "-commit", Arg.String (fun s -> info.commit_id <- Some s), " A commit hash"
+    ; ( "-pr_number"
+      , Arg.Int (fun s -> info.pull_number <- Some s)
+      , " An index of pull request (or issue)" )
     ; "-repo", Arg.String (fun s -> info.repo <- Some s), " GitHub repository"
     ; "-owner", Arg.String (fun s -> info.owner <- Some s), " Owner of that repository"
     ; ( "-irdjsonl"
@@ -195,10 +196,13 @@ let () =
       , " Set input file in rdjsonl format" )
     ; "-token", Arg.String (fun s -> info.token <- Some s), " An access token"
       (* *** *** *** *** *** *** *** *** *)
-    ; "-disreview", Arg.Unit (fun () -> dismiss_review info), " "
     ; "-review", Arg.Unit (fun () -> create_review info), " Create a review"
     ; "-submit_review", Arg.Unit (fun () -> submit_review info), " "
       (* TODO(Kakadu): is submit_review required?? *)
+    ; "-review_id", Arg.Int (fun s -> info.review_id <- Some s), " A review ID"
+    ; ( "-disreview"
+      , Arg.Unit (fun () -> dismiss_review info)
+      , " Dismiss a review specified by -review_id" )
     ; "-list_reviews", Arg.Unit (fun () -> list_reviews info), " "
     ]
     (fun s ->

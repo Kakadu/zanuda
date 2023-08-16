@@ -8,7 +8,9 @@
  (name main)
  (public_name reviewer)
  (modules main)
- (libraries diff_parser curly))
+ (libraries diff_parser curly)
+ (instrumentation
+  (backend bisect_ppx)))
 
 (library
  (name diff_parser)
@@ -17,11 +19,15 @@
  (libraries angstrom yojson ppx_show.runtime)
  (inline_tests)
  (preprocess
-  (pps ppx_inline_test ppx_show ppx_expect)))
+  (pps ppx_inline_test ppx_show ppx_expect))
+ (instrumentation
+  (backend bisect_ppx)))
 
 (executable
  (name parser)
  (modules parser)
  (libraries diff_parser)
  (preprocess
-  (pps ppx_show)))
+  (pps ppx_show))
+ (instrumentation
+  (backend bisect_ppx)))
