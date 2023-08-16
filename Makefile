@@ -28,14 +28,15 @@ clean:
 	@$(RM) -r _coverage
 
 TEST_COV_D = /tmp/zanudacov
+COVERAGE_OPTS = --coverage-path $(TEST_COV_D) --expect src/ --expect review/
 
 .PHONY: test_coverage coverage
 test_coverage: coverage
 coverage:
-	if [ -d $(TEST_COV_D) ]; then $(RM) -r $(TEST_COV_D); fi
+	$(RM) -r $(TEST_COV_D)
 	mkdir -p $(TEST_COV_D)
 	BISECT_FILE=$(TEST_COV_D)/zanuda dune runtest --no-print-directory \
           --instrument-with bisect_ppx --force
-	bisect-ppx-report html --coverage-path $(TEST_COV_D)  --expect src/ --expect review/
-	bisect-ppx-report summary --coverage-path $(TEST_COV_D) --expect src/ --expect review/
+	bisect-ppx-report html $(COVERAGE_OPTS)
+	bisect-ppx-report summary $(COVERAGE_OPTS)
 	@echo "Use 'xdg-open _coverage/index.html' to see coverage report"

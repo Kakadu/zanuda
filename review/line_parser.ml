@@ -8,8 +8,8 @@ let use_logging = false
 
 let log fmt =
   if use_logging
-  then Caml.Format.kasprintf (Caml.Format.eprintf "%s\n%!") fmt
-  else Caml.Format.ifprintf Caml.Format.std_formatter fmt
+  then Format.kasprintf (Format.eprintf "%s\n%!") fmt
+  else Format.ifprintf Format.std_formatter fmt
 ;;
 
 let diff_cmd : unit parser =
@@ -75,7 +75,7 @@ let chunk_item : (kind * string) parser =
 let no_new_line_eof : unit parser = string "\\ No newline at end of file" *> return ()
 
 let run : ?info:string -> _ parser -> _ parser =
- fun ?info ppp ->
+  fun ?info ppp ->
   log "inside run %s" (Option.fold ~none:"" ~some:Fun.id info);
   let* _ = many (char '\n') in
   let* str = take_while (fun c -> c <> '\n') in

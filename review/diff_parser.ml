@@ -8,8 +8,8 @@ let use_logging = false
 
 let log fmt =
   if use_logging
-  then Caml.Format.kasprintf (Caml.Format.printf "%s\n%!") fmt
-  else Caml.Format.ifprintf Caml.Format.std_formatter fmt
+  then Format.kasprintf (Format.printf "%s\n%!") fmt
+  else Format.ifprintf Format.std_formatter fmt
 ;;
 
 let lookup parsed ~file ~line =

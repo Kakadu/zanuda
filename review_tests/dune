@@ -1,2 +1,6 @@
 (cram
- (deps %{project_root}/review/parser.exe %{project_root}/review/main.exe))
+ (deps
+  %{project_root}/review/parser.exe
+  %{project_root}/review/main.exe
+  ;
+  ))
