@@ -48,8 +48,8 @@ jobs:
 
       - name: Installing dependencies
         run: |
-          opam pin add zanuda ./ -n
-          opam depext zanuda -y
+          opam pin add ./ -n
+          opam depext zanuda reviewer -y
           opam install . --deps-only --with-test --with-doc
 
       - name: Building...
