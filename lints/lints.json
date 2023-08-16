@@ -11,11 +11,44 @@
     }
   },
   {
+    "id": "manual_fold",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "untyped",
+    "docs": "### What it does\nProposes to use `List.fold_left` or `List.fold_right` instead of manual \nimplementations, such as:\n\n```ocaml\n  let rec fold_left f acc l = match l with\n  | [] -> acc\n  | x :: xs -> fold_left f (f acc a) l\n```\n\n### Why?\nIt is too verbose and reduces readability.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "manual_map",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "untyped",
+    "docs": "### What it does\nProposes to use `List.map` instead of manual implementation, such as\n\n```ocaml\n  let rec map f = function\n  | [] -> []\n  | x :: xs -> f x :: map f xs\n```\n\n### Why?\nIt is too verbose and most likely less performant.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "no_docs_parsetree",
     "group": "correctness",
     "level": "deny",
     "impl": "untyped",
     "docs": "### What it does\nIt checks that file `Parsetree.mli` has documentation comments for all constructors. Usually files like this are used to describe abstract syntax tree (AST) of a language. In this case it's recommended to annotate every constructor with a documentation about meaning of the constructors, for example, which real syntax if supposed to be parsed to this part of AST.\n\nAs example of this kind of documentation you can consult [OCaml 4.13 parse tree](https://github.com/ocaml/ocaml/blob/4.13/parsing/parsetree.mli#L282)",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "propose_function_untyped",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\nProposes to rewrite 'fun x -> match x with ...' to `function`.\n\n### Why?\nThe `function` keyword allows more shorter syntax for pattern matching on last argument.\nThe lint should not be raised if scrutinee variable is used later in the code.\n\nThe following code is recommended:\n\n```ocaml\n  let f = function\n    | [] -> ...\n    | (x::xs) as arg -> ... x ... xs ... arg\n```\n\nAnd this piece of code is discouraged:\n\n```ocaml\n  let f arg  = match arg with\n    | [] -> ...\n    | (x::xs) -> ... x ... xs ... arg\n```",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -48,7 +81,18 @@
     "group": "correctness",
     "level": "deny",
     "impl": "untyped",
-    "docs": "### What it does\nThe `@@` operator is used for writing less parentheses in expression. Code like `f (g (h x))` could be rewritten as\n`f @@ g (h x)`. But is some cases it is not required, like `print_int @@ 1`.\nSome of these cases are reported by this lint.",
+    "docs": "### What it does\nThe `@@` operator is used for writing less parentheses in expression.\nCode like `f (g (h x))` could be rewritten as `f @@ g (h x)`.\nBut is some cases it is not required, like `print_int @@ 1`.\nSome of these cases are reported by this lint.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "ambiguous_constructors",
+    "group": "nursery",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\n\nChecks if there are constructor names that hide default constructor names\nfrom `Stdlib`, such as `Some`, `None`, `Error`, `Ok`. \n\n### Why it is important\n\nShadowing names of default constructors may lead to name clashes within toplevel.\nUsing custom constructors is recommended.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -77,11 +121,44 @@
     }
   },
   {
+    "id": "eta_reduction",
+    "group": "suspicious",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\nStraightforward wrapper functions are excessive and may be reduced \n\n#### Explanation\n\nLet's look at the expression 'let f x = g x'. It may be simply replaced with an expression, `let f = g` which has the same semantics. In general, wrappers like this may be confusing, so it is recommended to get rid of them",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "physical_equality",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "typed",
+    "docs": "### What it does\nWarns about using of physical equality (of pointers) vs. structural equality (of values)\n\n### Why is is important?\nThe newcomers from C++ and C# may automatically write == to test for equality, \nand get unexpected results for complex values.\n\nIf you do low level performance hacking, this lint could give false positives.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "exc_failwith",
     "group": "suspicious",
     "level": "warn",
     "impl": "typed",
     "docs": "### What it does\nThe usage of 'Stdlib.failwith' in production code could be error-prone. The constructions `failwith \"not implemented\"` should be implemented sooner or later.\n\nConstructions `failwith \"should not happen\"` smells. Maybe techniques from https://doi.org/10.1145/3299711.3242755 could help.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "format_module_usage",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "typed",
+    "docs": "### What it does\nOCaml formatted string are more powerful than C counterpart. \nYou should be aware of available features.\n\n### Why is is important?\nShorter code is more readable. Rewrite\n\n*  `\\\"%s\\\"` to `%S`",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -114,7 +191,7 @@
     "group": "correctness",
     "level": "deny",
     "impl": "typed",
-    "docs": "### What it does\nUsing mutable data structures for teaching purposes is usually discouraged. Replace \\\nHashtables by standart tree-like maps or consider Hash-Array Mapped Tries (HAMT).\n\n##### How to fix?\nUse mutable `ref`erences and mutable structure fields only if it is really required. Usually, mutability is added for performance reasons. For example,\n\n  * [Effective generalization](https://okmij.org/ftp/ML/generalization.html) in OCaml type checher\n  * Functions, that count number of invocations and/or generate unique names.\n  * Implementing memoization or laziness",
+    "docs": "### What it does\nUsing mutable data structures for teaching purposes is usually discouraged. Replace \\\nHashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT).\n\n##### How to fix?\nUse mutable `ref`erences and mutable structure fields only if it is really required. Usually, mutability is added for performance reasons. For example,\n\n  * [Effective generalization](https://okmij.org/ftp/ML/generalization.html) in OCaml type checher\n  * Functions, that count number of invocations and/or generate unique names.\n  * Implementing memoization or laziness",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -136,7 +213,18 @@
     "group": "correctness",
     "level": "deny",
     "impl": "typed",
-    "docs": "### What it does\nThe function `Stdlib.List.length` evaluated length of standart OCaml linked lists (`'a list`). There return values supposed to be non-negative, so all code like `List.length .. <= 0` smells bad. If they need to check that list is empty it is more recommended to use pattern matching instead of calculating length, because for large list we will do full iteration, and it will not be too efficient.",
+    "docs": "### What it does\nThe function `Stdlib.List.length` evaluated length of standard OCaml linked lists (`'a list`). There return values supposed to be non-negative, so all code like `List.length .. <= 0` smells bad. If they need to check that list is empty it is more recommended to use pattern matching instead of calculating length, because for large list we will do full iteration, and it will not be too efficient.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "match_bool",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\nProposes to rewrite 'match x with ... | true -> (1)  ... | false -> (2) ` to `if x then (1) else (2)`.\n\n### Why?\nUsing `if` is more readable way to examine boolean value.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -165,11 +253,11 @@
     }
   },
   {
-    "id": "record_1",
+    "id": "record_punning",
     "group": "suspicious",
     "level": "warn",
     "impl": "typed",
-    "docs": "### What it does\nSimplyfies record construction using OCaml-specfic field punning.\n\n(Chapter)[https://dev.realworldocaml.org/records.html] in 'Real World OCaml'.\n\n##### Examples\n\n```ocaml\n{ x = r.x; y = r.y; z = 15}\n```\nvs\n```ocaml\n{ r with z = 15 }\n```",
+    "docs": "### What it does\nSimplyfies record construction using OCaml-specific field punning.\n\n[Chapter](https://dev.realworldocaml.org/records.html) in 'Real World OCaml'.\n\n##### Examples\n\n```ocaml\n{ x = r.x; y = r.y; z = 15}\n```\nvs\n```ocaml\n{ r with z = 15 }\n```",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -225,6 +313,17 @@
     "level": "warn",
     "impl": "typed",
     "docs": "### What it does\nUsing `and` where there is no mutual recursion is discouraged.\n\n#### Explanation\nThe keyword `and` should be used only to declare mutually recursive types or functions.\nIncorrect use of `and` can lead to confusion.\nIt's recommended to rewrite type declarations without `and` where mutual recursion is not required.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "forbid_many_nested_if_expressions",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "typed",
+    "docs": "### What it does\n\nCheck too many (>= 3 levels) nested if expressions, for example\n* `if ... then (if ... then (if ... then (if ... then ... else ...) else ...) else ...) else ...`\n\n### Why it is important\n\nThe big problem with nested conditions is that they confuse the control flow of the code:\nthey make it almost impossible to determine what code will be executed and when.\n\nAdopted from camelot's lint list.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
