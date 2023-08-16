@@ -14,11 +14,11 @@ depends: [
   "ppx_inline_test"
   "ppx_show"
   "ppx_expect"
+  "bisect_ppx"
   "curly"
   "yojson"
   "stdune"
   "angstrom" {>= "0.15.0"}
-  "base" {with-test}
   "ocamlformat" {>= "0.23.0"}
   "odoc" {with-doc}
 ]

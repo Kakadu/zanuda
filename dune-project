@@ -41,6 +41,7 @@
    (>= 0.15.0))
   (base :with-test)
   (ppx_fields_conv :with-test)
+  (ppx_blob :with-test) ; currently required for ToplevelEval test
   (menhir :with-test)
   (ocamlformat
    (>= 0.23.0))))
@@ -58,12 +59,13 @@
   ppx_inline_test
   ppx_show
   ppx_expect
+  bisect_ppx
   curly
   ;stdio
   yojson
   stdune
   (angstrom
    (>= 0.15.0))
-  (base :with-test)
+  ;(base :with-test)
   (ocamlformat
    (>= 0.23.0))))

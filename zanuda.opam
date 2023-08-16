@@ -21,6 +21,7 @@ depends: [
   "angstrom" {>= "0.15.0"}
   "base" {with-test}
   "ppx_fields_conv" {with-test}
+  "ppx_blob" {with-test}
   "menhir" {with-test}
   "ocamlformat" {>= "0.23.0"}
   "odoc" {with-doc}
