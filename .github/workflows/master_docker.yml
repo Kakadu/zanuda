@@ -30,22 +30,15 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
-      - run: sudo apt-get update -y
-
-      # checking out the code seems to be important because local switch is used
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0                      # fix me later
 
-      # - name: Use OCaml ${{ matrix.ocaml-compiler }}
-      #   #uses: ocaml/setup-ocaml@v2
-      #   uses: ocaml/setup-ocaml@5319ab427f3840efb109b436a4e6f047dcd9db9f
-      #     # working around issue with depext and opam 2.1
-      #   with:
-      #     ocaml-compiler: ${{ matrix.ocaml-compiler }}
-      #     dune-cache: true
+      # By some reason depext doesn't install it for conf-autoconf
+      - run: |
+          sudo apt-get update -y
+          sudo apt-get install autoconf -y
 
+      # checking out the code seems to be important because local switch is used
       - name: Installing dependencies
         run: |
           opam pin add ./ -n
@@ -53,8 +46,7 @@ jobs:
           opam install . --deps-only --with-test --with-doc
 
       - name: Building...
-        run: |
-          opam exec -- dune build
+        run: opam exec -- dune build --profile=release
 
       - run: opam exec -- dune build @install --profile=release
 
