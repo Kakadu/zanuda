@@ -1,3 +1,7 @@
+(** Copyright 2021-2023, Kakadu. *)
+
+(** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
 type chunk_info =
   { old : int
   ; old_range : int

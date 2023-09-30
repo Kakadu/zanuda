@@ -1,3 +1,7 @@
+(** Copyright 2021-2023, Kakadu. *)
+
+(** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
 (* https://git-scm.com/docs/diff-format *)
 
 open Angstrom
@@ -106,10 +110,6 @@ let is_correct_chunk info lines =
   true
 ;;
 
-let pp_lines_db xs =
-  Format.pp_print_list ~pp_sep:Format.pp_print_space [%show: int * (int * int)] xs
-;;
-
 let recover_lines input =
   let extend acc ~line start ~fin =
     if fin >= start then (line, (start + 1, fin)) :: acc else acc
@@ -124,57 +124,12 @@ let recover_lines input =
   loop [] 1 0
 ;;
 
-let make_lines_index input =
-  let db = recover_lines input in
-  (* Format.printf "db : %a\n%!" pp_lines_db db; *)
-  fun pos ->
-    List.find_map
-      (fun (line, (start, fin)) -> if start <= pos && pos <= fin then Some line else None)
-      db
-;;
-
-let%test "file head 1 " =
-  let input =
-    {|
-diff -N -u old/changed.txt new/changed.txt
---- old/changed.txt  2022-09-18 16:48:36.487062439 +0300
-+++ new/changed.txt  2022-09-18 16:48:36.487062439 +0300
-@@ -1,3 +1,4 @@
-|}
-  in
-  Angstrom.parse_string ~consume:Consume.Prefix file_head input
-  = Result.ok ("old/changed.txt", "new/changed.txt")
-;;
-
-let%test "chunk item 1" =
-  let input = "+      helper b (a+b) (n-1)" in
-  match Angstrom.parse_string ~consume:Consume.All Line_parser.(run chunk_item) input with
-  | Result.Error _ -> false
-  | Ok (Add, str) when str = "      helper b (a+b) (n-1)" -> true
-  | Ok (Add, _) -> false
-  | _ -> false
-;;
-
-let%expect_test _ =
-  let lst = recover_lines "aaaa\nbbbbb\ncccc\naaaaaaaaaaaaaa" in
-  Format.printf "[%a]\n%!" pp_lines_db lst;
-  [%expect {|
-    [(1, (1, 4)) (2, (6, 10)) (3, (12, 15))
-    (4, (17, 29))] |}]
-;;
-
-let%expect_test _ =
-  let lst = recover_lines "a\nb\nc\nd" in
-  Format.printf "[%a]\n%!" pp_lines_db lst;
-  [%expect {|
-    [(1, (1, 1)) (2, (3, 3)) (3, (5, 5))
-    (4, (7, 6))] |}]
-;;
-
-let%expect_test _ =
-  let lst = recover_lines "\n\n\n" in
-  Format.printf "[%a]\n%!" pp_lines_db lst;
-  [%expect {|
-    [(1, (1, 0)) (2, (2, 1))
-    (3, (3, 2))] |}]
-;;
+(* let make_lines_index input =
+   let db = recover_lines input in
+   (* Format.printf "db : %a\n%!" pp_lines_db db; *)
+   fun pos ->
+   List.find_map
+   (fun (line, (start, fin)) -> if start <= pos && pos <= fin then Some line else None)
+   db
+   ;;
+*)

@@ -8,18 +8,17 @@
  (name main)
  (public_name reviewer)
  (modules main)
- (libraries diff_parser curly)
+ (libraries yojson diff_parser curly)
  (instrumentation
   (backend bisect_ppx)))
 
 (library
  (name diff_parser)
+ (public_name zanuda.diff_parser)
+ (synopsis "Parser for diff file format")
  (modules types line_parser diff_parser)
  (wrapped false)
- (libraries angstrom yojson ppx_show.runtime)
- (inline_tests)
- (preprocess
-  (pps ppx_inline_test ppx_show ppx_expect))
+ (libraries angstrom)
  (instrumentation
   (backend bisect_ppx)))
 
@@ -27,7 +26,15 @@
  (name parser)
  (modules parser)
  (libraries diff_parser)
+ (instrumentation
+  (backend bisect_ppx)))
+
+(library
+ (name diff_parser_tests)
+ (modules tests)
+ (libraries diff_parser)
+ (inline_tests)
  (preprocess
-  (pps ppx_show))
+  (pps ppx_inline_test ppx_expect))
  (instrumentation
   (backend bisect_ppx)))

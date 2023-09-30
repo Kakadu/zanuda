@@ -6,6 +6,7 @@
 (library
  (name zanuda_core)
  (public_name zanuda.core)
+ (synopsis "Core library for the linter")
  (modules
   Utils
   ;
