@@ -51,6 +51,12 @@ let () =
     [ "-", Arg.Unit (fun () -> cfg.from <- None), " use stdin"
     ; "-f", Arg.String (fun s -> cfg.file <- Some s), " lookup for file"
     ; "-l", Arg.Int (fun n -> cfg.line <- Some n), " lookup for line in a file"
+    ; ( "-vdp"
+      , Arg.Unit (fun () -> Diff_parser.set_logging true)
+      , " Enable logging in the diff parser" )
+    ; ( "-vlp"
+      , Arg.Unit (fun () -> Line_parser.set_logging true)
+      , " Enable logging in the line parser" )
     ]
     (fun _ -> assert false)
     " "

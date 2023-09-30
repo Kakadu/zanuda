@@ -3,11 +3,11 @@ open Types
 
 type +'a parser = 'a Angstrom.t
 
-let use_logging = true
-let use_logging = false
+let use_logging = ref false
+let set_logging flg = use_logging := flg
 
 let log fmt =
-  if use_logging
+  if !use_logging
   then Format.kasprintf (Format.eprintf "%s\n%!") fmt
   else Format.ifprintf Format.std_formatter fmt
 ;;
