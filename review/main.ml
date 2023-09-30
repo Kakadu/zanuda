@@ -53,6 +53,9 @@ let create_review info =
     (match get_diff ~owner ~repo ~pull_number with
      | Some diff ->
        (match Diff_parser.parse_string diff with
+        | Error e_parse ->
+          Format.eprintf "Parsing failed: %s\n" e_parse;
+          exit 1
         | Result.Ok parsed ->
           let parse_json json =
             let open Yojson.Basic.Util in
@@ -102,8 +105,7 @@ let create_review info =
            | Ok x ->
              Format.printf "status: %d\n" x.Curly.Response.code;
              Format.printf "body: %s\n" x.Curly.Response.body
-           | Error e_api -> Format.eprintf "Failed: %a\n" Curly.Error.pp e_api)
-        | Error e_parse -> Format.eprintf "Parsing failed: %s\n" e_parse)
+           | Error e_api -> Format.eprintf "Failed: %a\n" Curly.Error.pp e_api))
      | None -> ())
   | _ -> Format.eprintf "Some argument was not initialized\n"
 ;;

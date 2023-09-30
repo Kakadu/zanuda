@@ -4,3 +4,7 @@
   %{project_root}/review/main.exe
   ;
   ))
+
+(cram
+ (applies_to extended)
+ (deps extended.diff))

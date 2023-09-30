@@ -100,5 +100,7 @@ let () =
             diff_pos
         | None -> Format.eprintf "Couldn't find it.\n")
      | _ -> Format.eprintf "File or line was not initialized\n")
-  | Error s -> Format.eprintf "Parsing failed: %s\n" s
+  | Error s ->
+    Format.eprintf "Parsing failed: %s\n" s;
+    exit 1
 ;;

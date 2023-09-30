@@ -1,3 +1,5 @@
+(* https://git-scm.com/docs/diff-format *)
+
 open Angstrom
 open Types
 
@@ -14,7 +16,9 @@ let log fmt =
 
 let lookup parsed ~file ~line =
   match List.find (fun { new_file } -> new_file = file) parsed with
-  | exception Not_found -> None
+  | exception Not_found ->
+    Printf.eprintf "No file %S in the list of parsed chunks" file;
+    None
   | { chunks } ->
     let rec find_chunk acc = function
       | (ch_info, ch_items) :: tl ->
@@ -38,8 +42,16 @@ let lookup parsed ~file ~line =
 let file_head : _ parser =
   log "%d: file_head" __LINE__;
   let* () = option () Line_parser.(run ~info:"diff_cmd" diff_cmd) in
-  let* () = option () Line_parser.(run ~info:"file_mode" file_mode) in
-  let* () = option () Line_parser.(run ~info:"index" index) in
+  let* () =
+    many
+      (choice
+         [ Line_parser.(run ~info:"similarity" similarity)
+         ; Line_parser.(run ~info:"file_mode" file_mode)
+         ; Line_parser.(run ~info:"rename" rename)
+         ; Line_parser.(run ~info:"index" index)
+         ])
+    *> return ()
+  in
   let* old_file = Line_parser.(run ~info:"remove_file" remove_file) in
   log "%d: old_file = %s" __LINE__ old_file;
   let* new_file = Line_parser.(run ~info:"new_file" add_file) in

@@ -22,6 +22,16 @@ let file_mode : unit parser =
   many any_char *> return ()
 ;;
 
+let similarity : unit parser =
+  let* _ = string "similarity index" in
+  many any_char *> return ()
+;;
+
+let rename : unit parser =
+  let* _ = string "rename from" <|> string "rename to" in
+  many any_char *> return ()
+;;
+
 let index : unit parser =
   let* _ = string "index" in
   many any_char *> return ()
