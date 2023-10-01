@@ -1,12 +1,22 @@
 ## Working version
 
-### Changed
+### New
 
-- #12: Split 'string_concat' lint to check separately patterns 'a^b^c' (level=Allow) and 'List.fold_left (^)' (level=Warn).
-  (reported by @edwintorok)
+- #13: Add lint that discourages matching a tuple using 'match' expression with single branch
+  (contributed by @s-khechnev)
+- #18: Add lint about unneeded mutually recursive types
+  (contributed by @s-khechnev)
 - Add command line switch '-skip-level-allow <bool>' to enable/disable lints
   with level=Allow. False has higher priority than per-lint command line switch
   (for example, `-no-string_concat`)
+- #22: Add 'reviewer' tool to report lint's a Github review.
+  (contributed by @s-khechnev)
+- Expose library to parse DIFF format. It is available as 'zanuda.diff_parser' ocamlfind package.
+
+### Changed
+
+- #15: Split 'string_concat' lint to check separately patterns 'a^b^c' (level=Allow) and 'List.fold_left (^)' (level=Warn).
+  (reported by @edwintorok)
 - #16: Calculate test coverage.
 
 
