@@ -88,27 +88,27 @@ let parse_whole_file : file_info list parser =
 
 let parse_string str = parse_string ~consume:Consume.All parse_whole_file str
 
-let is_correct_chunk info lines =
-  let old, fresh =
-    List.fold_left
-      (fun (oacc, facc) -> function
-        | Del, _, _ -> 1 + oacc, facc
-        | Add, _, _ -> oacc, 1 + facc
-        | Leave, _, _ -> 1 + oacc, 1 + facc)
-      (0, 0)
-      lines
-  in
-  log "@@@@ -%d,%d +%d,%d " info.old info.old_range info.fresh info.fresh_range;
-  let pk = function
-    | Add -> '+'
-    | Del -> '-'
-    | _ -> ' '
-  in
-  List.iteri (fun i (k, s, _) -> log "%d:\t%c%s" i (pk k) s) lines;
-  assert (info.old_range = old);
-  assert (info.fresh_range = fresh);
-  true
-;;
+(* let is_correct_chunk info lines =
+   let old, fresh =
+   List.fold_left
+   (fun (oacc, facc) -> function
+   | Del, _, _ -> 1 + oacc, facc
+   | Add, _, _ -> oacc, 1 + facc
+   | Leave, _, _ -> 1 + oacc, 1 + facc)
+   (0, 0)
+   lines
+   in
+   log "@@@@ -%d,%d +%d,%d " info.old info.old_range info.fresh info.fresh_range;
+   let pk = function
+   | Add -> '+'
+   | Del -> '-'
+   | _ -> ' '
+   in
+   List.iteri (fun i (k, s, _) -> log "%d:\t%c%s" i (pk k) s) lines;
+   assert (info.old_range = old);
+   assert (info.fresh_range = fresh);
+   true
+   ;; *)
 
 let recover_lines input =
   let extend acc ~line start ~fin =
