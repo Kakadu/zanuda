@@ -12,6 +12,8 @@ type input = Tast_iterator.iterator
 
 let lint_source = LINT.FPCourse
 let lint_id = "mutable_hashtables"
+
+(* TODO: rename that it checks mutability in general *)
 let level = LINT.Warn
 
 let documentation =
@@ -95,6 +97,21 @@ let run _ fallback =
         let loc = typ.Typedtree.ctyp_loc in
         check loc pat_typ typ;
         fallback.typ self typ)
+  ; type_declaration =
+      (fun self td ->
+        fallback.type_declaration self td;
+        match td.Typedtree.typ_type.Types.type_kind with
+        | Types.Type_abstract | Type_open -> ()
+        | Type_record (labels, _) ->
+          List.iter labels ~f:(function
+            | { ld_mutable = Mutable; ld_loc = loc; _ } ->
+              CollectedLints.add
+                ~loc
+                (report loc.Location.loc_start.Lexing.pos_fname ~loc ())
+            | _ -> ())
+        | Type_variant _ ->
+          (* TODO(Kakadu): Algbraic constuctors could have mutable record arguments *)
+          ())
   ; expr =
       (fun self expr ->
         let loc = expr.Typedtree.exp_loc in

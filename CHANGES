@@ -18,6 +18,7 @@
 - #15: Split 'string_concat' lint to check separately patterns 'a^b^c' (level=Allow) and 'List.fold_left (^)' (level=Warn).
   (reported by @edwintorok)
 - #16: Calculate test coverage.
+- The lint 'mutable_hashtables' now check for mutability in general: references, mutable record fields, etc.
 
 
 ## 1.0.0 (24-03-2023)

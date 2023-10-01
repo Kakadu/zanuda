@@ -24,3 +24,11 @@
   18 |   last_identity := code + 1;
          ^^^^^^^^^^^^^
   Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standart tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.
+  File "Hashtables.ml", line 22, characters 11-25:
+  22 | type env = int option ref BindsMap.t
+                  ^^^^^^^^^^^^^^
+  Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standart tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.
+  File "Hashtables.ml", line 24, characters 14-32:
+  24 | type args = { mutable count: int }
+                     ^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standart tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.

@@ -17,3 +17,8 @@ let get_unique_identity_code () =
   let code = !last_identity in
   last_identity := code + 1;
   code
+
+module BindsMap = Map.Make(String)
+type env = int option ref BindsMap.t
+
+type args = { mutable count: int }
