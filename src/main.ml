@@ -38,6 +38,7 @@ let typed_linters =
   ; (module UntypedLints.GuardInsteadOfIf : LINT.TYPED)
   ; (module Tuple_matching : LINT.TYPED)
   ; (module Mutually_rec_types : LINT.TYPED)
+  ; (module Nested_if : LINT.TYPED)
     (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
   ]
 ;;
