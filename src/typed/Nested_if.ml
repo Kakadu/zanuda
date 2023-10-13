@@ -34,8 +34,8 @@ let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 let msg ppf () =
   Caml.Format.fprintf
     ppf
-    "Using nested if statements more than three layers deep is bad practice. Use let \
-     statements or helper methods / rethinking logic.%!"
+    "Using nested if expressions more than three layers deep is a bad practice. Use let \
+     statements or helper methods or rethinking logic.%!"
 ;;
 
 let report filename ~loc =
@@ -61,7 +61,7 @@ let run _ fallback =
     let rec nst_ite depth f =
       match depth with
       | 3 -> f
-      | _ -> texp_ite drop f drop ||| texp_ite drop drop (some f) |> nst_ite @@ (depth + 1)
+      | _ -> texp_ite drop f drop ||| texp_ite drop drop (some f) |> nst_ite (depth + 1)
     in
     texp_ite drop drop drop |> nst_ite 0
   in

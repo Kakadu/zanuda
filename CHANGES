@@ -12,7 +12,8 @@
 - #22: Add 'reviewer' tool to report lint's a Github review.
   (contributed by @s-khechnev)
 - Expose library to parse DIFF format. It is available as 'zanuda.diff_parser' ocamlfind package.
-
+- #28: Add lint about nested if expressions.
+  (contributed by @Artem-Rzhankoff)
 ### Changed
 
 - #15: Split 'string_concat' lint to check separately patterns 'a^b^c' (level=Allow) and 'List.fold_left (^)' (level=Warn).

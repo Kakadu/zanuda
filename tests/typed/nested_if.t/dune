@@ -7,10 +7,7 @@
    ;-dsource
    ;
    ))
- (preprocess
-  (pps
-   ;ppx_show
-   ppx_fields_conv)))
+)
 
 (cram
  (deps %{bin:zanuda.exe}))
