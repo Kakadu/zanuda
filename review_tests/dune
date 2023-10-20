@@ -8,3 +8,7 @@
 (cram
  (applies_to extended)
  (deps extended.diff))
+
+(cram
+ (applies_to extended2)
+ (deps extended2.diff))
