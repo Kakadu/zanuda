@@ -13,6 +13,7 @@ let untyped_linters =
   let open UntypedLints in
   [ (module Casing : LINT.UNTYPED)
   ; (module ParsetreeHasDocs : LINT.UNTYPED)
+  ; (module UntypedLints.Propose_function : LINT.UNTYPED)
   ; (module ToplevelEval : LINT.UNTYPED)
   ; (module VarShouldNotBeUsed : LINT.UNTYPED)
   ; (module UntypedLints.Dollar : LINT.UNTYPED)
@@ -144,9 +145,9 @@ let process_cmt_typedtree filename typedtree =
 
 let process_cmti_typedtree filename typedtree =
   (* if Config.Options.verbose ()
-  then (
-    let () = printfn "Analyzing cmti: %s" filename in
-    printfn "%a" Printtyped.interface typedtree); *)
+     then (
+     let () = printfn "Analyzing cmti: %s" filename in
+     printfn "%a" Printtyped.interface typedtree); *)
   (* Format.printf "Typedtree MLI:\n%a\n%!" Printtyped.interface typedtree; *)
   with_info filename (fun info ->
     process_per_file_linters_sig info typedtree;

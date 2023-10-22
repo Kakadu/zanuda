@@ -1,4 +1,8 @@
 (library
  (name test_function)
  (wrapped false)
- (modules function))
+ (modules function)
+ ; (flags
+ ;  (:standard -dsource))
+ (preprocess
+  (pps ppx_deriving.show)))
