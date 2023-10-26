@@ -2,14 +2,15 @@
  (name UntypedLints)
  (libraries Tast_pattern zanuda_core angstrom)
  (modules
+  AmbiguousConstructors
   Casing
   GuardInsteadOfIf
-  Dollar
-  License
   ParsetreeHasDocs
   Propose_function
   ToplevelEval
+  Dollar
   VarShouldNotBeUsed
+  License
   ;
   )
  (preprocess

@@ -1,0 +1,12 @@
+(library
+ (name test_amb_cstrs)
+ (wrapped false)
+ (modules amb_cstrs)
+ (flags
+  (:standard
+   ;-dsource
+   ;
+   )))
+
+(cram
+ (deps %{bin:zanuda.exe}))
