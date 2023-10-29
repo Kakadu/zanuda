@@ -13,8 +13,8 @@
   (backend bisect_ppx)))
 
 (library
+ (package reviewer)
  (name diff_parser)
- (public_name zanuda.diff_parser)
  (synopsis "Parser for diff file format")
  (modules types line_parser diff_parser)
  (wrapped false)
