@@ -44,7 +44,9 @@
   (ppx_blob :with-test) ; currently required for ToplevelEval test
   (menhir :with-test)
   (ocamlformat
-   (>= 0.23.0))))
+   (and
+    (= 0.26.1)
+    :dev))))
 
 (package
  (name reviewer)
@@ -68,4 +70,6 @@
    (>= 0.15.0))
   ;(base :with-test)
   (ocamlformat
-   (>= 0.23.0))))
+   (and
+    (= 0.26.1)
+    :dev))))

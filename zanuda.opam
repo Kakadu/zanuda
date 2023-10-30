@@ -23,7 +23,7 @@ depends: [
   "ppx_fields_conv" {with-test}
   "ppx_blob" {with-test}
   "menhir" {with-test}
-  "ocamlformat" {>= "0.23.0"}
+  "ocamlformat" {= "0.26.1" & dev}
   "odoc" {with-doc}
 ]
 build: [

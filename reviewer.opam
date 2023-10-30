@@ -19,7 +19,7 @@ depends: [
   "yojson"
   "stdune"
   "angstrom" {>= "0.15.0"}
-  "ocamlformat" {>= "0.23.0"}
+  "ocamlformat" {= "0.26.1" & dev}
   "odoc" {with-doc}
 ]
 build: [
