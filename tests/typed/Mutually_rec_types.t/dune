@@ -6,4 +6,4 @@
 (library
  (name test_mutually_rec_types)
  (wrapped false)
- (modules Mutually_rec_types))
+ (modules Mutually_rec_types ast2))

@@ -35,10 +35,10 @@ let msg ppf strct_items =
     let open Parsetree in
     strct_items
     |> List.concat_map ~f:(fun s ->
-         match s.pstr_desc with
-         | Pstr_type (_, decls) ->
-           List.map decls ~f:(fun d -> Format.asprintf "'%s'" d.ptype_name.txt)
-         | _ -> [])
+      match s.pstr_desc with
+      | Pstr_type (_, decls) ->
+        List.map decls ~f:(fun d -> Format.asprintf "'%s'" d.ptype_name.txt)
+      | _ -> [])
     |> String.concat ~sep:", "
   in
   Format.fprintf
@@ -71,6 +71,11 @@ let report msg ~loc strct_items =
 
 module SCC = Strongly_connected_components.Make (Ident)
 
+let pp_graph ppf : Ident.Set.t Ident.Map.t -> unit =
+  Ident.Map.iter (fun key set ->
+    Format.fprintf ppf "%s ~~> %s\n%!" (Ident.name key) (Ident.Set.to_string set))
+;;
+
 let run _ fallback =
   let pat =
     let open Tast_pattern in
@@ -95,6 +100,7 @@ let run _ fallback =
                       loc
                       cr_typ
                       (fun p () ->
+                        default_iterator.typ self cr_typ;
                         match p with
                         | Path.Pident id
                           when List.exists decls ~f:(fun d -> Ident.same d.typ_id id) ->
@@ -108,6 +114,7 @@ let run _ fallback =
             let extrnl_typs = Ident.Set.of_list @@ Queue.to_list extrnl_typs in
             Ident.Map.add decl.typ_id extrnl_typs acc)
         in
+        (* Format.printf "%a\n%!" pp_graph graph; *)
         let comps = SCC.connected_components_sorted_from_roots_to_leaf graph in
         if Array.length comps > 1
         then (
@@ -119,33 +126,31 @@ let run _ fallback =
             comps
             |> Array.rev
             |> Array.filter_map ~f:(function
-                 | SCC.No_loop id ->
-                   List.find_map decls ~f:(fun dec ->
-                     if Stdlib.(dec = first_dec)
-                     then None
-                     else if Ident.same id dec.typ_id
-                     then
-                       Some
-                         (Ast_helper.Str.type_
-                            Recursive
-                            [ Untypeast.(
-                                default_mapper.type_declaration default_mapper dec)
-                            ])
-                     else None)
-                 | Has_loop loop ->
-                   if List.mem loop first_dec.typ_id ~equal:Ident.same
-                   then None
-                   else (
-                     let mtly_decls =
-                       List.filter_map decls ~f:(fun dec ->
-                         if List.mem loop dec.typ_id ~equal:Ident.same
-                         then
-                           Some
-                             Untypeast.(
-                               default_mapper.type_declaration default_mapper dec)
-                         else None)
-                     in
-                     Some (Ast_helper.Str.type_ Recursive mtly_decls)))
+              | SCC.No_loop id ->
+                List.find_map decls ~f:(fun dec ->
+                  if Stdlib.(dec = first_dec)
+                  then None
+                  else if Ident.same id dec.typ_id
+                  then
+                    Some
+                      (Ast_helper.Str.type_
+                         Recursive
+                         [ Untypeast.(default_mapper.type_declaration default_mapper dec)
+                         ])
+                  else None)
+              | Has_loop loop ->
+                if List.mem loop first_dec.typ_id ~equal:Ident.same
+                then None
+                else (
+                  let mtly_decls =
+                    List.filter_map decls ~f:(fun dec ->
+                      if List.mem loop dec.typ_id ~equal:Ident.same
+                      then
+                        Some
+                          Untypeast.(default_mapper.type_declaration default_mapper dec)
+                      else None)
+                  in
+                  Some (Ast_helper.Str.type_ Recursive mtly_decls)))
             |> Array.to_list
           in
           CollectedLints.add ~loc (report msg ~loc correct_strcts));
