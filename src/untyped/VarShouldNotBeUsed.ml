@@ -82,10 +82,9 @@ let check_occurances_exn txt e =
 ;;
 
 let is_name_suspicious txt =
-  (not (String.is_prefix txt ~prefix:"_menhir_action_"))
-  && (not (String.is_prefix txt ~prefix:"_menhir_cell"))
-  && (not (String.is_prefix txt ~prefix:"_menhir_lexer"))
-  && String.is_prefix txt ~prefix:"_"
+  String.is_prefix txt ~prefix:"_"
+  && (not (String.is_prefix txt ~prefix:"__ocaml_lex"))
+  && not (String.is_prefix txt ~prefix:"_menhir_")
 ;;
 
 let run { Compile_common.source_file; _ } fallback =
