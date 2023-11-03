@@ -11,8 +11,7 @@ let per_file_linters = [ (module UntypedLints.License : LINT.TYPED) ]
 
 let untyped_linters =
   let open UntypedLints in
-  [ (module AmbiguousConstructors : LINT.UNTYPED)
-  ; (module Casing : LINT.UNTYPED)
+  [ (module Casing : LINT.UNTYPED)
   ; (module ParsetreeHasDocs : LINT.UNTYPED)
   ; (module UntypedLints.Propose_function : LINT.UNTYPED)
   ; (module ToplevelEval : LINT.UNTYPED)
@@ -24,7 +23,8 @@ let untyped_linters =
 let typed_linters =
   let open TypedLints in
   [ (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
-    (module ExcTryWithWildcard : LINT.TYPED)
+    (module AmbiguousConstructors : LINT.TYPED)
+  ; (module ExcTryWithWildcard : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
   ; (module Failwith : LINT.TYPED)
   ; (module If_bool : LINT.TYPED)
