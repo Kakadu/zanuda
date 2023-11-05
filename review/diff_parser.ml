@@ -43,8 +43,9 @@ let lookup parsed ~file ~line =
        loop ci.fresh first_line_number lines)
 ;;
 
-let file_head : _ parser =
+let file_head : _ option parser =
   log "%d: file_head" __LINE__;
+  let* init_pos = pos in
   let* () = option () Line_parser.(run ~info:"diff_cmd" diff_cmd) in
   let* () =
     many
@@ -56,11 +57,18 @@ let file_head : _ parser =
          ])
     *> return ()
   in
-  let* old_file = Line_parser.(run ~info:"remove_file" remove_file) in
-  log "%d: old_file = %s" __LINE__ old_file;
-  let* new_file = Line_parser.(run ~info:"new_file" add_file) in
-  log "%d: new_file = %S" __LINE__ new_file;
-  return (old_file, new_file)
+  log "%d: " __LINE__;
+  let* rez =
+    Angstrom.option
+      None
+      (let* old_file = Line_parser.(run ~info:"remove_file" remove_file) in
+       log "%d: old_file = %s" __LINE__ old_file;
+       let* new_file = Line_parser.(run ~info:"new_file" add_file) in
+       log "%d: new_file = %S" __LINE__ new_file;
+       return (Some (old_file, new_file)))
+  in
+  let* next_pos = pos in
+  if next_pos > init_pos then return rez else fail "can't parse file chunk head"
 ;;
 
 let a_chunk : chunk parser =
@@ -78,12 +86,24 @@ let a_chunk : chunk parser =
 
 let parse_whole_file : file_info list parser =
   many
-    (let* old_file, new_file = file_head in
-     log "%d" __LINE__;
-     let* chunks = many a_chunk in
-     log "%d" __LINE__;
-     let* _ = many (string "\n") in
-     return { old_file; new_file; chunks })
+    (let* () = return () in
+     (* let* initial_pos = pos in
+        let* avai = available in
+        log "%d on pos %d (avail=%d)" __LINE__ initial_pos avai; *)
+     file_head
+     >>= function
+     | Some (old_file, new_file) ->
+       log "%d" __LINE__;
+       let* chunks = many a_chunk in
+       log "%d there are %d chunks parsed " __LINE__ (List.length chunks);
+       let* eols = many (string "\n") in
+       log "empty lines eaten: %d" (List.length eols);
+       return (Some { old_file; new_file; chunks })
+     | None ->
+       let* eols = many (string "\n") in
+       log "%d: empty lines eaten: %d" __LINE__ (List.length eols);
+       return None)
+  >>| List.filter_map Fun.id
 ;;
 
 let parse_string str = parse_string ~consume:Consume.All parse_whole_file str

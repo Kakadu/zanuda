@@ -102,7 +102,7 @@ let () =
             "Got something. It should be at %d lines below from the first chunk header \
              of file in diff\n"
             diff_pos
-        | None -> Format.eprintf "Couldn't find it.\n")
+        | None -> Format.eprintf "Can't find '%s' line %d in the diff\n" file line)
      | _ -> Format.eprintf "File or line was not initialized\n")
   | Error s ->
     Format.eprintf "Parsing failed: %s\n" s;

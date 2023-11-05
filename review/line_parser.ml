@@ -16,6 +16,8 @@ let log fmt =
   else Format.ifprintf Format.std_formatter fmt
 ;;
 
+let log1 fmt = Format.kasprintf (Format.eprintf "%s\n%!") fmt
+
 let diff_cmd : unit parser =
   let* _ = string "diff" in
   many any_char *> return ()
@@ -90,10 +92,10 @@ let no_new_line_eof : unit parser = string "\\ No newline at end of file" *> ret
 
 let run : ?info:string -> _ parser -> _ parser =
   fun ?info ppp ->
-  log "inside run %s" (Option.fold ~none:"" ~some:Fun.id info);
+  (* log1 "inside run %s" (Option.fold ~none:"" ~some:Fun.id info); *)
   let* _ = many (char '\n') in
   let* str = take_while (fun c -> c <> '\n') in
-  log "Going to parse from string %S" str;
+  (* log1 "Going to parse %S from string %S" (Option.fold ~none:"" ~some:Fun.id info) str; *)
   match parse_string ~consume:Consume.All ppp str with
   | Result.Error e ->
     log "failed: %d" __LINE__;

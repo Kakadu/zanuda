@@ -95,7 +95,7 @@ diff -N -u old/changed.txt new/changed.txt
 |}
       in
       Angstrom.parse_string ~consume:Angstrom.Consume.Prefix file_head input
-      = Result.ok ("old/changed.txt", "new/changed.txt")
+      = Result.ok (Option.some ("old/changed.txt", "new/changed.txt"))
     ;;
 
     let%test "chunk item 1" =

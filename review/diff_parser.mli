@@ -13,7 +13,7 @@ val parse_whole_file : Types.file_info list Angstrom.t
 val parse_string : string -> (Types.file_info list, string) result
 
 (** Parse header of the diff file *)
-val file_head : (string * string) Angstrom.t
+val file_head : (string * string) option Angstrom.t
 
 (** Parses hunk for the file *)
 val a_chunk : Types.chunk Angstrom.t
