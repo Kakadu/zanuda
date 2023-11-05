@@ -6,6 +6,7 @@ description:
 maintainer: ["kakadu@pm.me"]
 authors: ["Kakadu"]
 license: "LGPL-3.0-only"
+tags: ["lint" "test"]
 homepage: "https://github.com/Kakadu/zanuda"
 bug-reports: "https://github.com/Kakadu/zanuda/issues"
 depends: [

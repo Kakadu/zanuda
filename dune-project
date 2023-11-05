@@ -20,6 +20,8 @@
  (synopsis "OCaml linter experiment")
  (description
   "Inspired by https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml")
+ (tags
+  (lint test))
  (depends
   (ocaml
    (and
