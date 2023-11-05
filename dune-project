@@ -41,6 +41,7 @@
    (>= 0.15.0))
   (base :with-test)
   (ppx_fields_conv :with-test)
+  (ppx_deriving :with-test)
   (ppx_blob :with-test) ; currently required for ToplevelEval test
   (menhir :with-test)
   (ocamlformat
