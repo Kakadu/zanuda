@@ -2,6 +2,7 @@
  (name TypedLints)
  (libraries zanuda_core Tast_pattern)
  (modules
+  AmbiguousConstructors
   ExcTryWithWildcard
   Equality
   Failwith
