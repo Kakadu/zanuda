@@ -22,7 +22,7 @@ from `Stdlib`, such as `Some`, `None`, `Error`, `Ok`.
 
 ### Why it is important
 
-Shadowing names of default constructor may lead to name clashes within toplevel.
+Shadowing names of default constructors may lead to name clashes within toplevel.
 Using custom constructors is recommended.
 
 |}
