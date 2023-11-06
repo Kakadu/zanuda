@@ -35,7 +35,7 @@ let describe_as_json () =
 
 let msg ppf names =
   let show_names =
-    List.map names ~f:(fun name -> Format.asprintf "`%s`" name) |> String.concat ~sep:", "
+    List.map names ~f:(Format.asprintf "`%s`") |> String.concat ~sep:", "
   in
   Format.fprintf
     ppf
