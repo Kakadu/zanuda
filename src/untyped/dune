@@ -4,12 +4,12 @@
  (modules
   Casing
   GuardInsteadOfIf
+  Dollar
+  License
   ParsetreeHasDocs
   Propose_function
   ToplevelEval
-  Dollar
   VarShouldNotBeUsed
-  License
   ;
   )
  (preprocess
