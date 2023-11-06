@@ -93,8 +93,8 @@ let run _ fallback =
               ctyp.ctyp_loc
               ctyp
               (fun p ->
-                match Ident.name (Path.head p) with
-                | "Stdlib" | "option" -> true
+                match Path.name p with
+                | "Stdlib.result" | "option" -> true
                 | _ -> false)
               ~on_error:(fun _ -> false)
         in
