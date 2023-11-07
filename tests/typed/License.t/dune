@@ -16,4 +16,17 @@
 
 (alias
  (name default)
- (deps ./REPL.exe test_license.cmxa))
+ (deps ./REPL.exe test_license.cmxa test_license_with_ppx.cmxa))
+
+(library
+ (name test_license_with_ppx)
+ (wrapped false)
+ (libraries asdf)
+ (modules good2)
+ (inline_tests)
+ ;  (flags
+ ;   (:standard -dsource))
+ (preprocess
+  (pps ppx_inline_test ppx_assert bisect_ppx))
+ (instrumentation
+  (backend bisect_ppx)))

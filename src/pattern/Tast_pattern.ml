@@ -9,10 +9,10 @@ module Ast_pattern0 = struct
 
   type context =
     { (* [matched] counts how many constructors have been matched. This is used to find what
-       pattern matches the most some piece of ast in [Ast_pattern.alt]. In the case where
-       all branches fail to match, we report the error from the one that matches the
-       most.
-       This is only incremented by combinators that can fail. *)
+         pattern matches the most some piece of ast in [Ast_pattern.alt]. In the case where
+         all branches fail to match, we report the error from the one that matches the
+         most.
+         This is only incremented by combinators that can fail. *)
       mutable matched : int
     }
 
@@ -65,7 +65,7 @@ let __ : 'a 'b. ('a, 'a -> 'b, 'b) t =
 ;;
 
 let as__ : 'a 'b 'c. ('a, 'b, 'c) t -> ('a, 'a -> 'b, 'c) t =
- fun (T f1) ->
+  fun (T f1) ->
   T
     (fun ctx loc x k ->
       let k = f1 ctx loc x (k x) in
@@ -615,27 +615,27 @@ let rld_overriden (T flident) (T fexpr) =
 ;;
 
 (*   let hack0 (T path0) =
-    T
-      (fun ctx loc x k ->
-        match x.Types.val_type.Types.desc with
-        | Tconstr (path, [], _) ->
-          ctx.matched <- ctx.matched + 1;
-          path0 ctx loc path k
-        | _ -> fail loc "hack0")
-  ;;
+     T
+     (fun ctx loc x k ->
+     match x.Types.val_type.Types.desc with
+     | Tconstr (path, [], _) ->
+     ctx.matched <- ctx.matched + 1;
+     path0 ctx loc path k
+     | _ -> fail loc "hack0")
+     ;;
 
-  let hack1 ?(on_vd = drop) (T path0) =
-    T
-      (fun ctx loc x k ->
-        match x.exp_desc with
-        | Texp_ident (path, _, vd) ->
-          ctx.matched <- ctx.matched + 1;
-          let (T fvd) = on_vd in
-          k |> path0 ctx loc path |> fvd ctx loc vd
-        | _ -> fail loc "texp_ident")
-  ;;
+     let hack1 ?(on_vd = drop) (T path0) =
+     T
+     (fun ctx loc x k ->
+     match x.exp_desc with
+     | Texp_ident (path, _, vd) ->
+     ctx.matched <- ctx.matched + 1;
+     let (T fvd) = on_vd in
+     k |> path0 ctx loc path |> fvd ctx loc vd
+     | _ -> fail loc "texp_ident")
+     ;;
 
-  let __ path = hack1 __ path *)
+     let __ path = hack1 __ path *)
 let rec core_typ (T ftexpr) = T (fun ctx loc x k -> ftexpr ctx loc x.ctyp_type k)
 
 let rec typ_constr (T fpath) (T fargs) =
@@ -731,3 +731,9 @@ let tsig_docattr (T f) =
         k |> f ctx loc docstr
       | _ -> fail loc "tsig_docattr")
 ;;
+
+type context = Ast_pattern0.context
+
+let of_func f = T f
+let to_func (T f) = f
+let fail = fail

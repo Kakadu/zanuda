@@ -1,68 +1,76 @@
-(** Copyright 2021-2022, Dmitrii Kosarev a.k.a. Kakadu  *)
+(** Copyright 2021-2023, Dmitrii Kosarev a.k.a. Kakadu *)
 
 (** SPDX-License-Identifier: LGPL-3.0-only *)
 
 (*
-  Checking that every file starts from SPDX copyright and license information.
-  N.B. ppx could add extra attributes that complicate this check a little bit
+   Checking that every file starts from SPDX copyright and license information.
+   N.B. ppx could add extra attributes that complicate this check a little bit
 
-  TODO: support double licensing (AND keyword)
+   TODO: support double licensing (AND keyword)
 *)
+
+(* TODO: We can omit appearance of the license in the generated documentation.
+   We should write like this:
+   (** /* *)
+   (** Copyright ... *)
+   (** SPDX-License-Identifier: ... *)
+   (** */ *)
+*)
+
 open Caml.Format
 open Zanuda_core
 open Utils
 
 include (
-  struct
-    open Angstrom
+struct
+  open Angstrom
 
-    let is_space = function
-      | ' ' | '\t' -> true
-      | _ -> false
-    ;;
+  let is_space = function
+    | ' ' | '\t' -> true
+    | _ -> false
+  ;;
 
-    let is_digit = function
-      | '0' .. '9' -> true
-      | _ -> false
-    ;;
+  let is_digit = function
+    | '0' .. '9' -> true
+    | _ -> false
+  ;;
 
-    let ws = skip_while is_space
-    let year = take_while1 is_digit *> return ()
+  let ws = skip_while is_space
+  let year = take_while1 is_digit *> return ()
 
-    let parse1 =
-      let year_range = return (fun _ _ -> ()) <*> (year <* char '-') <*> year in
-      ws *> string "Copyright" *> ws *> (year_range <|> year)
-      <* ws
-      <* char ','
-      <* take_while (fun _ -> true)
-    ;;
+  let parse1 =
+    let year_range = return (fun _ _ -> ()) <*> (year <* char '-') <*> year in
+    ws *> string "Copyright" *> ws *> (year_range <|> year)
+    <* ws
+    <* char ','
+    <* take_while (fun _ -> true)
+  ;;
 
-    let decent_char = function
-      | '0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '-' | '.' -> true
-      | _ -> false
-    ;;
+  let decent_char = function
+    | '0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '-' | '.' -> true
+    | _ -> false
+  ;;
 
-    let parse2 =
-      ws *> string "SPDX-License-Identifier:" *> ws *> take_while1 decent_char *> ws
-    ;;
+  let parse2 =
+    ws *> string "SPDX-License-Identifier:" *> ws *> take_while1 decent_char *> ws
+  ;;
 
-    let parses p str =
-      match parse_string ~consume:Consume.All p str with
-      | Result.Ok _ -> true
-      | Error _ -> false
-    ;;
+  let parses p str =
+    match parse_string ~consume:Consume.All p str with
+    | Result.Ok _ -> true
+    | Error _ -> false
+  ;;
 
-    let verify_line1 = parses parse1
-    let verify_line2 = parses parse2
-  end :
-    sig
-      val verify_line1 : string -> bool
-      val verify_line2 : string -> bool
-    end)
+  let verify_line1 = parses parse1
+  let verify_line2 = parses parse2
+end :
+sig
+  val verify_line1 : string -> bool
+  val verify_line2 : string -> bool
+end)
 
 let%test _ = verify_line1 " Copyright 2021-2022, Kakadu and contributors  "
 let%test _ = verify_line2 " SPDX-License-Identifier: LGPL-3.0-or-later  "
-
 let lint_id = "top_file_license"
 let lint_source = LINT.FPCourse
 let level = LINT.Warn
@@ -138,6 +146,18 @@ let panic ~loc ~filename mode =
            (** SPDX-License-Identifier: LGPL-3.0-or-later *)|})
 ;;
 
+(*
+   Typical ppx_bisect support code:
+   + [@@@ocaml.text "/*"]
+   + module Bisect_visit___good2___ml =
+   + struct
+   + ...
+   + end
+   + open Bisect_visit___good2___ml
+   + [@@@ocaml.text "/*"]
+
+   It could be changed in the new version of PPX-bisect
+*)
 let run info fallback =
   let open Typedtree in
   let extract_string h1 =
@@ -159,6 +179,42 @@ let run info fallback =
     let open Tast_pattern in
     let pm = tsig_attribute (attribute (string "ocaml.ppx.context") drop) in
     parse pm item.sig_loc item ~on_error:(fun _ -> false) true
+  in
+  let is_ppx_bisect_artifact item =
+    let open Tast_pattern in
+    let pm =
+      let pat_bisect_mod () =
+        of_func (fun _ loc x k ->
+          match x.Typedtree.str_desc with
+          | Tstr_module { mb_name = { txt = Some name }; _ }
+            when String.starts_with ~prefix:"Bisect_visit" name -> k
+          | _ -> fail loc "")
+      in
+      let pat_bisect_open () =
+        of_func (fun _ loc x k ->
+          match x.Typedtree.str_desc with
+          | Tstr_open { open_expr = { mod_desc = Tmod_ident (_, { txt = Lident lid }) } }
+            when String.starts_with ~prefix:"Bisect_visit" lid -> k
+          | _ -> fail loc "")
+      in
+      let pat_bisect_c_comment () =
+        tstr_attribute
+          (attribute
+             (string "ocaml.text")
+             (of_func (fun _ loc x k ->
+                match x with
+                | Parsetree.PStr
+                    [ { pstr_desc =
+                          Pstr_eval
+                            ( { pexp_desc = Pexp_constant (Pconst_string ("/*", _, None)) }
+                            , _ )
+                      }
+                    ] -> k
+                | _ -> fail loc "Can't parse right payload")))
+      in
+      pat_bisect_mod () ||| pat_bisect_open () ||| pat_bisect_c_comment ()
+    in
+    parse pm item.str_loc item ~on_error:(fun _ -> false) true
   in
   let filename = info.Compile_common.source_file in
   let loc = Location.in_file filename in
@@ -219,9 +275,15 @@ let run info fallback =
             panic ~loc ~filename bad_spec
           | Some _ -> ()
         in
+        (* The analysis is complicated because various preprocessors can
+           install code in the beginning of the file
+           TODO(Kakadu). Maybe we should look for two documentation comments
+           colocated in the file, and not in the beginning of the file?
+        *)
         let () =
           let rec loop = function
             | h :: tl when is_ocaml_ppx_context h -> loop tl
+            | h :: tl when is_ppx_bisect_artifact h -> loop tl
             | h :: _ -> wrap h `First
             | [] -> panic ~loc ~filename No_license_at_all
           in
@@ -230,6 +292,7 @@ let run info fallback =
         let () =
           let rec loop = function
             | h :: tl when is_ocaml_ppx_context h -> loop tl
+            | h :: tl when is_ppx_bisect_artifact h -> loop tl
             | _ :: h :: _ -> wrap h `Second
             | [ _ ] | [] -> panic ~loc ~filename No_license_at_all
           in

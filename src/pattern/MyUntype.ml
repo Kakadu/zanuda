@@ -11,3 +11,12 @@ let untype_expression = default_mapper.expr default_mapper
 [%%endif]
 
 let expr = untype_expression
+
+let untype_stru_item si =
+  match
+    untype_structure
+      Typedtree.{ str_items = [ si ]; str_type = Obj.magic 1; str_final_env = si.str_env }
+  with
+  | [ si ] -> si
+  | _ -> failwith "A bug"
+;;
