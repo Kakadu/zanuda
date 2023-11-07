@@ -1,0 +1,35 @@
+lib: [
+  "_build/install/default/lib/reviewer/META"
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.a" {"diff_parser/diff_parser.a"}
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.cma" {"diff_parser/diff_parser.cma"}
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.cmi" {"diff_parser/diff_parser.cmi"}
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.cmt" {"diff_parser/diff_parser.cmt"}
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.cmti" {"diff_parser/diff_parser.cmti"}
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.cmx" {"diff_parser/diff_parser.cmx"}
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.cmxa" {"diff_parser/diff_parser.cmxa"}
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.ml" {"diff_parser/diff_parser.ml"}
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.mli" {"diff_parser/diff_parser.mli"}
+  "_build/install/default/lib/reviewer/diff_parser/line_parser.cmi" {"diff_parser/line_parser.cmi"}
+  "_build/install/default/lib/reviewer/diff_parser/line_parser.cmt" {"diff_parser/line_parser.cmt"}
+  "_build/install/default/lib/reviewer/diff_parser/line_parser.cmti" {"diff_parser/line_parser.cmti"}
+  "_build/install/default/lib/reviewer/diff_parser/line_parser.cmx" {"diff_parser/line_parser.cmx"}
+  "_build/install/default/lib/reviewer/diff_parser/line_parser.ml" {"diff_parser/line_parser.ml"}
+  "_build/install/default/lib/reviewer/diff_parser/line_parser.mli" {"diff_parser/line_parser.mli"}
+  "_build/install/default/lib/reviewer/diff_parser/types.cmi" {"diff_parser/types.cmi"}
+  "_build/install/default/lib/reviewer/diff_parser/types.cmt" {"diff_parser/types.cmt"}
+  "_build/install/default/lib/reviewer/diff_parser/types.cmx" {"diff_parser/types.cmx"}
+  "_build/install/default/lib/reviewer/diff_parser/types.ml" {"diff_parser/types.ml"}
+  "_build/install/default/lib/reviewer/dune-package"
+  "_build/install/default/lib/reviewer/opam"
+]
+libexec: [
+  "_build/install/default/lib/reviewer/diff_parser/diff_parser.cmxs" {"diff_parser/diff_parser.cmxs"}
+]
+bin: [
+  "_build/install/default/bin/reviewer"
+]
+doc: [
+  "_build/install/default/doc/reviewer/CHANGES.md"
+  "_build/install/default/doc/reviewer/LICENSE"
+  "_build/install/default/doc/reviewer/README.md"
+]

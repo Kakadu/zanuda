@@ -8,13 +8,13 @@ type ('a, 'b, 'c) t
 val parse : ('a, 'b, 'c) t -> Location.t -> ?on_error:(string -> 'c) -> 'a -> 'b -> 'c
 
 module Packed : sig
-  type ('a, 'b, 'c) pattern = ('a, 'b, 'c) t
-  type ('a, 'b) t
+    type ('a, 'b, 'c) pattern = ('a, 'b, 'c) t
+    type ('a, 'b) t
 
-  val create : ('a, 'b, 'c) pattern -> 'b -> ('a, 'c) t
-  val parse : ('a, 'b) t -> Location.t -> 'a -> 'b
-end
-with type ('a, 'b, 'c) pattern := ('a, 'b, 'c) t
+    val create : ('a, 'b, 'c) pattern -> 'b -> ('a, 'c) t
+    val parse : ('a, 'b) t -> Location.t -> 'a -> 'b
+  end
+  with type ('a, 'b, 'c) pattern := ('a, 'b, 'c) t
 
 val as__ : ('a, 'b, 'c) t -> ('a, 'a -> 'b, 'c) t
 
@@ -94,11 +94,10 @@ val tpat_any : (value_pat, 'a, 'a) t
 val pident : (string, 'a, 'b) t -> (Path.t, 'a, 'b) t
 
 (** Trying to parse identifier with a given path. Beware that standard function
-  are locted implicitly in Stdlib module. For example
+    are locted implicitly in Stdlib module. For example
 
     texp_ident (path [ "&&" ])  (* WRONG *)
-    texp_ident (path [ "Stdlib"; "&&" ])  (* CORRECT *)
-*)
+    texp_ident (path [ "Stdlib"; "&&" ])  (* CORRECT *) *)
 val texp_ident : (Path.t, 'a, 'b) t -> (expression, 'a, 'b) t
 
 val texp_ident_typ
@@ -195,3 +194,9 @@ val attribute
 
 val tstr_docattr : (string, 'a, 'b) t -> (structure_item, 'a, 'b) t
 val tsig_docattr : (string, 'a, 'b) t -> (signature_item, 'a, 'b) t
+
+type context
+
+val of_func : (context -> Location.t -> 'a -> 'b -> 'c) -> ('a, 'b, 'c) t
+val to_func : ('a, 'b, 'c) t -> context -> Location.t -> 'a -> 'b -> 'c
+val fail : Warnings.loc -> string -> 'a
