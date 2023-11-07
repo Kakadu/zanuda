@@ -88,7 +88,11 @@ let chunk_item : (kind * string) parser =
   return (k, rest)
 ;;
 
-let no_new_line_eof : unit parser = string "\\ No newline at end of file" *> return ()
+let no_new_line_eof : unit parser =
+  let* s = string "\\ No newline at end of file" in
+  log "%S skipped after eating %d chars" s (String.length s);
+  return ()
+;;
 
 let run : ?info:string -> _ parser -> _ parser =
   fun ?info ppp ->
@@ -101,7 +105,7 @@ let run : ?info:string -> _ parser -> _ parser =
     log "failed: %d" __LINE__;
     fail "Line parser failed"
   | Result.Ok rez ->
-    log "forcing tail";
+    (* log "forcing tail"; *)
     return rez
 ;;
 

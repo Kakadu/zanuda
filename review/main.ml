@@ -36,10 +36,12 @@ let info =
 
 open Printf
 
+let github_patch_url ~owner ~repo ~pull_number =
+  Printf.sprintf "https://api.github.com/repos/%s/%s/pulls/%d" owner repo pull_number
+;;
+
 let get_diff ~owner ~repo ~pull_number =
-  let url =
-    Printf.sprintf "https://api.github.com/repos/%s/%s/pulls/%d" owner repo pull_number
-  in
+  let url = github_patch_url ~owner ~repo ~pull_number in
   let headers = [ "Accept", "application/vnd.github.diff" ] in
   match Curly.(run (Request.make ~headers ~url ~meth:`GET ())) with
   | Ok x -> Some x.Curly.Response.body
@@ -59,6 +61,9 @@ let create_review info =
        (match Diff_parser.parse_string diff with
         | Error e_parse ->
           Format.eprintf "Parsing failed: %s\n" e_parse;
+          Format.eprintf
+            "of a diff from '%s'\n"
+            (github_patch_url ~owner ~repo ~pull_number);
           exit 1
         | Result.Ok parsed ->
           let parse_json json =
