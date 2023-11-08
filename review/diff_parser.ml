@@ -21,7 +21,7 @@ let log fmt =
 let lookup parsed ~file ~line =
   match List.find (fun { new_file } -> new_file = file) parsed with
   | exception Not_found ->
-    Printf.eprintf "No file %S in the list of parsed chunks" file;
+    Printf.eprintf "No file %S in the list of parsed chunks\n" file;
     None
   | { chunks } ->
     let rec find_chunk acc = function
@@ -57,7 +57,6 @@ let file_head : _ option parser =
          ])
     *> return ()
   in
-  log "%d: " __LINE__;
   let* rez =
     Angstrom.option
       None
@@ -74,34 +73,34 @@ let file_head : _ option parser =
 let a_chunk : chunk parser =
   log "%d: a_chunk" __LINE__;
   let* info = Line_parser.(run ~info:"chunk_head" chunk_head) in
+  (* The string '\ No new line in the end of file' could be
+     in an arbitrary place of the diff. So we do filter of result *)
   let* diffs =
     many
-      (let* pos = pos in
-       let* kind, s = Line_parser.(run ~info:"chunk_item" chunk_item) in
-       return (kind, s, pos))
+      ((let* () = Line_parser.(run ~info:"no_new_line_eof" no_new_line_eof) in
+        return None)
+       <|> let* pos = pos in
+           let* kind, s = Line_parser.(run ~info:"chunk_item" chunk_item) in
+           return (Some (kind, s, pos)))
+    >>| List.filter_map Fun.id
   in
-  let* () = option () Line_parser.(run ~info:"no_new_line_eof" no_new_line_eof) in
   return (info, diffs)
 ;;
 
 let parse_whole_file : file_info list parser =
   many
     (let* () = return () in
-     (* let* initial_pos = pos in
-        let* avai = available in
-        log "%d on pos %d (avail=%d)" __LINE__ initial_pos avai; *)
      file_head
      >>= function
      | Some (old_file, new_file) ->
-       log "%d" __LINE__;
        let* chunks = many a_chunk in
        log "%d there are %d chunks parsed " __LINE__ (List.length chunks);
        let* eols = many (string "\n") in
-       log "empty lines eaten: %d" (List.length eols);
+       (* log "empty lines eaten: %d" (List.length eols); *)
        return (Some { old_file; new_file; chunks })
      | None ->
-       let* eols = many (string "\n") in
-       log "%d: empty lines eaten: %d" __LINE__ (List.length eols);
+       let* _eols = many (string "\n") in
+       (* log "%d: empty lines eaten: %d" __LINE__ (List.length eols); *)
        return None)
   >>| List.filter_map Fun.id
 ;;

@@ -1,0 +1,19 @@
+diff --git a/lib/ast.ml b/lib/ast.ml
+index bdea1644..99f96d2c 100644
+--- a/lib/ast.ml
++++ b/lib/ast.ml
+@@ -116,7 +131,11 @@ let unot _ = Not
+ (* Smart constructors for patterns *)
+ let pliteral literal = PLiteral literal
+ let pwildcard _ = PWildcard
+-let ptuple head tail = PTuple (head :: tail)
++
++let ptuple first_pattern second_pattern other_patterns =
++  PTuple (first_pattern, second_pattern, other_patterns)
++;;
++
+ let plist pattern_list = PList pattern_list
+ let pconstruct_list head tail = PConstructList (head, tail)
+-let pidentifier id = PIdentifier id
+\ No newline at end of file
++let pidentifier id = PIdentifier id

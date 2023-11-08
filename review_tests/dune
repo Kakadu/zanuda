@@ -12,3 +12,11 @@
 (cram
  (applies_to extended2)
  (deps extended2.diff))
+
+; (cram
+;  (applies_to extended3)
+;  (deps extended3.diff))
+
+(cram
+ (applies_to no_new_line)
+ (deps no_new_line.diff))
