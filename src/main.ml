@@ -197,6 +197,22 @@ let process_untyped filename =
 ;;
 
 let () =
+  let config_filename = ".zanuda" in
+  if Caml.Sys.file_exists config_filename
+  then (
+    let s = In_channel.with_open_text config_filename In_channel.input_all in
+    String.split s ~on:'\n'
+    |> List.iter ~f:(fun s ->
+      if String.is_empty s
+      then ()
+      else if String.is_prefix s ~prefix:"-no-"
+      then (
+        let lint_name = String.chop_prefix_exn s ~prefix:"-no-" in
+        Config.(Hash_set.remove opts.enabled_lints lint_name))
+      else Format.eprintf ".zanuda: Don't know what to do with %S\n%!" s))
+;;
+
+let () =
   Config.parse_args ();
   let () =
     match Config.mode () with

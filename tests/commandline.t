@@ -7,3 +7,9 @@ Golint format currently is not used
   $ zanuda -ogolint 1.golint > /dev/null
   $ zanuda -dump-lints 1.json 2> /dev/null
   $ zanuda -o file.out -v 2> /dev/null
+Testing config file
+  $ echo  '-no-no-topelevel-eval\nasdf' > .zanuda
+  $ zanuda -o file.out -v 2> /dev/null
+  $ rm -fr .zanuda
+
+  $ zanuda -dump > /dev/null
