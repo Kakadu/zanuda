@@ -150,9 +150,10 @@ let parse_args () =
         , " Disable checking for this lint" )
         :: acc)
       opts.enabled_lints
+    |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   in
   Arg.parse
-    (standard_args @ List.rev extra_args)
+    (standard_args @ extra_args)
     set_in_file
     "Use -dir [PATH] to check dune-based project"
 ;;
