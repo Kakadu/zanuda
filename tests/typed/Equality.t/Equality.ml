@@ -8,3 +8,7 @@ let __ xx y (>>=) =
   (match x = Boolean true with
         | true -> y
         | false -> y)
+
+
+let suffix_is_always_false x ~suffix =
+  x == (1::suffix)

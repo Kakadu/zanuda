@@ -12,3 +12,7 @@
   3 | let __ x = if x = true then 3 else 3
                  ^^^^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Using generic equality for type bool and other algebraic data types is not recommended. Use pattern matching
+  File "Equality.ml", line 14, characters 2-18:
+  14 |   x == (1::suffix)
+         ^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Do you really need physical equality? Physical means the equality of pointers.

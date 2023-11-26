@@ -26,6 +26,7 @@ let typed_linters =
     (module AmbiguousConstructors : LINT.TYPED)
   ; (module ExcTryWithWildcard : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
+  ; (module Equality_phys : LINT.TYPED)
   ; (module Failwith : LINT.TYPED)
   ; (module If_bool : LINT.TYPED)
   ; (module Ignore : LINT.TYPED)

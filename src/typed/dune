@@ -5,20 +5,23 @@
   AmbiguousConstructors
   ExcTryWithWildcard
   Equality
+  Equality_phys
   Failwith
   Hashtables
   If_bool
   List_fusion
   List_length
   Monad_laws
+  Mutually_rec_types
+  Nested_if
   Record1
   Propose_function
   String_concat
   String_concat_fold
   Ignore
   Tuple_matching
-  Mutually_rec_types
-  Nested_if)
+  ;
+  )
  (preprocess
   (pps ppx_inline_test ppxlib.metaquot))
  (instrumentation
