@@ -39,6 +39,7 @@
   ppx_expect
   bisect_ppx
   stdune
+  dune-build-info
   (angstrom
    (>= 0.15.0))
   (base :with-test)

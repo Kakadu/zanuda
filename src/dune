@@ -17,7 +17,7 @@
   Dune_project
   LoadDune)
  (modules_without_implementation LINT)
- (libraries compiler-libs.common sexplib yojson)
+ (libraries compiler-libs.common sexplib yojson dune-build-info)
  (preprocess
   (pps
    ppx_optcomp

@@ -122,10 +122,18 @@ let parse_args () =
       , "Set prefix to prepend to pathes in OUTPUT file" )
     ; "-I", Arg.String add_include, "Add extra include path for type checking"
       (* ; "-ws", Arg.String set_workspace, "[FILE] Set dune workspace root" *)
-    ; "-v", Arg.Unit set_verbose, "More verbose output"
     ; ( "-skip-level-allow"
       , Arg.Bool set_skip_level_allow
       , "[bool] Skip lints with level = Allow" )
+    ; "-v", Arg.Unit set_verbose, "More verbose output"
+    ; ( "-version"
+      , Arg.Unit
+          (fun () ->
+            let open Build_info.V1 in
+            Printf.printf
+              "version: %s\n"
+              (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
+      , " print version" )
     ]
   in
   let extra_args =
