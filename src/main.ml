@@ -12,6 +12,8 @@ let per_file_linters = [ (module UntypedLints.License : LINT.TYPED) ]
 let untyped_linters =
   let open UntypedLints in
   [ (module Casing : LINT.UNTYPED)
+  ; (module Manual_fold : LINT.UNTYPED)
+  ; (module Manual_map : LINT.UNTYPED)
   ; (module ParsetreeHasDocs : LINT.UNTYPED)
   ; (module UntypedLints.Propose_function : LINT.UNTYPED)
   ; (module ToplevelEval : LINT.UNTYPED)

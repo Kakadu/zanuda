@@ -6,6 +6,8 @@
   GuardInsteadOfIf
   Dollar
   License
+  Manual_fold
+  Manual_map
   ParsetreeHasDocs
   Propose_function
   ToplevelEval
