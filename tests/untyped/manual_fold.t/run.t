@@ -1,11 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
-  File "manual_fold.ml", lines 2-5, characters 24-39:
-  2 | ........................l =
-  3 |   match l with
-  4 |   | [] -> acc
-  5 |   | x :: xs -> fold_left f (f acc x) xs
-  Alert zanuda-linter: Using `function` is recommended
+  $ zanuda  -no-check-filesystem -no-top_file_license -no-propose_function_untyped -no-propose_function -dir .  -ordjsonl /dev/null
   File "manual_fold.ml", lines 2-5, characters 0-39:
   2 | let rec fold_left f acc l =
   3 |   match l with
@@ -23,12 +17,6 @@
   17 |   | [] -> acc
   18 |   | x :: xs -> f x (fold_right1 acc xs)
   Alert zanuda-linter: Consider using `List.fold_right` instead of `fold_right1`
-  File "manual_fold.ml", lines 21-24, characters 25-40:
-  21 | .........................l =
-  22 |   match l with
-  23 |   | [] -> acc
-  24 |   | x :: xs -> fold_left1 f (f acc x) xs
-  Alert zanuda-linter: Using `function` is recommended
   File "manual_fold.ml", lines 21-24, characters 0-40:
   21 | let rec fold_left1 f acc l =
   22 |   match l with
@@ -50,15 +38,3 @@
   39 |     | [] -> acc 
   40 |     | x :: xs -> x + helper acc xs
   Alert zanuda-linter: Consider using `List.fold_right` instead of `helper`
-  File "manual_fold.ml", lines 2-5, characters 24-39:
-  2 | ........................l =
-  3 |   match l with
-  4 |   | [] -> acc
-  5 |   | x :: xs -> fold_left f (f acc x) xs
-  Alert zanuda-linter: Using `function` is recommended
-  File "manual_fold.ml", lines 21-24, characters 25-40:
-  21 | .........................l =
-  22 |   match l with
-  23 |   | [] -> acc
-  24 |   | x :: xs -> fold_left1 f (f acc x) xs
-  Alert zanuda-linter: Using `function` is recommended
