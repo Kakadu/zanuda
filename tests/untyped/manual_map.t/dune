@@ -1,0 +1,13 @@
+(library
+ (name test_manual_map)
+ (wrapped false)
+ (modules manual_map)
+ (instrumentation
+  (backend bisect_ppx))
+ (flags
+  (:standard
+   ;
+   )))
+
+(cram
+ (deps %{bin:zanuda.exe}))

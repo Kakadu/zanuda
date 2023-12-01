@@ -1,0 +1,13 @@
+(library
+ (name test_manual_fold)
+ (wrapped false)
+ (modules manual_fold)
+ (instrumentation
+  (backend bisect_ppx))
+ (flags
+  (:standard
+   ;
+   )))
+
+(cram
+ (deps %{bin:zanuda.exe}))
