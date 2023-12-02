@@ -16,7 +16,7 @@
   (contributed by @Artem-Rzhankoff)
 - #32: Add lint about constructor names that hide default constructor names 
   (contributed by @nnemakin)
-- #34: Add lints that detects manual implementations of List.map/fold functions
+- #35: Add lints that detects manual implementations of List.map/fold functions
   (contributed by @nnemakin)
 
 ### Changed

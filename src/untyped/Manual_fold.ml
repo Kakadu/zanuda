@@ -23,11 +23,11 @@ implementations, such as:
 ```ocaml
   let rec fold_left f acc l = match l with
   | [] -> acc
-  | x :: xs -> my_fold_left f (f acc a) l
+  | x :: xs -> fold_left f (f acc a) l
 ```
 
 ### Why?
-It is too verbose and less perfomant.
+It is too verbose and reduces readability.
 
 |}
   |> Stdlib.String.trim
@@ -104,41 +104,27 @@ let rec fun_body expr =
 ;;
 
 let run _ fallback =
+  let open Ppxlib.Ast_pattern in
   let cases =
-    let open Ppxlib.Ast_pattern in
-    case
-      ~lhs:
-        (ppat_construct
-           (lident (string "::"))
-           (some (drop ** ppat_tuple (drop ^:: ppat_var __ ^:: nil))))
-      ~guard:none
-      ~rhs:(pexp_apply (pexp_ident (lident __)) __)
-    ^:: case
-          ~lhs:(ppat_construct (lident (string "[]")) drop)
-          ~guard:none
-          ~rhs:(pexp_ident (lident drop))
-    ^:: nil
-    ||| case
-          ~lhs:(ppat_construct (lident (string "[]")) drop)
-          ~guard:none
-          ~rhs:(pexp_ident (lident drop))
-        ^:: case
-              ~lhs:
-                (ppat_construct
-                   (lident (string "::"))
-                   (some (drop ** ppat_tuple (drop ^:: ppat_var __ ^:: nil))))
-              ~guard:none
-              ~rhs:(pexp_apply (pexp_ident (lident __)) __)
-        ^:: nil
+    let empty_case () =
+      case
+        ~lhs:(ppat_construct (lident (string "[]")) drop)
+        ~guard:none
+        ~rhs:(pexp_ident (lident drop))
+    in
+    let cons_case () =
+      case
+        ~lhs:
+          (ppat_construct
+             (lident (string "::"))
+             (some (drop ** ppat_tuple (drop ^:: ppat_var __ ^:: nil))))
+        ~guard:none
+        ~rhs:(pexp_apply (pexp_ident (lident __)) __)
+    in
+    cons_case () ^:: empty_case () ^:: nil ||| empty_case () ^:: cons_case () ^:: nil
   in
-  let pat_main =
-    let open Ppxlib.Ast_pattern in
-    value_binding ~pat:(ppat_var __) ~expr:(pexp_fun drop drop drop __)
-  in
-  let pat_exp =
-    let open Ppxlib.Ast_pattern in
-    pexp_match drop cases ||| pexp_function cases
-  in
+  let pat_main = value_binding ~pat:(ppat_var __) ~expr:(pexp_fun drop drop drop __) in
+  let pat_exp = pexp_match drop cases ||| pexp_function cases in
   let parse vb =
     let loc = vb.pvb_loc in
     Ppxlib.Ast_pattern.parse

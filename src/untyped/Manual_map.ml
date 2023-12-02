@@ -26,7 +26,7 @@ Proposes to use `List.map` instead of manual implementation, such as
 ```
 
 ### Why?
-It is too verbose and most likely less perfomant.
+It is too verbose and most likely less performant.
 
 |}
   |> Stdlib.String.trim
@@ -76,37 +76,25 @@ let run _ fallback =
   let pat =
     let open Ppxlib.Ast_pattern in
     let cases =
-      alt
-        (case
-           ~lhs:
-             (ppat_construct
-                (lident (string "::"))
-                (some (drop ** ppat_tuple (drop ^:: ppat_var __ ^:: nil))))
-           ~guard:none
-           ~rhs:
-             (pexp_construct
-                (lident (string "::"))
-                (some (pexp_tuple (drop ^:: pexp_apply __ __ ^:: nil))))
-         ^:: case
-               ~lhs:(ppat_construct (lident (string "[]")) drop)
-               ~guard:none
-               ~rhs:(pexp_construct (lident (string "[]")) drop)
-         ^:: nil)
-        (case
-           ~lhs:(ppat_construct (lident (string "[]")) drop)
-           ~guard:none
-           ~rhs:(pexp_construct (lident (string "[]")) drop)
-         ^:: case
-               ~lhs:
-                 (ppat_construct
-                    (lident (string "::"))
-                    (some (drop ** ppat_tuple (drop ^:: ppat_var __ ^:: nil))))
-               ~guard:none
-               ~rhs:
-                 (pexp_construct
-                    (lident (string "::"))
-                    (some (pexp_tuple (drop ^:: pexp_apply __ __ ^:: nil))))
-         ^:: nil)
+      let empty_case () =
+        case
+          ~lhs:(ppat_construct (lident (string "[]")) drop)
+          ~guard:none
+          ~rhs:(pexp_construct (lident (string "[]")) drop)
+      in
+      let cons_case () =
+        case
+          ~lhs:
+            (ppat_construct
+               (lident (string "::"))
+               (some (drop ** ppat_tuple (drop ^:: ppat_var __ ^:: nil))))
+          ~guard:none
+          ~rhs:
+            (pexp_construct
+               (lident (string "::"))
+               (some (pexp_tuple (drop ^:: pexp_apply __ __ ^:: nil))))
+      in
+      cons_case () ^:: empty_case () ^:: nil ||| empty_case () ^:: cons_case () ^:: nil
     in
     value_binding
       ~pat:(ppat_var __)
