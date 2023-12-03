@@ -8,23 +8,6 @@ open Typedtree
 
 let first_case cs = List.nth cs 0
 
-type fix_kind =
-  | Extra_argument
-  | Verbose_match
-
-let msg = function
-  | Extra_argument ->
-    Format.sprintf
-      "(Fix `Propose_function` lint)\n%s"
-      "Removing extra argument of an expression with replacing `match .. with ` to \
-       `function`"
-  | Verbose_match ->
-    Format.sprintf
-      "(Fix `Propose_function` lint)\n%s"
-      "This pattern matching will be replaced by an equivalent and more concise \
-       construction `function`"
-;;
-
 let get_match_constr_payload ematch_case =
   let e =
     let c = first_case ematch_case in

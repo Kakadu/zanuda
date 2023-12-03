@@ -19,23 +19,6 @@ type fix_kind =
   | Unwise_conjuction of bool
   | Unwise_ite of ite
 
-type msg_kind =
-  | Ite
-  | Conj
-
-let msg = function
-  | Conj ->
-    Format.sprintf
-      "(Fix `If_bool` lint)\n%s"
-      "This boolean expression will be replaced by an equivalent with removing unwise \
-       conjunction"
-  | Ite ->
-    Format.sprintf
-      "(Fix `If_bool` lint):\n%s"
-      "This boolean expression will be replaced by an equivalent with removing \
-       unwise`if_then_else`"
-;;
-
 let check_bool args vbool =
   let _, val1 = List.nth args 0 in
   let _, val2 = List.nth args 1 in

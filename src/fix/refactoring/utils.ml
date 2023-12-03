@@ -6,7 +6,6 @@ open Location
 open Typedtree
 open Replacement.Refill
 
-(*[TEMPORARY] we plan use a combination if dune diff and promote (maybe git variant) for user preview*)
 module Report = struct
   let console loc ms =
     let open Zanuda_core.Utils in
