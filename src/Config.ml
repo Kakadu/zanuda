@@ -11,6 +11,7 @@ type mode =
   | Dump_text
   | File of string
   | Dir of string
+  | Fix of string
 
 type t =
   { mutable outfile : string option
@@ -55,6 +56,7 @@ let set_in_file s = set_mode (File s)
 let set_in_dir s = set_mode (Dir s)
 
 (** Other switches *)
+let set_fix s = set_mode (Fix s)
 
 let add_include s = opts.extra_includes <- s :: opts.extra_includes
 let set_out_file s = opts.outfile <- Some s
@@ -134,6 +136,7 @@ let parse_args () =
               "version: %s\n"
               (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
       , " print version" )
+    ; "-fix", Arg.String set_fix, "Apply all found lints available for correction"
     ]
   in
   let extra_args =

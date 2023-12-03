@@ -117,9 +117,10 @@ let run _ fallback =
               if String.equal argname (Ident.name id)
                  && List.for_all cases ~f:(no_ident id)
               then
-                CollectedLints.add
+                (CollectedLints.add
                   ~loc
-                  (report loc.Location.loc_start.Lexing.pos_fname ~loc)
+                  (report loc.Location.loc_start.Lexing.pos_fname ~loc);
+                Refactoring.ProposeFunction.apply_fix expr.exp_desc)
             | _ -> ())
           ();
         fallback.expr self expr)

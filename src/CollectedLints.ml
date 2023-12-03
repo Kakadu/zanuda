@@ -10,6 +10,7 @@ let found_Lints : (Location.t * (module LINT.REPORTER)) Queue.t = Queue.create (
 let clear () = Queue.clear found_Lints
 let is_empty () = Queue.is_empty found_Lints
 let add ~loc m = Queue.enqueue found_Lints (loc, m)
+let loc_lints f = Queue.map found_Lints ~f
 
 let report () =
   (* let mdfile =

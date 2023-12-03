@@ -1,0 +1,7 @@
+(library
+ (name test_fix_propose_function)
+ (wrapped false)
+ (modules ProposeFunction))
+ 
+(cram
+ (deps %{bin:zanuda.exe}))

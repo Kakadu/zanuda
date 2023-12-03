@@ -6,6 +6,7 @@ open Base
 module Format = Caml.Format
 open Zanuda_core
 open Zanuda_core.Utils
+open Refactoring.IfBool
 
 type input = Tast_iterator.iterator
 
@@ -64,16 +65,16 @@ let run _ fallback =
     let open Tast_pattern in
     let ite =
       texp_ite ebool drop drop
-      |> map1 ~f:(Format.asprintf "Executing 'if %b' smells bad")
+      |> map1 ~f:(fun b -> Format.asprintf "Executing 'if %b' smells bad" b, (Unwise_ite (If b)))
       ||| (texp_ite drop ebool drop
-          |> map1 ~f:(Format.asprintf "Executing 'if ... then %b' smells bad"))
+          |> map1 ~f:(fun b -> Format.asprintf "Executing 'if ... then %b' smells bad" b, (Unwise_ite (Then b))))
       ||| (texp_ite drop drop (some ebool)
-          |> map1 ~f:(Format.asprintf "Executing 'if ... then .. else %b' smells bad"))
+          |> map1 ~f:(fun b -> Format.asprintf "Executing 'if ... then .. else %b' smells bad" b, (Unwise_ite (Else b))))
     in
     let ops =
       texp_apply2 (texp_ident (path [ "Stdlib"; "&&" ])) ebool drop
       ||| texp_apply2 (texp_ident (path [ "Stdlib"; "&&" ])) drop ebool
-      |> map1 ~f:(fun _ -> Format.asprintf "Conjunction with boolean smells bad")
+      |> map1 ~f:(fun b -> Format.asprintf "Conjunction with boolean smells bad", (Unwise_conjuction b))
     in
     ite ||| ops
   in
@@ -95,10 +96,11 @@ let run _ fallback =
             loc
             ~on_error:(fun _desc () -> ())
             expr
-            (fun s () ->
+            (fun (s, unwise_type) () ->
               CollectedLints.add
                 ~loc
-                (report loc.Location.loc_start.Lexing.pos_fname ~loc s))
+                (report loc.Location.loc_start.Lexing.pos_fname ~loc s);
+              Refactoring.IfBool.apply_fix expr unwise_type)
             ());
         fallback.expr self expr)
   ; structure_item =
