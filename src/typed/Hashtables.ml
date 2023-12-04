@@ -20,7 +20,7 @@ let documentation =
   {|
 ### What it does
 Using mutable data structures for teaching purposes is usually discouraged. Replace \
-Hashtables by standart tree-like maps or consider Hash-Array Mapped Tries (HAMT).
+Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT).
 
 ##### How to fix?
 Use mutable `ref`erences and mutable structure fields only if it is really required. Usually, mutability is added for performance reasons. For example,
@@ -38,7 +38,7 @@ let msg ppf () =
   Format.fprintf
     ppf
     "Using mutable data structures for teaching purposes is usually discouraged. Replace \
-     Hashtables by standart tree-like maps or consider Hash-Array Mapped Tries (HAMT). \
+     Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT). \
      Use mutable `ref`erences and mutable structure fields only if it is really \
      required. In all places where it is needed indeed, describe in a comment why it is \
      needed there.%!"
