@@ -15,6 +15,8 @@
 - #28: Add lint about nested if expressions.
   (contributed by @Artem-Rzhankoff)
   #32: Add lint about constructor names that hide default constructor names (contributed by @nnemakin)
+- #23: Implement a trial version of the Fix module for auto-correction of lints
+  (contributed by @Artem-Rzhankoff)
 
 
 ### Changed

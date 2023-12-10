@@ -1,0 +1,10 @@
+(library
+ (name test_fix_propose_function)
+ (wrapped false)
+ (modules FalseProposeFunction)
+ (preprocess
+  (pps ppx_show ppx_deriving.eq))
+ (libraries ppx_show.runtime))
+ 
+(cram
+ (deps %{bin:zanuda.exe}))

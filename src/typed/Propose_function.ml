@@ -116,8 +116,8 @@ let run _ fallback =
             | Path.Pident id ->
               if String.equal argname (Ident.name id)
                  && List.for_all cases ~f:(no_ident id)
-              then
-                (CollectedLints.add
+              then (
+                CollectedLints.add
                   ~loc
                   (report loc.Location.loc_start.Lexing.pos_fname ~loc);
                 Refactoring.ProposeFunction.apply_fix expr.exp_desc)

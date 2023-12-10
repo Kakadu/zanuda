@@ -23,7 +23,7 @@ let check_loc loc lines =
   && sline < Array.length lines
   && eline > 0
   && eline < Array.length lines
-  && scol > 0
+  && scol >= 0
   && scol <= String.length lines.(sline - 1) + 1
   && ecol > 0
   && ecol <= String.length lines.(eline - 1) + 1
@@ -31,16 +31,20 @@ let check_loc loc lines =
   && (eline != sline || ecol - scol >= 0)
 ;;
 
+let check_pos pos pos' =
+  let col pos = pos.pos_cnum - pos.pos_bol in
+  (pos.pos_lnum = pos'.pos_lnum && col pos >= col pos') || pos.pos_lnum > pos'.pos_lnum
+;;
+
 let space_padding loc flines =
   let sline, scol, eline, ecol = get_line_col loc in
-  match sline = eline with
-  | true ->
+  if sline = eline
+  then (
     let padding = String.make (ecol - scol) ' ' in
-    padding
-  | false ->
+    padding)
+  else (
     let padding =
-      String.make (String.length flines.(sline - 1) - scol) ' '
-      |> fun s -> Format.sprintf "%s\n" s
+      String.make (String.length flines.(sline - 1) - scol) ' ' |> Format.sprintf "%s\n"
     in
     let padding =
       Array.fold_left
@@ -49,7 +53,7 @@ let space_padding loc flines =
         (Array.sub flines sline (eline - sline - 1))
     in
     let padding = Format.sprintf "%s%s" padding (String.make ecol ' ') in
-    padding
+    padding)
 ;;
 
 let payload_between_repls (loc_end_buf, loc_start_repl) flines =
@@ -71,7 +75,7 @@ let payload_between_repls (loc_end_buf, loc_start_repl) flines =
       in
       let lines =
         Array.fold_left
-          (fun ls l -> Format.sprintf "%s%s\n" ls l)
+          (Format.sprintf "%s%s\n")
           (Format.sprintf "%s\n" lines)
           (Array.sub flines end_buf_line (repl_line - end_buf_line - 1))
       in
@@ -146,11 +150,11 @@ let insert_comments ({ loc_start; loc_end; _ } as loc) flines fcoms =
         ""
         coms
     in
-    let len = List.length coms in
-    (match len with
+    let length = List.length coms in
+    (match length with
      | 0 -> padding
      | _ ->
-       let _, epos, _ = List.nth coms (List.length coms - 1) in
+       let _, epos, _ = List.nth coms (length - 1) in
        payload
        ^ payload_between_repls
            (relative_pos loc_start epos, relative_pos loc_start loc_end)

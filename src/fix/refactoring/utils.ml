@@ -6,15 +6,6 @@ open Location
 open Typedtree
 open Replacement.Refill
 
-module Report = struct
-  let console loc ms =
-    let open Zanuda_core.Utils in
-    let fname = loc.loc_start.pos_fname in
-    let msg ppf s = Format.fprintf ppf "%s\n%!" s in
-    Report.txt ~loc ~filename:fname Format.std_formatter msg ms
-  ;;
-end
-
 type end_point =
   | Start
   | End
@@ -42,12 +33,12 @@ let gen_loc spoint epoint =
 let fname loc = loc.loc_start.pos_fname
 let set_payload ({ location; _ } as r) = add (fname location) r
 
-let set_padding p1 p2 payload =
-  let location = gen_loc p1 p2 in
+let set_padding p p' payload =
+  let location = gen_loc p p' in
   set_payload { location; payload }
 ;;
 
-let set_empty_padding p1 p2 = set_padding p1 p2 Void
+let set_empty_padding p p' = set_padding p p' Void
 
 open Lexing
 

@@ -39,8 +39,7 @@ let comm_inside_line tks =
 
 let quoted_str ec sc =
   peek_char
-  >>| fun c ->
-  match c with
+  >>| function
   | Some c -> if Char.equal c ec then sc, Quoted_str else sc, Augth
   | None -> failwith "invalid_arg"
 ;;

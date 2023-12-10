@@ -1,7 +1,6 @@
   $ dune build
   $ zanuda -dir . > /dev/null 
   $ cat fix_gen/diffs.log
-  
   Diffs for file ProposeFunction.ml
   6,8c6,8
   < let fix_required x y = 

@@ -10,35 +10,43 @@ type ite =
   | Then of bool
   | Else of bool
 
+type fix_kind =
+  | Unwise_conjuction of bool
+  | Unwise_ite of ite
+
+let ite_if b = Unwise_ite (If b)
+let ite_then b = Unwise_ite (Then b)
+let ite_else b = Unwise_ite (Else b)
+let conj b = Unwise_conjuction b
+
 let bool_value e =
   let open Tast_pattern in
   parse ebool e.exp_loc ~on_error:(fun _ () -> None) e (fun b () -> Some b) ()
 ;;
 
-type fix_kind =
-  | Unwise_conjuction of bool
-  | Unwise_ite of ite
-
+(* Fix for unwise_conj assumes that the conj takes two arguments because at the time
+   of implementation the linter can only detect the use of a conjuction with two arguments *)
 let check_bool args vbool =
-  let _, val1 = List.nth args 0 in
-  let _, val2 = List.nth args 1 in
-  let open Tast_pattern in
-  match val1, val2 with
-  | Some e1, Some e2 ->
-    parse
-      ebool
-      e1.exp_loc
-      ~on_error:(fun _ () ->
-        match vbool with
-        | true -> set_empty_padding (exp_end e1) (exp_end e2)
-        | false -> set_empty_padding (exp_start e1) (exp_start e2))
-      e1
-      (fun _ () ->
-        match vbool with
-        | true -> set_empty_padding (exp_start e1) (exp_start e2)
-        | false -> set_empty_padding (exp_end e1) (exp_end e2))
-      ()
-  | _ -> failwith "invalid_arg"
+  let helper e e' f f' = function
+    | true -> set_empty_padding (f e) (f e')
+    | false -> set_empty_padding (f' e) (f' e')
+  in
+  match List.length args with
+  | 2 ->
+    let _, v = List.nth args 0 in
+    let _, v' = List.nth args 1 in
+    let open Tast_pattern in
+    (match v, v' with
+     | Some e, Some e' ->
+       parse
+         ebool
+         e.exp_loc
+         ~on_error:(fun _ () -> helper e e' exp_end exp_start vbool)
+         e
+         (fun _ () -> helper e e' exp_start exp_end vbool)
+         ()
+     | _ -> failwith "invalid_arg")
+  | _ -> ()
 ;;
 
 let get_ite_loc e ie te ee pbool_site =

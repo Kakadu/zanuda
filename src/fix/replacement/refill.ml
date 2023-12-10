@@ -20,7 +20,7 @@ module OrderedType = struct
     ; _
     }
     =
-    if sc = sc' then ec - ec' else sc - sc'
+    if sc > sc' && ec < ec' then 0 else if sc = sc' then ec - ec' else sc - sc'
   ;;
 end
 
@@ -55,17 +55,16 @@ let apply_all repls fcontent =
   let cur = ref start_pos in
   let coms = Comments_parser.parse start_pos fcontent in
   let apply_repl { location = { loc_start; loc_end; _ } as loc; payload } buf =
-    if check_loc loc flines
+    if check_loc loc flines && check_pos loc_start !cur
     then (
       let buf = payload_between_repls_buf (!cur, loc_start) flines buf in
       Buffer.add_string buf (insert_comments loc flines coms payload);
       cur := loc_end)
-    else
-      Log.Error.wrong_loc loc;
+    else Log.Error.wrong_loc loc;
     buf
   in
   let buf = Buffer.create (String.length fcontent) in
-  let buf = Set.fold (fun repl buf -> apply_repl repl buf) repls buf in
+  let buf = Set.fold apply_repl repls buf in
   let file_end =
     { pos_lnum = Array.length flines
     ; pos_cnum = String.length flines.(Array.length flines - 1)

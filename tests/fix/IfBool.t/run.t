@@ -1,7 +1,6 @@
   $ dune build
   $ zanuda -dir . > /dev/null
   $ cat fix_gen/diffs.log
-  
   Diffs for file IfBool.ml
   2c2
   < let f1 x = if x then true else false

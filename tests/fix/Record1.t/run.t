@@ -1,7 +1,6 @@
   $ dune build
   $ zanuda -dir . > /dev/null
   $ cat fix_gen/diffs.log
-  
   Diffs for file Record1.ml
   6,8c6
   <   {x1 = point.x1 + 1;
