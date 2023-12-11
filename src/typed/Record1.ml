@@ -20,7 +20,7 @@ let documentation =
 ### What it does
 Simplyfies record construction using OCaml-specfic field punning.
 
-(Chapter)[https://dev.realworldocaml.org/records.html] in 'Real World OCaml'.
+[Chapter](https://dev.realworldocaml.org/records.html) in 'Real World OCaml'.
 
 ##### Examples
 
