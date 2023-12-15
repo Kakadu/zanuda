@@ -14,10 +14,12 @@
 - Expose library to parse DIFF format. It is available as 'zanuda.diff_parser' ocamlfind package.
 - #28: Add lint about nested if expressions.
   (contributed by @Artem-Rzhankoff)
-  #32: Add lint about constructor names that hide default constructor names (contributed by @nnemakin)
+- #32: Add lint about constructor names that hide default constructor names 
+  (contributed by @nnemakin)
+- #35: Add lints that detects manual implementations of List.map/fold functions
+  (contributed by @nnemakin)
 - #23: Implement a trial version of the Fix module for auto-correction of lints
   (contributed by @Artem-Rzhankoff)
-
 
 ### Changed
 
