@@ -6,6 +6,8 @@ open Base
 module Format = Caml.Format
 open Zanuda_core
 open Zanuda_core.Utils
+open Refactoring.IfBool
+open Parsetree
 
 type input = Tast_iterator.iterator
 
@@ -64,16 +66,19 @@ let run _ fallback =
     let open Tast_pattern in
     let ite =
       texp_ite ebool drop drop
-      |> map1 ~f:(Format.asprintf "Executing 'if %b' smells bad")
+      |> map1 ~f:(fun b -> Format.asprintf "Executing 'if %b' smells bad" b, ite_if b)
       ||| (texp_ite drop ebool drop
-          |> map1 ~f:(Format.asprintf "Executing 'if ... then %b' smells bad"))
+           |> map1 ~f:(fun b ->
+             Format.asprintf "Executing 'if ... then %b' smells bad" b, ite_then b))
       ||| (texp_ite drop drop (some ebool)
-          |> map1 ~f:(Format.asprintf "Executing 'if ... then .. else %b' smells bad"))
+           |> map1 ~f:(fun b ->
+             Format.asprintf "Executing 'if ... then .. else %b' smells bad" b, ite_else b)
+          )
     in
     let ops =
       texp_apply2 (texp_ident (path [ "Stdlib"; "&&" ])) ebool drop
       ||| texp_apply2 (texp_ident (path [ "Stdlib"; "&&" ])) drop ebool
-      |> map1 ~f:(fun _ -> Format.asprintf "Conjunction with boolean smells bad")
+      |> map1 ~f:(fun b -> Format.asprintf "Conjunction with boolean smells bad", conj b)
     in
     ite ||| ops
   in
@@ -86,20 +91,21 @@ let run _ fallback =
     expr =
       (fun self expr ->
         (if !do_check
-        then
-          let open Typedtree in
-          let __ _ = Format.eprintf "%a\n%!" MyPrinttyped.expr expr in
-          let loc = expr.exp_loc in
-          Tast_pattern.parse
-            pat
-            loc
-            ~on_error:(fun _desc () -> ())
-            expr
-            (fun s () ->
-              CollectedLints.add
-                ~loc
-                (report loc.Location.loc_start.Lexing.pos_fname ~loc s))
-            ());
+         then
+           let open Typedtree in
+           let __ _ = Format.eprintf "%a\n%!" MyPrinttyped.expr expr in
+           let loc = expr.exp_loc in
+           Tast_pattern.parse
+             pat
+             loc
+             ~on_error:(fun _desc () -> ())
+             expr
+             (fun (s, unwise_type) () ->
+               CollectedLints.add
+                 ~loc
+                 (report loc.Location.loc_start.Lexing.pos_fname ~loc s);
+               Refactoring.IfBool.apply_fix expr unwise_type)
+             ());
         fallback.expr self expr)
   ; structure_item =
       (fun self si ->

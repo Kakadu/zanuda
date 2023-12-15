@@ -243,14 +243,17 @@ let () =
       Caml.exit 0
     | File file ->
       process_untyped file;
-      CollectedLints.report ()
+      CollectedLints.report ();
+      Replacement.Refill.apply_all ()
     | Dir path ->
       LoadDune.analyze_dir
         ~untyped:process_untyped
         ~cmt:process_cmt_typedtree
         ~cmti:process_cmti_typedtree
         path;
-      CollectedLints.report ()
+      CollectedLints.report ();
+      Replacement.Refill.apply_all ()
+    | Fix path -> Replacement.Log.promote path
   in
   ()
 ;;

@@ -1,6 +1,6 @@
 (library
  (name TypedLints)
- (libraries zanuda_core Tast_pattern)
+ (libraries zanuda_core Tast_pattern Refactoring)
  (modules
   AmbiguousConstructors
   ExcTryWithWildcard

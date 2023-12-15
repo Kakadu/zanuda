@@ -187,9 +187,10 @@ let run _ fallback =
               match State.get_result ans with
               | None -> ()
               | Some expr ->
-                CollectedLints.add
+                (CollectedLints.add
                   ~loc
-                  (report loc.Location.loc_start.Lexing.pos_fname ~loc expr)
+                  (report loc.Location.loc_start.Lexing.pos_fname ~loc expr);
+                Refactoring.Record1.apply_fix loc expr)
             with
             | NotApplicable -> ())
           ();

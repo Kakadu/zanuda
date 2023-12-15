@@ -1,0 +1,7 @@
+(library
+ (name test_fix_nested_comments)
+ (wrapped false)
+ (modules BugDemo))
+ 
+(cram
+ (deps %{bin:zanuda.exe}))

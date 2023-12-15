@@ -1,0 +1,7 @@
+(library
+ (name test_fix_ifbool)
+ (wrapped false)
+ (modules ifBool))
+
+(cram
+ (deps %{bin:zanuda.exe}))

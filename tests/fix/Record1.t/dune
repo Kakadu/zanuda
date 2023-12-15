@@ -1,0 +1,7 @@
+(library
+ (name test_fix_record1)
+ (wrapped false)
+ (modules record1))
+
+(cram
+ (deps %{bin:zanuda.exe}))
