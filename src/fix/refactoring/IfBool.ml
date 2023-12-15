@@ -27,23 +27,23 @@ let bool_value e =
 (* Fix for unwise_conj assumes that the conj takes two arguments because at the time
    of implementation the linter can only detect the use of a conjuction with two arguments *)
 let check_bool args vbool =
-  let helper e e' f f' = function
-    | true -> set_empty_padding (f e) (f e')
-    | false -> set_empty_padding (f' e) (f' e')
+  let helper e e' f f' = 
+    let func = if vbool then f else f' in
+    set_empty_padding (func e) (func e')
   in
-  match List.length args with
-  | 2 ->
-    let _, v = List.nth args 0 in
-    let _, v' = List.nth args 1 in
+  match args with
+  | f :: s :: _ ->
+    let _, v = f in
+    let _, v' = s in
     let open Tast_pattern in
     (match v, v' with
      | Some e, Some e' ->
        parse
          ebool
          e.exp_loc
-         ~on_error:(fun _ () -> helper e e' exp_end exp_start vbool)
+         ~on_error:(fun _ () -> helper e e' exp_end exp_start)
          e
-         (fun _ () -> helper e e' exp_start exp_end vbool)
+         (fun _ () -> helper e e' exp_start exp_end)
          ()
      | _ -> failwith "invalid_arg")
   | _ -> ()

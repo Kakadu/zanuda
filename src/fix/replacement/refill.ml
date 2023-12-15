@@ -46,9 +46,6 @@ let add fname r =
   repls := FileRepl.add fname frepls !repls
 ;;
 
-let mk loc p = { location = loc; payload = p }
-let location { location; _ } = location
-
 let apply_all repls fcontent =
   let flines = Array.of_list (String.split_on_char '\n' fcontent) in
   let start_pos = { dummy_pos with pos_lnum = 1; pos_cnum = 0; pos_bol = 0 } in
