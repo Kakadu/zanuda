@@ -39,7 +39,7 @@ let rec rm path =
   | false -> Sys.remove path
 ;;
 
-let prepare_env =
+let prepare_env () =
   if Sys.file_exists fix_dir then rm fix_dir;
   Sys.mkdir fix_dir 0o755;
   create_file promote_script;
