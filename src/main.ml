@@ -50,16 +50,20 @@ let typed_linters =
 
 (* prepare for disabling some lints *)
 let () =
-  let h = Config.enabled_lints () in
+  let enabled = Config.enabled_lints () in
+  let all = Config.all_lints () in
+  assert (Hash_set.length enabled = 0);
+  assert (Hash_set.length all = 0);
   List.iter untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
-    assert (not (Hash_set.mem h L.lint_id));
-    Hash_set.add h L.lint_id);
+    Hash_set.add all L.lint_id;
+    if not (String.equal L.lint_id UntypedLints.ToplevelEval.lint_id)
+    then Hash_set.add enabled L.lint_id);
   List.iter typed_linters ~f:(fun (module L : LINT.TYPED) ->
-    assert (not (Hash_set.mem h L.lint_id));
-    Hash_set.add h L.lint_id);
+    Hash_set.add all L.lint_id;
+    Hash_set.add enabled L.lint_id);
   List.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
-    assert (not (Hash_set.mem h L.lint_id));
-    Hash_set.add h L.lint_id);
+    Hash_set.add all L.lint_id;
+    Hash_set.add enabled L.lint_id);
   ()
 ;;
 

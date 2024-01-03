@@ -27,6 +27,7 @@ type t =
   ; mutable verbose : bool
   ; mutable gen_replacements : bool
   ; enabled_lints : string Hash_set.t
+  ; all_lints : string Hash_set.t
   ; mutable skip_level_allow : bool
   ; mutable check_filesystem : bool
   }
@@ -43,6 +44,7 @@ let opts =
   ; verbose = false
   ; gen_replacements = false
   ; enabled_lints = Hash_set.create (module String)
+  ; all_lints = Hash_set.create (module String)
   ; skip_level_allow = true
   ; check_filesystem = true
   }
@@ -72,6 +74,7 @@ let prefix_to_cut () = opts.prefix_to_cut
 let prefix_to_add () = opts.prefix_to_add
 let is_check_filesystem () = opts.check_filesystem
 let enabled_lints () = opts.enabled_lints
+let all_lints () = opts.all_lints
 let outfile () = opts.outfile
 let out_golint () = opts.outgolint
 let out_rdjsonl () = opts.out_rdjsonl
@@ -157,8 +160,11 @@ let parse_args () =
         ( sprintf "-no-%s" x
         , Arg.Unit (fun () -> Hash_set.remove opts.enabled_lints x)
         , " Disable checking for this lint" )
+        :: ( sprintf "-with-%s" x
+           , Arg.Unit (fun () -> Hash_set.add opts.enabled_lints x)
+           , " Enable checking for this lint" )
         :: acc)
-      opts.enabled_lints
+      opts.all_lints
     |> List.sort (fun (a, _, _) (b, _, _) -> String.compare a b)
   in
   Arg.parse
