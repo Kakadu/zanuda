@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -no-top_file_license -dir .
+  $ zanuda -no-top_file_license -dir . -diffs-with-fixes
   File '_build/default/FalseProposeFunction.ml' doesn't have corresponding .mli interface
   
   File "FalseProposeFunction.ml", lines 2-5, characters 0-43:

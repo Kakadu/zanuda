@@ -244,7 +244,7 @@ let () =
     | File file ->
       process_untyped file;
       CollectedLints.report ();
-      Replacement.Refill.apply_all ()
+      if Config.gen_replacements () then Replacement.Refill.apply_all ()
     | Dir path ->
       LoadDune.analyze_dir
         ~untyped:process_untyped
@@ -252,7 +252,7 @@ let () =
         ~cmti:process_cmti_typedtree
         path;
       CollectedLints.report ();
-      Replacement.Refill.apply_all ()
+      if Config.gen_replacements () then Replacement.Refill.apply_all ()
     | Fix path -> Replacement.Log.promote path
   in
   ()

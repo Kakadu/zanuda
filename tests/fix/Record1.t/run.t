@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -dir . > /dev/null
+  $ zanuda -dir . -diffs-with-fixes > /dev/null
   $ cat fix_gen/diffs.log
   Diffs for file Record1.ml
   6,8c6

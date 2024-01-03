@@ -75,12 +75,14 @@ let apply_all repls fcontent =
 
 open Log
 
-let apply_all _ =
+let apply_all () =
   let () = prepare_env () in
   let new_payloads =
     FileRepl.fold
       (fun fname frepls fr_acc ->
-        (fname, apply_all frepls (file_content fname)) :: fr_acc)
+        if Sys.file_exists fname
+        then (fname, apply_all frepls (file_content fname)) :: fr_acc
+        else fr_acc)
       !repls
       []
   in

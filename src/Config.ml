@@ -25,6 +25,7 @@ type t =
   ; mutable prefix_to_add : string option
   ; mutable extra_includes : string list
   ; mutable verbose : bool
+  ; mutable gen_replacements : bool
   ; enabled_lints : string Hash_set.t
   ; mutable skip_level_allow : bool
   ; mutable check_filesystem : bool
@@ -40,6 +41,7 @@ let opts =
   ; prefix_to_add = None
   ; extra_includes = []
   ; verbose = false
+  ; gen_replacements = false
   ; enabled_lints = Hash_set.create (module String)
   ; skip_level_allow = true
   ; check_filesystem = true
@@ -75,6 +77,7 @@ let out_golint () = opts.outgolint
 let out_rdjsonl () = opts.out_rdjsonl
 let unset_check_filesystem () = opts.check_filesystem <- false
 let verbose () = opts.verbose
+let gen_replacements () = opts.gen_replacements
 let set_verbose () = opts.verbose <- true
 let set_skip_level_allow b = opts.skip_level_allow <- b
 
@@ -136,6 +139,9 @@ let parse_args () =
               "version: %s\n"
               (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
       , " print version" )
+    ; ( "-diffs-with-fixes"
+      , Arg.Unit (fun () -> opts.gen_replacements <- true)
+      , " Do generate DIFFs with replacements" )
     ; "-fix", Arg.String set_fix, "Apply all found lints available for correction"
     ]
   in
