@@ -126,6 +126,10 @@ let run _ fallback =
   let pat_main = value_binding ~pat:(ppat_var __) ~expr:(pexp_fun drop drop drop __) in
   let pat_exp = pexp_match drop cases ||| pexp_function cases in
   let parse vb =
+    (* We hide attributes. Don't know why it is really needed.
+       TODO: Rewrite to typed tree and see what will happen.
+    *)
+    let vb = { vb with pvb_attributes = [] } in
     let loc = vb.pvb_loc in
     Ppxlib.Ast_pattern.parse
       pat_main

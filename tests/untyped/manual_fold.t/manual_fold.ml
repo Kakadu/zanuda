@@ -38,4 +38,7 @@ let sum =
   let rec helper acc = function
     | [] -> acc 
     | x :: xs -> x + helper acc xs
-  in helper 0 
+  in helper 0
+
+(** On some test Ast_pattern gave exception about presence of attributes  *)
+let rec f x = f x;;
