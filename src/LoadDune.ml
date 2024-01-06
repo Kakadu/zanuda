@@ -78,7 +78,8 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
               else
                 fun _ ->
                 eprintf
-                  "File '%s' doesn't exist. Maybe some of source files are not compiled?\n"
+                  "File '%s' doesn't exist. Maybe some of source files are not compiled?\n\
+                   %!"
                   cmt_filename
             else
               fun f ->
