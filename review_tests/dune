@@ -20,3 +20,7 @@
 (cram
  (applies_to no_new_line)
  (deps no_new_line.diff))
+
+(cram
+ (applies_to 40)
+ (deps 40.diff))
