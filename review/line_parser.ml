@@ -1,4 +1,4 @@
-(** Copyright 2021-2023, Kakadu. *)
+(** Copyright 2023-2024, Kakadu and contributors *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -29,7 +29,7 @@ let file_mode : unit parser =
 ;;
 
 let similarity : unit parser =
-  let* _ = string "similarity index" in
+  let* _ = string "similarity index" <?> "similarity index" in
   many any_char *> return ()
 ;;
 
@@ -39,7 +39,12 @@ let rename : unit parser =
 ;;
 
 let index : unit parser =
-  let* _ = string "index" in
+  let* _ = string "index" <?> "index" in
+  many any_char *> return ()
+;;
+
+let binary_files_differ : unit parser =
+  let* _ = string "Binary files" <?> "binary_files_differ" in
   many any_char *> return ()
 ;;
 

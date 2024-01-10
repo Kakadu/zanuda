@@ -1,4 +1,4 @@
-(** Copyright 2021-2023, Kakadu. *)
+(** Copyright 2021-2024, Kakadu and contributors *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -10,6 +10,7 @@ val file_mode : unit Angstrom.t
 val similarity : unit Angstrom.t
 val rename : unit Angstrom.t
 val index : unit Angstrom.t
+val binary_files_differ : unit Angstrom.t
 val remove_file : string Angstrom.t
 val add_file : string Angstrom.t
 val pos_num : int Angstrom.t

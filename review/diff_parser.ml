@@ -1,4 +1,4 @@
-(** Copyright 2021-2023, Kakadu. *)
+(** Copyright 2021-2024, Kakadu and contributors *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -54,6 +54,7 @@ let file_head : _ option parser =
          ; Line_parser.(run ~info:"file_mode" file_mode)
          ; Line_parser.(run ~info:"rename" rename)
          ; Line_parser.(run ~info:"index" index)
+         ; Line_parser.(run ~info:"binary files differ" binary_files_differ)
          ])
     *> return ()
   in
@@ -65,6 +66,7 @@ let file_head : _ option parser =
        let* new_file = Line_parser.(run ~info:"new_file" add_file) in
        log "%d: new_file = %S" __LINE__ new_file;
        return (Some (old_file, new_file)))
+    <?> "option"
   in
   let* next_pos = pos in
   if next_pos > init_pos then return rez else fail "can't parse file chunk head"
@@ -72,7 +74,7 @@ let file_head : _ option parser =
 
 let a_chunk : chunk parser =
   log "%d: a_chunk" __LINE__;
-  let* info = Line_parser.(run ~info:"chunk_head" chunk_head) in
+  let* info = Line_parser.(run ~info:"chunk_head" @@ chunk_head <?> "chunk_head") in
   (* The string '\ No new line in the end of file' could be
      in an arbitrary place of the diff. So we do filter of result *)
   let* diffs =
