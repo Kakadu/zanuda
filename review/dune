@@ -18,7 +18,12 @@
  (synopsis "Parser for diff file format")
  (modules types line_parser diff_parser)
  (wrapped false)
- (libraries angstrom)
+ (libraries
+  angstrom
+  ;ppx_show.runtime
+  )
+ ;  (preprocess
+ ;   (pps ppx_show))
  (instrumentation
   (backend bisect_ppx)))
 

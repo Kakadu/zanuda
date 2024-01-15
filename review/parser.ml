@@ -93,7 +93,16 @@ let () =
   in
   match Diff_parser.parse_string input with
   | Result.Ok parsed ->
-    (* Format.printf "Parsed stuff:@[%a@]\n%!" [%show: Types.file_info list] parsed; *)
+    (* Format.printf
+      "Parsed stuff:@[%a@]\n%!"
+      (Format.pp_print_list (fun ppf { Types.old_file; new_file; chunks } ->
+         Format.fprintf
+           ppf
+           "@['%s -> %s with %d chunks'@]"
+           old_file
+           new_file
+           (List.length chunks)))
+      parsed; *)
     (match cfg with
      | { file = Some file; line = Some line } ->
        (match Diff_parser.lookup parsed ~file ~line with

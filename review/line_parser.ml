@@ -48,6 +48,16 @@ let binary_files_differ : unit parser =
   many any_char *> return ()
 ;;
 
+let old_mode : unit parser =
+  let* _ = string "old mode" <?> "old mode" in
+  many any_char *> return ()
+;;
+
+let new_mode : unit parser =
+  let* _ = string "new mode" <?> "new mode" in
+  many any_char *> return ()
+;;
+
 let remove_file : string parser =
   let* _ = string "--- " in
   let* _ = string "a/" <|> return "" in

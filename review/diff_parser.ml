@@ -55,6 +55,8 @@ let file_head : _ option parser =
          ; Line_parser.(run ~info:"rename" rename)
          ; Line_parser.(run ~info:"index" index)
          ; Line_parser.(run ~info:"binary files differ" binary_files_differ)
+         ; Line_parser.(run ~info:"old_mode" old_mode)
+         ; Line_parser.(run ~info:"new_mode" new_mode)
          ])
     *> return ()
   in

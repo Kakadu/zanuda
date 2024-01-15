@@ -11,6 +11,8 @@ val similarity : unit Angstrom.t
 val rename : unit Angstrom.t
 val index : unit Angstrom.t
 val binary_files_differ : unit Angstrom.t
+val old_mode : unit Angstrom.t
+val new_mode : unit Angstrom.t
 val remove_file : string Angstrom.t
 val add_file : string Angstrom.t
 val pos_num : int Angstrom.t

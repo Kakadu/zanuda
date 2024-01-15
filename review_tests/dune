@@ -24,3 +24,7 @@
 (cram
  (applies_to 40)
  (deps 40.diff))
+
+(cram
+ (applies_to 112)
+ (deps 112.diff))
