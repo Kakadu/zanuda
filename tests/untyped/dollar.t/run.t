@@ -12,3 +12,11 @@
   6 | let _ = string_of_int @@ max_int
               ^^^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Extranous `@@`.
+  File "dollar.ml", line 7, characters 8-35:
+  7 | let _ = (function _ -> ()) @@ (1,2)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Extranous `@@`.
+  File "dollar.ml", line 8, characters 8-34:
+  8 | let _ = (function _ -> ()) @@ None
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Extranous `@@`.

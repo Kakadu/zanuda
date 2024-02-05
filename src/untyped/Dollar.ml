@@ -16,8 +16,9 @@ let level = LINT.Warn
 let documentation =
   {|
 ### What it does
-The `@@` operator is used for writing less parentheses in expression. Code like `f (g (h x))` could be rewritten as
-`f @@ g (h x)`. But is some cases it is not required, like `print_int @@ 1`.
+The `@@` operator is used for writing less parentheses in expression.
+Code like `f (g (h x))` could be rewritten as `f @@ g (h x)`.
+But is some cases it is not required, like `print_int @@ 1`.
 Some of these cases are reported by this lint.
 
   |}
@@ -59,19 +60,23 @@ let run _ fallback =
           match e.pexp_desc with
           | Parsetree.Pexp_apply
               ( { pexp_desc = Pexp_ident { txt = Lident "@@" } }
-              , [ (Nolabel, { pexp_desc = Pexp_ident _ })
-                ; (Nolabel, { pexp_desc = Pexp_ident _ })
-                ] )
+              , [ _; (Nolabel, { pexp_desc = Pexp_ident _ }) ] )
+          (* ... @@ 42 *)
           | Pexp_apply
               ( { pexp_desc = Pexp_ident { txt = Lident "@@" } }
-              , [ (Nolabel, { pexp_desc = Pexp_ident _ })
-                ; (Nolabel, { pexp_desc = Pexp_constant _ })
-                ] )
+              , [ _; (Nolabel, { pexp_desc = Pexp_constant _ }) ] )
+          (* ... @@ (1,2,...) *)
           | Pexp_apply
               ( { pexp_desc = Pexp_ident { txt = Lident "@@" } }
-              , [ (Nolabel, { pexp_desc = Pexp_ident _ })
-                ; (Nolabel, { pexp_desc = Pexp_record _ })
-                ] ) ->
+              , [ _; (Nolabel, { pexp_desc = Pexp_tuple _ }) ] )
+          (* ... @@ None *)
+          | Pexp_apply
+              ( { pexp_desc = Pexp_ident { txt = Lident "@@" } }
+              , [ _; (Nolabel, { pexp_desc = Pexp_construct (_, None) }) ] )
+          (* ... @@ { ... } *)
+          | Pexp_apply
+              ( { pexp_desc = Pexp_ident { txt = Lident "@@" } }
+              , [ _; (Nolabel, { pexp_desc = Pexp_record _ }) ] ) ->
             let loc = e.pexp_loc in
             let filename = loc.Location.loc_start.Lexing.pos_fname in
             CollectedLints.add ~loc (report ~loc ~filename ())
