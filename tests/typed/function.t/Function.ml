@@ -13,3 +13,18 @@ let backslash = fun ch ->
   | "\n" -> ""
   | ch -> "" ^ ch
 ;;
+
+let _ = 
+  let (let*)  =Option.bind in 
+  let fail _ = None in 
+  let* _res =
+    Fun.id (fun error ->
+        match error with
+        | _ ->
+          (match "" with
+          | "print_newline" ->
+            Some 42
+          | _ -> fail error)
+        ) ()
+  in
+  None
