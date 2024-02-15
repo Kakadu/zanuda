@@ -1,4 +1,4 @@
-.PHONY: all release watch test promote install
+.PHONY: all release watch test promote install deps
 
 all:
 	dune build
@@ -26,6 +26,10 @@ uninstall:
 clean:
 	@dune clean
 	@$(RM) -r _coverage
+
+deps:
+	opam install --confirm-level=yes \
+		ppx_blob curly dune ppx_expect stdune angstrom sexplib
 
 TEST_COV_D = /tmp/zanudacov
 COVERAGE_OPTS = --coverage-path $(TEST_COV_D) --expect src/ --expect review/
