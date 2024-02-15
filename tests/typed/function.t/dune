@@ -2,7 +2,10 @@
  (name test_function)
  (wrapped false)
  (modules function)
- ; (flags
- ;  (:standard -dsource))
+ (flags
+  (:standard
+   ;-dtypedtree
+   ;
+   ))
  (preprocess
   (pps ppx_deriving.show)))
