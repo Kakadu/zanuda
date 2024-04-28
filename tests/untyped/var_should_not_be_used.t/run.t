@@ -12,3 +12,7 @@
   6 |   let _true = "true"  in
             ^^^^^
   Alert zanuda-linter: Identifier `_true` used somewhere else but supposed to be unused.
+  File "lib.ml", line 1, characters 13-23:
+  1 | let rec _foo x = _foo x
+                   ^^^^^^^^^^
+  Alert zanuda-linter: Eta reduction may be applied. It is recommenden to rewrite it as 'let (_: 'a -> 'b) = _foo'

@@ -38,3 +38,7 @@
   39 |     | [] -> acc 
   40 |     | x :: xs -> x + helper acc xs
   Alert zanuda-linter: Consider using `List.fold_right` instead of `helper`
+  File "manual_fold.ml", line 44, characters 10-17:
+  44 | let rec f x = f x;;
+                 ^^^^^^^
+  Alert zanuda-linter: Eta reduction may be applied. It is recommenden to rewrite it as 'let (_: 'a -> 'b) = f'
