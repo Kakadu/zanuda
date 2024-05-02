@@ -29,6 +29,7 @@ val nil : ('a list, 'b, 'b) t
 val ( ^:: ) : ('a, 'b, 'c) t -> ('a list, 'c, 'd) t -> ('a list, 'b, 'd) t
 val none : ('a option, 'b, 'b) t
 val some : ('a, 'b, 'c) t -> ('a option, 'b, 'c) t
+val many : ('a, 'b -> 'b, 'c) t -> ('a list, 'c list -> 'd, 'd) t
 val pair : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
 val ( ** ) : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
 val ( ||| ) : ('a, 'b, 'c) t -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
@@ -196,6 +197,10 @@ val tstr_docattr : (string, 'a, 'b) t -> (structure_item, 'a, 'b) t
 val tsig_docattr : (string, 'a, 'b) t -> (signature_item, 'a, 'b) t
 
 type context
+
+val save_context : context -> int
+val restore_context : context -> int -> unit
+val incr_matched : context -> unit
 
 val of_func : (context -> Location.t -> 'a -> 'b -> 'c) -> ('a, 'b, 'c) t
 val to_func : ('a, 'b, 'c) t -> context -> Location.t -> 'a -> 'b -> 'c

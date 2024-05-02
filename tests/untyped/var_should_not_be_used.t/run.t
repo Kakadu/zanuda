@@ -15,4 +15,4 @@
   File "lib.ml", line 1, characters 13-23:
   1 | let rec _foo x = _foo x
                    ^^^^^^^^^^
-  Alert zanuda-linter: Eta reduction may be applied. It is recommenden to rewrite it as 'let (_: 'a -> 'b) = _foo'
+  Alert zanuda-linter: Eta reduction proposed. It's recommended to rewrite it as 'let (_: 'a -> 'b) = _foo'
