@@ -1,0 +1,11 @@
+(library
+ (name test_matchbool)
+ (wrapped false)
+ (modules MatchBool)
+ (flags
+  (:standard
+   ;-dtypedtree
+   ;
+   ))
+ (preprocess
+  (pps ppx_deriving.show)))

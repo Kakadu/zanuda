@@ -89,6 +89,12 @@ type comp_pat = computation pattern_desc pattern_data
 val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val labelled : (string, 'a, 'b) t -> (Asttypes.arg_label, 'a, 'b) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
+val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
+val tpat_constructor
+    : (Longident.t, 'a, 'b) t 
+    -> (pattern list, 'b, 'c) t 
+    -> (pattern, 'a, 'c) t
+val tpat_value : (value_pat, 'a, 'b) t -> (comp_pat, 'a, 'b) t
 val tpat_exception : (value_pat, 'a, 'b) t -> (comp_pat, 'a, 'b) t
 val tpat_any : (value_pat, 'a, 'a) t
 val pident : (string, 'a, 'b) t -> (Path.t, 'a, 'b) t
@@ -135,6 +141,12 @@ val case
   -> (expression option, 'b, 'c) t
   -> (expression, 'c, 'd) t
   -> (case_val, 'a, 'd) t
+
+val ccase
+  :  (comp_pat, 'a, 'b) t
+  -> (expression option, 'b, 'c) t
+  -> (expression, 'c, 'd) t
+  -> (case_comp, 'a, 'd) t
 
 val texp_match
   :  (expression, 'a, 'b) t

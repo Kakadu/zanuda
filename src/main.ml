@@ -35,6 +35,7 @@ let typed_linters =
   ; (module Hashtables : LINT.TYPED)
   ; (module List_fusion : LINT.TYPED)
   ; (module List_length : LINT.TYPED)
+  ; (module Match_Bool : LINT.TYPED)
   ; (module Monad_laws : LINT.TYPED)
   ; (module Propose_function : LINT.TYPED)
   ; (module Record1 : LINT.TYPED)
