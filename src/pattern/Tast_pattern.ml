@@ -378,7 +378,7 @@ let tpat_constructor (T fname) (T fargs) =
       | Tpat_construct ({ txt }, _, args, _) ->
         ctx.matched <- ctx.matched + 1;
         k |> fname ctx loc txt |> fargs ctx loc args
-      | _ -> fail loc "tpat_var")
+      | _ -> fail loc "tpat_constructor")
 ;;
 
 let tpat_value (T fpat) =
