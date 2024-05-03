@@ -111,8 +111,7 @@ let run _ fallback =
   let rec pat_func = (
     let open Tast_pattern in
       let base_pattern = (Tast_pattern.map (
-        texp_apply __ (many (
-          (nolabel ** some (texp_ident __)) ||| (labelled drop ** some (texp_ident __)))))
+        texp_apply __ (many (nolabel ** some (texp_ident __))))
          ~f:pattern_base_map)
       in
       let base_pattern_func = to_func base_pattern in 
@@ -140,9 +139,12 @@ let run _ fallback =
       let cons_pattern_func = 
         (fun ctx loc e k ->
           match e.Typedtree.exp_desc with
-          | Texp_function { cases } ->
-            incr_matched ctx; 
-            k |> cases_pattern_function ctx loc cases
+          | Texp_function { arg_label; cases } -> (
+            match arg_label with 
+            | Nolabel -> 
+              incr_matched ctx; 
+              k |> cases_pattern_function ctx loc cases 
+            | _       -> fail loc "texp_function label")
           | _ -> fail loc "texp_function" )
       in
       let base_wrapped = (fun ctx loc x k -> base_pattern_func ctx loc x (pattern_base_map k)) in
@@ -181,13 +183,13 @@ let run _ fallback =
           (fun vals ->
             match vals with 
             | (ids, (_, func, args), _) -> (
-(*              Format.printf "Expr: `%s`\nInner=`%s`\nFormal args=`%s`\nReal args=`%s`\nLengths: %d %d\n" 
+(**              Format.printf "Expr: `%s`\nInner=`%s`\nFormal args=`%s`\nReal args=`%s`\nLengths: %d %d\n" 
                 (expr2string expr)
                 (expr2string func)
                 (String.concat ~sep:", " ids)
                 (String.concat ~sep:", " (List.map ~f:ident2string args))
                 (List.length ids) 
-                (List.length args);*)
+                (List.length args); *)
               if List.length args > 0  
                 && List.equal String.equal ids (List.map args ~f:ident2string) 
                 && ( let no_id_in_func ident = 
