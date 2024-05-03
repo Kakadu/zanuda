@@ -389,7 +389,7 @@ let tpat_value (T fpat) =
         let inner = (arg :> value pattern_desc pattern_data) in
           ctx.matched <- ctx.matched + 1;
           k |> fpat ctx loc inner
-      | _ -> fail loc "tpat_exception")
+      | _ -> fail loc "tpat_value")
 ;;
 
 let tpat_exception (T fpat) =
