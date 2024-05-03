@@ -1,4 +1,4 @@
-(** Copyright 2021-2023, . *)
+(** Copyright 2021-2024, Kakadu *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -113,7 +113,8 @@ let run _ fallback =
   let rec pat_func = (
     let open Tast_pattern in
       let base_pattern = (Tast_pattern.map (
-        texp_apply __ (many (nolabel ** some (texp_ident __))))
+        texp_apply __ (many (
+          (nolabel ** some (texp_ident __)) ||| (labelled drop ** some (texp_ident __)))))
          ~f:pattern_base_map)
       in
       let base_pattern_func = to_func base_pattern in 

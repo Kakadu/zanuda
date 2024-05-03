@@ -13,3 +13,7 @@ let xx f g h = my_add3 f g h
 let flipper x y z = my_add3 y z x
 
 let listsAreEqual a b = List.equal (fun lhs rhs -> String.equal lhs rhs) a b
+
+let labeled_add ~x ~y = x + y
+
+let labeled_wrapper a b = labeled_add ~x:a ~y:b

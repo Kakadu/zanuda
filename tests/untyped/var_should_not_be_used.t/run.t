@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ zanuda -no-check-filesystem -no-eta_reduction -no-top_file_license -dir .  -ordjsonl /dev/null
   File "lib.ml", line 1, characters 8-12:
   1 | let rec _foo x = _foo x
               ^^^^
@@ -12,7 +12,3 @@
   6 |   let _true = "true"  in
             ^^^^^
   Alert zanuda-linter: Identifier `_true` used somewhere else but supposed to be unused.
-  File "lib.ml", line 1, characters 13-23:
-  1 | let rec _foo x = _foo x
-                   ^^^^^^^^^^
-  Alert zanuda-linter: Eta reduction proposed. It's recommended to rewrite it as 'let (_: 'a -> 'b) = _foo'

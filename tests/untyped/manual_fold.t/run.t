@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-top_file_license -no-propose_function_untyped -no-propose_function -dir .  -ordjsonl /dev/null
+  $ zanuda  -no-check-filesystem -no-eta_reduction -no-top_file_license -no-propose_function_untyped -no-propose_function -dir .  -ordjsonl /dev/null
   File "manual_fold.ml", lines 2-5, characters 0-39:
   2 | let rec fold_left f acc l =
   3 |   match l with
@@ -38,7 +38,3 @@
   39 |     | [] -> acc 
   40 |     | x :: xs -> x + helper acc xs
   Alert zanuda-linter: Consider using `List.fold_right` instead of `helper`
-  File "manual_fold.ml", line 44, characters 10-17:
-  44 | let rec f x = f x;;
-                 ^^^^^^^
-  Alert zanuda-linter: Eta reduction proposed. It's recommended to rewrite it as 'let (_: 'a -> 'b) = f'
