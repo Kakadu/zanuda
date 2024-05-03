@@ -49,9 +49,7 @@ let msg ppf e0 =
   let si =
     let open Ast_helper in
     Format.asprintf
-      "let (_: %a) = %a"
-      Printtyp.type_expr
-      e0.exp_type
+      "%a"
       Pprintast.expression
       e
   in 
