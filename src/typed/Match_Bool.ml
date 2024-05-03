@@ -33,12 +33,12 @@ let msg ppf e0 =
   let e = MyUntype.untype_expression e0 in
   let si =
     let open Ast_helper in
-    Format.asprintf
-      "%a"
-      Pprintast.expression
-      e
-  in 
-  Caml.Format.fprintf ppf "Match is redundant. It's recommended to rewrite it as '%s'%!" si
+    Format.asprintf "%a" Pprintast.expression e
+  in
+  Caml.Format.fprintf
+    ppf
+    "Match is redundant. It's recommended to rewrite it as '%s'%!"
+    si
 ;;
 
 let report filename ~loc e =
@@ -58,26 +58,21 @@ let report filename ~loc e =
   (module M : LINT.REPORTER)
 ;;
 
-let expr2string e0 = 
+let expr2string e0 =
   let open Parsetree in
   let e = MyUntype.untype_expression e0 in
   let open Ast_helper in
-    Format.asprintf
-      "let (_: %a) = %a"
-      Printtyp.type_expr
-      e0.exp_type
-      Pprintast.expression
-      e 
+  Format.asprintf "let (_: %a) = %a" Printtyp.type_expr e0.exp_type Pprintast.expression e
 ;;
 
 let run _ fallback =
   let pat =
     let open Tast_pattern in
-    (texp_match __ (
-          (ccase (tpat_constructor __ nil |> tpat_value) none __) 
-      ^:: (ccase (tpat_constructor __ nil |> tpat_value) none __)
-      ^:: nil  
-    ))
+    texp_match
+      __
+      (ccase (tpat_constructor __ nil |> tpat_value) none __
+       ^:: ccase (tpat_constructor __ nil |> tpat_value) none __
+       ^:: nil)
   in
   let open Tast_iterator in
   { fallback with
@@ -90,29 +85,32 @@ let run _ fallback =
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun scru id1 rhs1 id2 rhs2 () -> 
-(**            Format.printf "%a -> %s\n%a -> %s\n"
-              Pprintast.longident 
-              id1
-              (expr2string rhs1)
-              Pprintast.longident 
-              id2
-              (expr2string rhs2); *)
-              if   (List.equal String.equal (Longident.flatten id1) ["true"])
-                && (List.equal String.equal (Longident.flatten id2) ["false"]) then (
-                  CollectedLints.add
-                  ~loc
-                  (report loc.Location.loc_start.Lexing.pos_fname ~loc
-                  {expr with exp_desc=Texp_ifthenelse (scru, rhs1, Some rhs2)}) 
-              ) ;
-              if   (List.equal String.equal (Longident.flatten id1) ["false"])
-                && (List.equal String.equal (Longident.flatten id2) ["true"]) then (
-                  CollectedLints.add
-                  ~loc
-                  (report loc.Location.loc_start.Lexing.pos_fname ~loc 
-                    {expr with exp_desc=Texp_ifthenelse (scru, rhs2, Some rhs1)})
-              ) 
-          )
+          (fun scru id1 rhs1 id2 rhs2 () ->
+            (*            Format.printf "%a -> %s\n%a -> %s\n"
+                          Pprintast.longident
+                          id1
+                          (expr2string rhs1)
+                          Pprintast.longident
+                          id2
+                          (expr2string rhs2); *)
+            if List.equal String.equal (Longident.flatten id1) [ "true" ]
+               && List.equal String.equal (Longident.flatten id2) [ "false" ]
+            then
+              CollectedLints.add
+                ~loc
+                (report
+                   loc.Location.loc_start.Lexing.pos_fname
+                   ~loc
+                   { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) });
+            if List.equal String.equal (Longident.flatten id1) [ "false" ]
+               && List.equal String.equal (Longident.flatten id2) [ "true" ]
+            then
+              CollectedLints.add
+                ~loc
+                (report
+                   loc.Location.loc_start.Lexing.pos_fname
+                   ~loc
+                   { expr with exp_desc = Texp_ifthenelse (scru, rhs2, Some rhs1) }))
           ();
         fallback.expr self expr)
   }
