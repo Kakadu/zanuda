@@ -371,6 +371,27 @@ let tpat_var (T fname) =
       | _ -> fail loc "tpat_var")
 ;;
 
+let tpat_constructor (T fname) (T fargs) =
+  T
+    (fun ctx loc x k ->
+      match x.pat_desc with
+      | Tpat_construct ({ txt }, _, args, _) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fname ctx loc txt |> fargs ctx loc args
+      | _ -> fail loc "tpat_var")
+;;
+
+let tpat_value (T fpat) =
+  T
+    (fun ctx loc x k ->
+      match x.pat_desc with
+      | Tpat_value (arg) ->
+        let inner = (arg :> value pattern_desc pattern_data) in
+          ctx.matched <- ctx.matched + 1;
+          k |> fpat ctx loc inner
+      | _ -> fail loc "tpat_exception")
+;;
+
 let tpat_exception (T fpat) =
   T
     (fun ctx loc x k ->
@@ -530,6 +551,12 @@ let texp_function (T fcases) =
 ;;
 
 let case (T pat) (T guard) (T rhs) =
+  T
+    (fun ctx loc { c_lhs; c_rhs; c_guard } k ->
+      k |> pat ctx loc c_lhs |> guard ctx loc c_guard |> rhs ctx loc c_rhs)
+;;
+
+let ccase (T pat) (T guard) (T rhs) =
   T
     (fun ctx loc { c_lhs; c_rhs; c_guard } k ->
       k |> pat ctx loc c_lhs |> guard ctx loc c_guard |> rhs ctx loc c_rhs)

@@ -11,6 +11,7 @@
   If_bool
   List_fusion
   List_length
+  Match_Bool
   Monad_laws
   Mutually_rec_types
   Nested_if
