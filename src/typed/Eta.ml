@@ -147,7 +147,7 @@ let run _ fallback =
             | _       -> fail loc "texp_function label")
           | _ -> fail loc "texp_function" )
       in
-      let base_wrapped = (fun ctx loc x k -> base_pattern_func ctx loc x (pattern_base_map k)) in
+      let base_wrapped = (fun ctx loc x k -> base_pattern_func ctx loc x k) in
       let cons_wrapped = (fun ctx loc x k -> cons_pattern_func ctx loc x (pattern_cons_map k)) in
       (fun ctx loc x k ->
         let backup = save_context ctx in
@@ -180,9 +180,9 @@ let run _ fallback =
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun vals ->
+          (fun vals () ->
             match vals with 
-            | (ids, (_, func, args), _) -> (
+            | (ids, func, args) -> (
 (**              Format.printf "Expr: `%s`\nInner=`%s`\nFormal args=`%s`\nReal args=`%s`\nLengths: %d %d\n" 
                 (expr2string expr)
                 (expr2string func)
