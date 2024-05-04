@@ -105,32 +105,33 @@ let run _ fallback =
   in
   let var_pattern_func = to_func (tpat_var __) in
   let suitable_arg = function
-    | (Asttypes.Nolabel, Some _) -> true
-    | _ -> false 
+    | Asttypes.Nolabel, Some _ -> true
+    | _ -> false
   in
   let extract_path = function
-    | (Asttypes.Nolabel, Some {Typedtree.exp_desc = Typedtree.Texp_ident (path, _, _)}) -> path
-    | _ -> (*This can't be called on proper call*) Pident (Ident.create_local "****")
-  in  
+    | Asttypes.Nolabel, Some { Typedtree.exp_desc = Typedtree.Texp_ident (path, _, _) } ->
+      path
+    | _ ->
+      (*This can't be called on proper call TODO: rewrite in smth like haskell's sequence*)
+      Pident (Ident.create_local "****")
+  in
   let rec pat_func ctx lc e k =
     let open Tast_pattern in
-      match e.Typedtree.exp_desc with 
-      | Texp_function { arg_label; cases = { c_lhs; c_guard = None; c_rhs } :: [] } ->
-        (match arg_label with
-         | Nolabel ->
-           incr_matched ctx;
-           incr_matched ctx;
-           pattern_cons_map k |> var_pattern_func ctx lc c_lhs |> pat_func ctx lc c_rhs
-         | _ -> fail lc "eta-redex")   
-      | Texp_apply (body, args) ->
-        (
-          if List.for_all ~f:suitable_arg args then (
-              incr_matched ctx;
-              k ([], body, List.map ~f:extract_path args))   
-          else 
-            (fail lc "eta_redex")
-        ) 
-      | _ -> fail lc "eta-redex" 
+    match e.Typedtree.exp_desc with
+    | Texp_function { arg_label; cases = { c_lhs; c_guard = None; c_rhs } :: [] } ->
+      (match arg_label with
+       | Nolabel ->
+         incr_matched ctx;
+         incr_matched ctx;
+         pattern_cons_map k |> var_pattern_func ctx lc c_lhs |> pat_func ctx lc c_rhs
+       | _ -> fail lc "eta-redex")
+    | Texp_apply (body, args) ->
+      if List.for_all ~f:suitable_arg args
+      then (
+        incr_matched ctx;
+        k ([], body, List.map ~f:extract_path args))
+      else fail lc "eta_redex"
+    | _ -> fail lc "eta-redex"
   in
   let pat = of_func pat_func in
   let open Tast_iterator in
