@@ -146,8 +146,7 @@ let run _ fallback =
       (fun self expr ->
         let open Typedtree in
         let loc = expr.exp_loc in
-        let ident2string ident =
-          match ident with
+        let ident2string = function
           | Path.Pident id -> Ident.name id
           | _ -> ""
         in
