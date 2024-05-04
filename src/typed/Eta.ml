@@ -99,45 +99,38 @@ let no_ident ident c =
 ;;
 
 let run _ fallback =
-  let pattern_base_map f func args = f ([], func, args) in
   let pattern_cons_map f id rest =
     match rest with
     | ids, func, args -> f (id :: ids, func, args)
   in
-  let rec pat_func =
+  let var_pattern_func = to_func (tpat_var __) in
+  let suitable_arg = function
+    | (Asttypes.Nolabel, Some _) -> true
+    | _ -> false 
+  in
+  let extract_path = function
+    | (Asttypes.Nolabel, Some {Typedtree.exp_desc = Typedtree.Texp_ident (path, _, _)}) -> path
+    | _ -> (*This can't be called on proper call*) Pident (Ident.create_local "****")
+  in  
+  let rec pat_func ctx lc e k =
     let open Tast_pattern in
-    let base_pattern_func = to_func (
-      Tast_pattern.map
-        (texp_apply __ (many (nolabel ** some (texp_ident __))))
-        ~f:pattern_base_map
-    )
-    in
-    let var_pattern_func = to_func (tpat_var __) in
-    let cons_pattern_func ctx loc e k =
-      match e.Typedtree.exp_desc with
+      match e.Typedtree.exp_desc with 
       | Texp_function { arg_label; cases = { c_lhs; c_guard = None; c_rhs } :: [] } ->
         (match arg_label with
          | Nolabel ->
            incr_matched ctx;
            incr_matched ctx;
-           k |> var_pattern_func ctx loc c_lhs |> pat_func ctx loc c_rhs
-         | _ -> fail loc "texp_function")
-      | _ -> fail loc "texp_function"
-    in
-    fun ctx loc x k ->
-      let backup = save_context ctx in
-      try base_pattern_func ctx loc x k with
-      | e1 ->
-        let m1 = save_context ctx in
-        restore_context ctx backup;
-        (try cons_pattern_func ctx loc x (pattern_cons_map k) with
-         | e2 ->
-           let m2 = save_context ctx in
-           if m1 >= m2
-           then (
-             restore_context ctx m1;
-             raise e1)
-           else raise e2)
+           pattern_cons_map k |> var_pattern_func ctx lc c_lhs |> pat_func ctx lc c_rhs
+         | _ -> fail lc "eta-redex")   
+      | Texp_apply (body, args) ->
+        (
+          if List.for_all ~f:suitable_arg args then (
+              incr_matched ctx;
+              k ([], body, List.map ~f:extract_path args))   
+          else 
+            (fail lc "eta_redex")
+        ) 
+      | _ -> fail lc "eta-redex" 
   in
   let pat = of_func pat_func in
   let open Tast_iterator in
