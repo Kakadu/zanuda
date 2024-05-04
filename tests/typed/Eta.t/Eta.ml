@@ -8,6 +8,8 @@ let my_add3 x y z = x + y + z
 
 let good_wrapper x = my_add x x
 
+let strange_wrapper x x = my_add x x
+
 let xx f g h = my_add3 f g h 
 
 let flipper x y z = my_add3 y z x
