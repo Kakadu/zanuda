@@ -4,3 +4,7 @@
   2 | ..try raise Not_found
   3 | with _ -> 1
   Alert zanuda-linter: Antipattern: error swallowing
+  File "ExcTryWithWildcard.ml", line 24, characters 4-23:
+  24 |     try 1 with | _ -> 2
+           ^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Antipattern: error swallowing
