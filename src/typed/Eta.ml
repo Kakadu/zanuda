@@ -104,16 +104,15 @@ let run _ fallback =
     | ids, func, args -> f (id :: ids, func, args)
   in
   let var_pattern_func = to_func (tpat_var __) in
-  let suitable_arg = function
-    | Asttypes.Nolabel, Some _ -> true
-    | _ -> false
+  let rec sequence = function
+    | Some value :: rest -> Option.map ~f:(List.cons value) (sequence rest)
+    | None :: _ -> None
+    | [] -> Some []
   in
   let extract_path = function
     | Asttypes.Nolabel, Some { Typedtree.exp_desc = Typedtree.Texp_ident (path, _, _) } ->
-      path
-    | _ ->
-      (*This can't be called on proper call TODO: rewrite in smth like haskell's sequence*)
-      Pident (Ident.create_local "****")
+      Some path
+    | _ -> None
   in
   let rec pat_func ctx lc e k =
     let open Tast_pattern in
@@ -122,10 +121,9 @@ let run _ fallback =
         { arg_label = Nolabel; cases = { c_lhs; c_guard = None; c_rhs } :: [] } ->
       pattern_cons_map k |> var_pattern_func ctx lc c_lhs |> pat_func ctx lc c_rhs
     | Texp_apply (body, args) ->
-      if List.for_all ~f:suitable_arg args
-      then (
-        k ([], body, List.map ~f:extract_path args))
-      else fail lc "eta_redex"
+      (match sequence (List.map ~f:extract_path args) with
+       | Some paths -> k ([], body, paths)
+       | None -> fail lc "eta_redex")
     | _ -> fail lc "eta-redex"
   in
   let pat = of_func pat_func in
