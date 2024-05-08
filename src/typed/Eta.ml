@@ -120,13 +120,10 @@ let run _ fallback =
     match e.Typedtree.exp_desc with
     | Texp_function
         { arg_label = Nolabel; cases = { c_lhs; c_guard = None; c_rhs } :: [] } ->
-      incr_matched ctx;
-      incr_matched ctx;
       pattern_cons_map k |> var_pattern_func ctx lc c_lhs |> pat_func ctx lc c_rhs
     | Texp_apply (body, args) ->
       if List.for_all ~f:suitable_arg args
       then (
-        incr_matched ctx;
         k ([], body, List.map ~f:extract_path args))
       else fail lc "eta_redex"
     | _ -> fail lc "eta-redex"
