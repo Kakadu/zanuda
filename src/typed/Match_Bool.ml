@@ -93,24 +93,22 @@ let run _ fallback =
                           Pprintast.longident
                           id2
                           (expr2string rhs2); *)
-            if List.equal String.equal (Longident.flatten id1) [ "true" ]
-               && List.equal String.equal (Longident.flatten id2) [ "false" ]
-            then
+            match Longident.flatten id1, Longident.flatten id2 with
+            | [ "true" ], [ "false" ] ->
               CollectedLints.add
                 ~loc
                 (report
                    loc.Location.loc_start.Lexing.pos_fname
                    ~loc
-                   { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) });
-            if List.equal String.equal (Longident.flatten id1) [ "false" ]
-               && List.equal String.equal (Longident.flatten id2) [ "true" ]
-            then
+                   { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) })
+            | [ "false" ], [ "true" ] ->
               CollectedLints.add
                 ~loc
                 (report
                    loc.Location.loc_start.Lexing.pos_fname
                    ~loc
-                   { expr with exp_desc = Texp_ifthenelse (scru, rhs2, Some rhs1) }))
+                   { expr with exp_desc = Texp_ifthenelse (scru, rhs2, Some rhs1) })
+            | _ -> ())
           ();
         fallback.expr self expr)
   }
