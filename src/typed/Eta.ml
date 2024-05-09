@@ -68,39 +68,10 @@ let report filename ~loc e =
   (module M : LINT.REPORTER)
 ;;
 
-let no_ident ident c =
-  let exception Found in
-  let open Tast_iterator in
-  let open Typedtree in
-  let it =
-    { default_iterator with
-      expr =
-        (fun self e ->
-          match e.exp_desc with
-          | Texp_ident (Path.Pident id, _, _) when Ident.equal id ident -> raise Found
-          | Texp_function { param } when Ident.equal ident param -> ()
-          | _ -> default_iterator.expr self e)
-    ; case =
-        (fun (type a) self (c : a case) ->
-          match c.c_lhs.pat_desc with
-          | Tpat_value v ->
-            (match (v :> pattern) with
-             | { pat_desc = Tpat_var (id, _) } ->
-               if Ident.equal ident id then () else default_iterator.case self c
-             | _ -> default_iterator.case self c)
-          | _ -> default_iterator.case self c)
-    }
-  in
-  try
-    it.expr it c;
-    true
-  with
-  | Found -> false
-;;
+let no_ident ident c = Utils.no_ident ident (fun it -> it.expr it c)
 
 let run _ fallback =
-  let pattern_cons_map f id rest =
-    match rest with
+  let pattern_cons_map f id = function
     | ids, func, args -> f (id :: ids, func, args)
   in
   let var_pattern_func = to_func (tpat_var __) in
@@ -117,7 +88,7 @@ let run _ fallback =
       pattern_cons_map k |> var_pattern_func ctx lc c_lhs |> pat_func ctx lc c_rhs
     | Texp_apply (body, args) ->
       let paths = List.filter_map ~f:extract_path args in
-      if List.length args == List.length paths
+      if List.length args = List.length paths
       then k ([], body, paths)
       else fail lc "eta_redex"
     | _ -> fail lc "eta-redex"
@@ -129,40 +100,33 @@ let run _ fallback =
       (fun self expr ->
         let open Typedtree in
         let loc = expr.exp_loc in
-        let ident2string = function
-          | Path.Pident id -> Ident.name id
-          | _ -> ""
+        let extract_ident = function
+          | Path.Pident id -> Some id
+          | _ -> None
         in
         Tast_pattern.parse
           pat
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun vals () ->
-            match vals with
-            | ids, func, args ->
-              if (*              Format.printf "Expr: `%s`\nInner=`%s`\nFormal args=`%s`\nReal args=`%s`\nLengths: %d %d\n"
-                                 (expr2string expr)
-                                 (expr2string func)
-                                 (String.concat ~sep:", " ids)
-                                 (String.concat ~sep:", " (List.map ~f:ident2string args))
-                                 (List.length ids)
-                                 (List.length args); *)
-                 List.length args > 0
-                 && List.equal String.equal ids (List.map args ~f:ident2string)
-                 && List.length (ListLabels.sort_uniq ~cmp:String.compare ids)
-                    == List.length ids
-                 &&
-                 let no_id_in_func ident =
-                   match ident with
-                   | Path.Pident id -> no_ident id func
-                   | _ -> false
-                 in
-                 List.for_all args ~f:no_id_in_func
-              then
-                CollectedLints.add
-                  ~loc
-                  (report loc.Location.loc_start.Lexing.pos_fname ~loc func))
+          (fun (ids, func, args) () ->
+            (*              Format.printf "Expr: `%s`\nInner=`%s`\nFormal args=`%s`\nReal args=`%s`\nLengths: %d %d\n"
+                            (expr2string expr)
+                            (expr2string func)
+                            (String.concat ~sep:", " ids)
+                            (String.concat ~sep:", " (List.map ~f:ident2string args))
+                            (List.length ids)
+                            (List.length args); *)
+            let idents = List.filter_map ~f:extract_ident args in
+            if List.length args > 0
+               && List.length args = List.length idents
+               && List.equal String.equal ids (List.map idents ~f:Ident.name)
+               && (not (Base.List.contains_dup ~compare:String.compare ids))
+               && List.for_all idents ~f:(fun ident -> no_ident ident func)
+            then
+              CollectedLints.add
+                ~loc
+                (report loc.Location.loc_start.Lexing.pos_fname ~loc func))
           ();
         fallback.expr self expr)
   }
