@@ -64,36 +64,7 @@ let report filename ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let no_ident ident c =
-  let exception Found in
-  let open Tast_iterator in
-  let open Typedtree in
-  let it =
-    { default_iterator with
-      expr =
-        (fun self e ->
-          (* TODO: rewrite with FCPM *)
-          match e.exp_desc with
-          | Texp_ident (Path.Pident id, _, _) when Ident.equal id ident -> raise Found
-          | Texp_function { param } when Ident.equal ident param -> ()
-          | _ -> default_iterator.expr self e)
-    ; case =
-        (fun (type a) self (c : a case) ->
-          match c.c_lhs.pat_desc with
-          | Tpat_value v ->
-            (match (v :> pattern) with
-             | { pat_desc = Tpat_var (id, _) } ->
-               if Ident.equal ident id then () else default_iterator.case self c
-             | _ -> default_iterator.case self c)
-          | _ -> default_iterator.case self c)
-    }
-  in
-  try
-    it.case it c;
-    true
-  with
-  | Found -> false
-;;
+let no_ident ident c = Utils.no_ident ident (fun it -> it.case it c)
 
 let run _ fallback =
   let pat =

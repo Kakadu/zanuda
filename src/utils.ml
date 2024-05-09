@@ -38,12 +38,12 @@ end = struct
          ; "location", location filename ~line ~col:1
          ; "severity", `String "INFO"
          ]
-        @
-        match code with
-        | None -> []
-        | Some (desc, None) -> [ "code", `Assoc [ "value", `String desc ] ]
-        | Some (desc, Some url) ->
-          [ "code", `Assoc [ "value", `String desc; "url", `String url ] ])
+         @
+         match code with
+         | None -> []
+         | Some (desc, None) -> [ "code", `Assoc [ "value", `String desc ] ]
+         | Some (desc, Some url) ->
+           [ "code", `Assoc [ "value", `String desc; "url", `String url ] ])
     in
     fprintf ppf "%s\n%!" (Yojson.to_string j)
   ;;
@@ -122,4 +122,36 @@ let describe_as_clippy_json
           ; "applicability", `String "Unresolved"
           ] )
     ]
+;;
+
+let no_ident ident =
+  let exception Found in
+  let open Tast_iterator in
+  let open Typedtree in
+  let it =
+    { default_iterator with
+      expr =
+        (fun self e ->
+          (* TODO: rewrite with FCPM *)
+          match e.exp_desc with
+          | Texp_ident (Path.Pident id, _, _) when Ident.equal id ident -> raise Found
+          | Texp_function { param } when Ident.equal ident param -> ()
+          | _ -> default_iterator.expr self e)
+    ; case =
+        (fun (type a) self (c : a case) ->
+          match c.c_lhs.pat_desc with
+          | Tpat_value v ->
+            (match (v :> pattern) with
+             | { pat_desc = Tpat_var (id, _) } ->
+               if Ident.equal ident id then () else default_iterator.case self c
+             | _ -> default_iterator.case self c)
+          | _ -> default_iterator.case self c)
+    }
+  in
+  fun f ->
+    try
+      f it;
+      true
+    with
+    | Found -> false
 ;;

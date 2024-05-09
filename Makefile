@@ -29,7 +29,8 @@ clean:
 
 deps:
 	opam install --confirm-level=yes \
-		ppx_blob curly dune ppx_expect stdune angstrom sexplib
+		ppx_blob curly dune ppx_expect stdune angstrom sexplib \
+		ppx_fields_conv ppx_show
 
 TEST_COV_D = /tmp/zanudacov
 COVERAGE_OPTS = --coverage-path $(TEST_COV_D) --expect src/ --expect review/
