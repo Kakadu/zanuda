@@ -121,6 +121,17 @@
     }
   },
   {
+    "id": "eta_reduction",
+    "group": "suspicious",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\nStraightforward wrapper functions are excessive and may be reduced \n\n#### Explanation\n\nLet's look at the expression 'let f x = g x'. It may be simply replaced with an expression, `let f = g` which has the same semantics. In general, wrappers like this may be confusing, so it is recommended to get rid of them",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "physical_equality",
     "group": "correctness",
     "level": "deny",
