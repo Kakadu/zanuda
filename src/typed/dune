@@ -6,6 +6,7 @@
   ExcTryWithWildcard
   Equality
   Equality_phys
+  Eta
   Failwith
   Hashtables
   If_bool
