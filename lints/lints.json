@@ -198,6 +198,17 @@
     }
   },
   {
+    "id": "match_bool",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\nProposes to rewrite 'match x with ... | true -> (1)  ... | false -> (2) ` to `if x then (1) else (2)`.\n\n### Why?\nUsing `if` is more readable way to examine boolean value.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "monad_laws_simplify",
     "group": "correctness",
     "level": "deny",
