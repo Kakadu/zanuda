@@ -154,6 +154,17 @@
     }
   },
   {
+    "id": "format_module_usage",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "typed",
+    "docs": "### What it does\nOCaml formatted string are more powerful than C counterpart. \nYou should be aware of available features.\n\n### Why is is important?\nShorter code is more readable. Rewrite\n\n*  `\\\"%s\\\"` to `%S`",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "if_bool",
     "group": "style",
     "level": "warn",
