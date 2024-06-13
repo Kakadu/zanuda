@@ -31,6 +31,7 @@ let typed_linters =
   ; (module Eta : LINT.TYPED)
   ; (module Equality_phys : LINT.TYPED)
   ; (module Failwith : LINT.TYPED)
+  ; (module Format : LINT.TYPED)
   ; (module If_bool : LINT.TYPED)
   ; (module Ignore : LINT.TYPED)
   ; (module Hashtables : LINT.TYPED)

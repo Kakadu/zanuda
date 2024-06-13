@@ -8,6 +8,7 @@
   Equality_phys
   Eta
   Failwith
+  Format
   Hashtables
   If_bool
   List_fusion

@@ -1,0 +1,10 @@
+(library
+ (name test_Format)
+ (wrapped false)
+ (modules test_Format)
+ ; (flags
+ ;  (:standard -dtypedtree))
+ )
+
+(cram
+ (deps %{bin:zanuda.exe}))

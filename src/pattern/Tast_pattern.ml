@@ -255,7 +255,17 @@ let lident (T fident) =
       | Longident.Lident id ->
         ctx.matched <- ctx.matched + 1;
         k |> fident ctx loc id
-      | _ -> fail loc (sprintf "lident"))
+      | _ -> fail loc "lident")
+;;
+
+let elongident (lident : Longident.t) =
+  T
+    (fun ctx loc x k ->
+      if Stdlib.compare x lident = 0
+      then (
+        ctx.matched <- ctx.matched + 1;
+        k)
+      else fail loc "elongident")
 ;;
 
 let path_pident (T fident) =
@@ -338,14 +348,21 @@ let econst (T f0) =
 let eint (T f0) =
   T
     (fun ctx loc x k ->
-      (* let _ = log "<eint> %a\n%!" MyPrinttyped.expr x in *)
       match x.exp_desc with
       | Texp_constant (Asttypes.Const_int n) ->
         ctx.matched <- ctx.matched + 1;
-        let ans = f0 ctx loc n k in
-        (* log "eint succeeded %a\n%!" MyPrinttyped.expr x; *)
-        ans
+        f0 ctx loc n k
       | _ -> fail loc "eint")
+;;
+
+let estring =
+  T
+    (fun ctx loc x k ->
+      match x.exp_desc with
+      | Texp_constant (Asttypes.Const_string (s, _, None)) ->
+        ctx.matched <- ctx.matched + 1;
+        k s
+      | _ -> fail loc "estring")
 ;;
 
 let ebool =
@@ -385,10 +402,10 @@ let tpat_value (T fpat) =
   T
     (fun ctx loc x k ->
       match x.pat_desc with
-      | Tpat_value (arg) ->
+      | Tpat_value arg ->
         let inner = (arg :> value pattern_desc pattern_data) in
-          ctx.matched <- ctx.matched + 1;
-          k |> fpat ctx loc inner
+        ctx.matched <- ctx.matched + 1;
+        k |> fpat ctx loc inner
       | _ -> fail loc "tpat_value")
 ;;
 

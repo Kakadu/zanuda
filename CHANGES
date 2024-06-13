@@ -20,6 +20,7 @@
   (contributed by @nnemakin)
 - #23: Implement a trial version of the Fix module for auto-correction of lints
   (contributed by @Artem-Rzhankoff)
+- #53: Warn about `"%s"` in formatted strings
 
 ### Changed
 

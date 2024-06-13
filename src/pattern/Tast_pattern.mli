@@ -64,10 +64,12 @@ open Typedtree
 val int : int -> (int, 'a, 'a) t
 val string : string -> (string, 'a, 'a) t
 val lident : (string, 'a, 'b) t -> (Longident.t, 'a, 'b) t
+val elongident : Longident.t -> (Longident.t, 'a, 'a) t
 val path : string list -> (Path.t, 'a, 'a) t
 val path_pident : (Ident.t, 'a, 'b) t -> (Path.t, 'a, 'b) t
 val eint : (int, 'a, 'b) t -> (expression, 'a, 'b) t
 val ebool : (expression, bool -> 'a, 'a) t
+val estring : (expression, string -> 'a, 'a) t
 val econst : (Asttypes.constant, 'a, 'b) t -> (expression, 'a, 'b) t
 
 [%%if ocaml_version < (4, 11, 0)]
@@ -90,10 +92,12 @@ val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val labelled : (string, 'a, 'b) t -> (Asttypes.arg_label, 'a, 'b) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
+
 val tpat_constructor
-    : (Longident.t, 'a, 'b) t 
-    -> (pattern list, 'b, 'c) t 
-    -> (pattern, 'a, 'c) t
+  :  (Longident.t, 'a, 'b) t
+  -> (pattern list, 'b, 'c) t
+  -> (pattern, 'a, 'c) t
+
 val tpat_value : (value_pat, 'a, 'b) t -> (comp_pat, 'a, 'b) t
 val tpat_exception : (value_pat, 'a, 'b) t -> (comp_pat, 'a, 'b) t
 val tpat_any : (value_pat, 'a, 'a) t
@@ -147,6 +151,12 @@ val ccase
   -> (expression option, 'b, 'c) t
   -> (expression, 'c, 'd) t
   -> (case_comp, 'a, 'd) t
+
+val texp_construct
+  :  (Longident.t, 'a, 'b) t
+  -> (Types.constructor_description, 'b, 'c) t
+  -> (expression list, 'c, 'd) t
+  -> (expression, 'a, 'd) t
 
 val texp_match
   :  (expression, 'a, 'b) t
