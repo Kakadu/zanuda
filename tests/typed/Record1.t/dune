@@ -1,7 +1,7 @@
 (library
  (name test_Record1)
  (wrapped false)
- (modules Record1))
+ (modules Record1 Record2))
 
 (cram
  (deps %{bin:zanuda}))
