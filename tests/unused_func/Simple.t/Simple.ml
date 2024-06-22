@@ -7,4 +7,4 @@ module Meow = struct
   let woof = 3
 end
 
-let false_use = meow
+let _false_use = meow

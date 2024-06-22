@@ -47,7 +47,7 @@ let run _ fallback =
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun id () -> Format.printf "%s: %s\n" (extract_module_name loc) (Ident.unique_toplevel_name  id);
+          (fun id () -> (*Format.printf "%s: %s\n" (extract_module_name loc) (Ident.unique_toplevel_name  id);*)
                         CollectedDecls.add_just_decl (extract_module_name loc) (Ident.name id))
           ();
         fallback.signature_item self expr)
