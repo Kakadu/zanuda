@@ -12,6 +12,7 @@ type mode =
   | File of string
   | Dir of string
   | Fix of string
+  | UnusedDecls of string
 
 type t =
   { mutable outfile : string option
@@ -58,6 +59,7 @@ let set_dump_file s = set_mode (Dump_json s)
 let set_dump_text () = set_mode Dump_text
 let set_in_file s = set_mode (File s)
 let set_in_dir s = set_mode (Dir s)
+let set_in_unused_decls s = set_mode (UnusedDecls s)
 
 (** Other switches *)
 let set_fix s = set_mode (Fix s)
@@ -120,6 +122,9 @@ let parse_args () =
       , Arg.String set_dump_file
       , "[FILE] Dump information about available lints to JSON" )
     ; "-dir", Arg.String set_in_dir, "[FILE] Set root directory of dune project"
+    ; ( "-unused-decls"
+      , Arg.String set_in_unused_decls
+      , "[FILE] Set root directory of dune project" )
     ; "-ogolint", Arg.String set_out_golint, "Set output file in golint format"
     ; "-ordjsonl", Arg.String set_out_rdjsonl, "Set output file in rdjsonl format"
     ; ( "-del-prefix"
