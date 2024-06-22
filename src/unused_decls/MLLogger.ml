@@ -62,8 +62,8 @@ let run _ fallback =
           ~on_error:(fun _desc () -> ())
           expr
           (fun path () -> 
-            Format.printf "path: %s\n" (String.concat ~sep:", " (List.map ~f:Ident.unique_toplevel_name (Path.heads path)));
-            Format.printf "ident: %s\n" (CollectedDecls.print_path path);
+            (*Format.printf "path: %s\n" (String.concat ~sep:", " (List.map ~f:Ident.unique_toplevel_name (Path.heads path)));
+            Format.printf "ident: %s\n" (CollectedDecls.print_path path);*)
             (match path with 
             |  Pdot (_, rhs) -> CollectedDecls.add_used_decl (Path.head path |> Ident.name) rhs
             |  _               -> ())

@@ -174,7 +174,8 @@ let process_cmt_typedtree filename typedtree =
   if Config.verbose ()
   then (
     printfn "Analyzing cmt: %s" filename;
-    Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree);
+    (*Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree*) 
+  ); 
   with_info filename (fun info ->
     process_per_file_linters_str info typedtree;
     typed_on_structure info typedtree)
@@ -192,7 +193,7 @@ let process_cmti_typedtree filename typedtree =
 ;;
 
 let find_unused_in_cmti_typedtree filename typedtree =
-  Format.printf "Analizing cmti %s\ntree:\n%a" filename Printtyped.interface typedtree;
+  (*Format.printf "Analizing cmti %s\ntree:\n%a" filename Printtyped.interface typedtree;*)
   with_info filename (fun info -> unused_decls_on_signature info typedtree)
 ;;
 
@@ -206,7 +207,7 @@ let find_unused_in_cmti_typedtree filename typedtree =
    typed_on_signature info typedtree)*)
 
 let find_unused_in_cmt_typedtree filename typedtree =
-  Format.printf "Analizing cmt %s\ntree:\n%a" filename Printtyped.implementation typedtree;
+  (*Format.printf "Analizing cmt %s\ntree:\n%a" filename Printtyped.implementation typedtree;*)
   with_info filename (fun info -> unused_decls_on_structure info typedtree)
 ;;
 
@@ -311,8 +312,8 @@ let () =
         ~cmt:find_unused_in_cmt_typedtree
         ~cmti:find_unused_in_cmti_typedtree
         path;
-      CollectedDecls.print_all_decls ();
-      CollectedDecls.print_used_decls ();
+      (*CollectedDecls.print_all_decls ();
+      CollectedDecls.print_used_decls ();*)
       CollectedDecls.collect_unused ()
     | Fix path -> Replacement.Log.promote path
   in
