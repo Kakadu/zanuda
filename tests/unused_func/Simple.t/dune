@@ -1,0 +1,11 @@
+(library
+ (name test_Simple)
+ (wrapped false)
+ (modules 
+   Simple
+   SecondTU
+ )
+ ;  (flags
+ ;   (:standard -dtypedtree))
+ (instrumentation
+  (backend bisect_ppx)))

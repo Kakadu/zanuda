@@ -74,6 +74,12 @@ module type TYPED = sig
   include GENERAL with type input := input
 end
 
+module type UNUSED_DECLS = sig
+  type input = Tast_iterator.iterator
+
+  include GENERAL with type input := input
+end
+
 module type REPORTER = sig
   (** *)
 

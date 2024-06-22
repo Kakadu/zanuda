@@ -13,6 +13,7 @@
   LINT
   Config
   CollectedLints
+  CollectedDecls
   Lint_filesystem
   Dune_project
   LoadDune)
@@ -38,6 +39,7 @@
   compiler-libs.common
   Tast_pattern
   zanuda_core
+  UnusedDecls
   TypedLints
   UntypedLints)
  (preprocess

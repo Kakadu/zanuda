@@ -51,6 +51,16 @@ let typed_linters =
   ]
 ;;
 
+let unused_decls_signature_linters =
+  let open UnusedDecls in
+  [ (module MLILogger : LINT.UNUSED_DECLS) ]
+;;
+
+let unused_decls_structure_linters =
+  let open UnusedDecls in
+  [ (module MLLogger : LINT.UNUSED_DECLS) ]
+;;
+
 (* prepare for disabling some lints *)
 let () =
   let enabled = Config.enabled_lints () in
@@ -134,6 +144,22 @@ let typed_on_signature info =
     typed_linters
 ;;
 
+let unused_decls_on_signature info =
+  build_iterator
+    ~f:(fun o -> o.Tast_iterator.signature o)
+    ~compose:(fun (module L : LINT.UNUSED_DECLS) -> L.run info)
+    ~init:Tast_iterator.default_iterator
+    unused_decls_signature_linters
+;;
+
+let unused_decls_on_structure info =
+  build_iterator
+    ~f:(fun o -> o.Tast_iterator.structure o)
+    ~compose:(fun (module L : LINT.UNUSED_DECLS) -> L.run info)
+    ~init:Tast_iterator.default_iterator
+    unused_decls_structure_linters
+;;
+
 let with_info filename f =
   Compile_common.with_info
     ~native:false
@@ -163,6 +189,25 @@ let process_cmti_typedtree filename typedtree =
   with_info filename (fun info ->
     process_per_file_linters_sig info typedtree;
     typed_on_signature info typedtree)
+;;
+
+let find_unused_in_cmti_typedtree filename typedtree =
+  Format.printf "Analizing cmti %s\ntree:\n%a" filename Printtyped.interface typedtree;
+  with_info filename (fun info -> unused_decls_on_signature info typedtree)
+;;
+
+(* if Config.Options.verbose ()
+   then (
+   let () = printfn "Analyzing cmti: %s" filename in
+   printfn "%a" Printtyped.interface typedtree); *)
+(* Format.printf "Typedtree MLI:\n%a\n%!" Printtyped.interface typedtree; *)
+(* with_info filename (fun info ->
+   process_per_file_linters_sig info typedtree;
+   typed_on_signature info typedtree)*)
+
+let find_unused_in_cmt_typedtree filename typedtree =
+  Format.printf "Analizing cmt %s\ntree:\n%a" filename Printtyped.implementation typedtree;
+  with_info filename (fun info -> unused_decls_on_structure info typedtree)
 ;;
 
 module Migr = Ppxlib_ast.Selected_ast.Of_ocaml
@@ -260,6 +305,15 @@ let () =
         path;
       CollectedLints.report ();
       if Config.gen_replacements () then Replacement.Refill.apply_all ()
+    | UnusedDecls path ->
+      LoadDune.analyze_dir
+        ~untyped:process_untyped
+        ~cmt:find_unused_in_cmt_typedtree
+        ~cmti:find_unused_in_cmti_typedtree
+        path;
+      CollectedDecls.print_all_decls ();
+      CollectedDecls.print_used_decls ();
+      CollectedDecls.collect_unused ()
     | Fix path -> Replacement.Log.promote path
   in
   ()

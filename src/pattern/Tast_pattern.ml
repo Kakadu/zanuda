@@ -729,6 +729,15 @@ let tsig_attribute (T fattr) =
       | _ -> fail loc "tsig_attribute")
 ;;
 
+let tsig_val_name (T fname) = 
+  T
+    (fun ctx loc str k ->
+      match str.sig_desc with
+      | Tsig_value {val_id = txt} ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fname ctx loc txt
+      | _ -> fail loc "tsig_val_name")
+
 let attribute (T fname) (T fpayload) =
   T
     (fun ctx loc attr k ->
