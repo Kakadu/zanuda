@@ -70,12 +70,12 @@ let run _ fallback =
           expr
           (fun path () ->
             (*Format.printf "path: %s\n" (String.concat ~sep:", " (List.map ~f:Ident.unique_toplevel_name (Path.heads path)));*)
-            (*Format.printf
-              "ident in %s: %s\n"
-              loc.Location.loc_start.Lexing.pos_fname
-              (CollectedDecls.print_path path);*)
             match path, get_ident_string path with
             | Pdot (_, _), Some str ->
+              (*Format.printf
+                "ident in %s: %s\n"
+                loc.Location.loc_start.Lexing.pos_fname
+                str;*)
               CollectedDecls.add_used_decl (Path.head path |> Ident.name) str
             | _, _ -> ()
             (*Format.printf "%s\n" (Ident.unique_toplevel_name (Path.head path))*))
