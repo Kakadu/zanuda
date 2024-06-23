@@ -194,7 +194,8 @@ let process_cmti_typedtree filename typedtree =
 
 let find_unused_in_cmti_typedtree filename typedtree =
   (*Format.printf "Analizing cmti %s\ntree:\n%a" filename Printtyped.interface typedtree;*)
-  with_info filename (fun info -> unused_decls_on_signature info typedtree)
+  CollectedDecls.collect_from_mli_tree filename typedtree;
+  (*with_info filename (fun info -> unused_decls_on_signature info typedtree)*)
 ;;
 
 (* if Config.Options.verbose ()
