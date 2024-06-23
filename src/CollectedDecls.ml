@@ -51,7 +51,9 @@ let collect_unused _ =
         then (
           let used_decls_set = queue2set (Hashtbl.find used_decls module_name) in
           (StringSet.diff all_decls_set used_decls_set |> StringSet.elements) :: acc)
-        else acc)
+        else  
+          StringSet.elements all_decls_set :: acc
+      )
       all_decls
       []
   in
@@ -68,6 +70,7 @@ let collect_from_mli_tree filename tree =
     |> List.hd
     |> String.split_on_char '.'
     |> List.hd
+    |> String.mapi (fun i c -> if i = 0 then Char.uppercase_ascii c else c)
   in
   let rec collect_from_module seed = function
     | { Typedtree.sig_items } ->
@@ -75,7 +78,7 @@ let collect_from_mli_tree filename tree =
       List.iter
         (function
           | { sig_desc = Tsig_value { val_id = id } } ->
-            (*ormat.printf "found value %s\n" (seed ^ Ident.name id);*)
+            (*Format.printf "found value %s\n" (seed ^ Ident.name id);*)
             add_just_decl module_name (seed ^ Ident.name id)
           | { sig_desc =
                 Tsig_module

@@ -208,7 +208,7 @@ let find_unused_in_cmti_typedtree filename typedtree =
    typed_on_signature info typedtree)*)
 
 let find_unused_in_cmt_typedtree filename typedtree =
-  (*Format.printf "Analizing cmt %s\ntree:\n%a" filename Printtyped.implementation typedtree;*)
+  (*Format.printf "Analizing cmt %s\n" filename;*)
   with_info filename (fun info -> unused_decls_on_structure info typedtree)
 ;;
 
