@@ -46,13 +46,20 @@ let describe_as_json () =
 ;;
 
 let run _ fallback =
+  let rec get_ident_string path =
+    match path with
+    | Path.Pident id -> Some (Ident.name id)
+    | Path.Pdot (lhs, rhs) ->
+      get_ident_string lhs |> Option.map ~f:(fun str -> str ^ "." ^ rhs)
+    | _ -> None
+  in
   let pat =
     let open Tast_pattern in
-    texp_ident (__)
+    texp_ident __
   in
   let open Tast_iterator in
   { fallback with
-    expr   =
+    expr =
       (fun self expr ->
         let open Typedtree in
         let loc = expr.exp_loc in
@@ -61,14 +68,17 @@ let run _ fallback =
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun path () -> 
-            (*Format.printf "path: %s\n" (String.concat ~sep:", " (List.map ~f:Ident.unique_toplevel_name (Path.heads path)));
-            Format.printf "ident: %s\n" (CollectedDecls.print_path path);*)
-            (match path with 
-            |  Pdot (_, rhs) -> CollectedDecls.add_used_decl (Path.head path |> Ident.name) rhs
-            |  _               -> ())
-            (*Format.printf "%s\n" (Ident.unique_toplevel_name (Path.head path))*)
-          )          
+          (fun path () ->
+            (*Format.printf "path: %s\n" (String.concat ~sep:", " (List.map ~f:Ident.unique_toplevel_name (Path.heads path)));*)
+            (*Format.printf
+              "ident in %s: %s\n"
+              loc.Location.loc_start.Lexing.pos_fname
+              (CollectedDecls.print_path path);*)
+            match path, get_ident_string path with
+            | Pdot (_, _), Some str ->
+              CollectedDecls.add_used_decl (Path.head path |> Ident.name) str
+            | _, _ -> ()
+            (*Format.printf "%s\n" (Ident.unique_toplevel_name (Path.head path))*))
           ();
         fallback.expr self expr)
   }

@@ -1,3 +1,4 @@
   $ dune build
   $ zanuda -unused-decls . 
-  unused decl: woof
+  unused decl: Simple.Meow.meow
+  unused decl: Simple.Meow.woof

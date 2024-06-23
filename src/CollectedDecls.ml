@@ -59,3 +59,32 @@ let collect_unused _ =
     (fun elem -> List.iter (fun decl -> Format.printf "unused decl: %s\n" decl) elem)
     unused
 ;;
+
+let collect_from_mli_tree filename tree =
+  let module_name =
+    filename
+    |> String.split_on_char '/'
+    |> List.rev
+    |> List.hd
+    |> String.split_on_char '.'
+    |> List.hd
+  in
+  let rec collect_from_module seed = function
+    | { Typedtree.sig_items } ->
+      let open Typedtree in
+      List.iter
+        (function
+          | { sig_desc = Tsig_value { val_id = id } } ->
+            (*ormat.printf "found value %s\n" (seed ^ Ident.name id);*)
+            add_just_decl module_name (seed ^ Ident.name id)
+          | { sig_desc =
+                Tsig_module
+                  { md_id = Some id; md_type = { mty_desc = Tmty_signature sign } }
+            } ->
+            (*Format.printf "found module %s\n" (Ident.name id);*)
+            collect_from_module (seed ^ Ident.name id ^ ".") sign
+          | _ -> ())
+        sig_items
+  in
+  collect_from_module (module_name ^ ".") tree
+;;
