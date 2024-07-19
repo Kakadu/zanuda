@@ -1,4 +1,8 @@
-  $ dune build
-  $ zanuda -unused-decls . 
-  unused decl: Simple.Meow.meow
-  unused decl: Simple.Meow.woof
+  $ dune build @check
+$ dune describe
+  $ zanuda -unused-decls .
+  module "Custom_lib" is omitted
+  Unused declarations:
+   0: Simple.Meow.meow
+   1: Simple.Meow.woof
+

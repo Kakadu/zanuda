@@ -1,0 +1,13 @@
+(library
+ (name only_mli_lib)
+ (public_name Only_mli.LIBA)
+ (modules A B)
+ (modules_without_implementation A B))
+
+(executable
+ (name only_mli_demo)
+ (modules only_mli_demo)
+ (libraries only_mli_lib))
+
+(cram
+ (deps ./only_mli_demo.exe))
