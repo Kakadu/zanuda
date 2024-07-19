@@ -292,8 +292,10 @@ let () =
         ~cmt:find_unused_in_cmt_typedtree
         ~cmti:find_unused_in_cmti_typedtree
         path;
-      CollectedDecls.print_all_decls ();
-      CollectedDecls.print_used_decls ();
+      if Config.verbose ()
+      then (
+        CollectedDecls.print_all_decls ();
+        CollectedDecls.print_used_decls ());
       CollectedDecls.collect_unused ()
     | Fix path -> Replacement.Log.promote path
   in
