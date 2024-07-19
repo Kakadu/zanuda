@@ -1,0 +1,15 @@
+(library
+ (name wrapped_lib)
+ (modules Ast Parser)
+ (wrapped true)
+ (libraries angstrom)
+ (preprocess
+  (pps ppx_deriving.show)))
+
+(library
+ (name tests)
+ (modules p_tests)
+ (libraries wrapped_lib nonwrapped_lib)
+ (inline_tests)
+ (preprocess
+  (pps ppx_expect ppx_inline_test)))

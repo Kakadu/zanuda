@@ -1,11 +1,15 @@
 (library
  (name test_Simple)
  (wrapped false)
- (modules 
-   Simple
-   SecondTU
- )
+ (modules
+  Simple
+  SecondTU
+  ;
+  )
  ;  (flags
  ;   (:standard -dtypedtree))
- (instrumentation
-  (backend bisect_ppx)))
+ (inline_tests)
+ (preprocess
+  (pps ppx_expect ppx_inline_test))
+ ;(libraries base angstrom)
+ )
