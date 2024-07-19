@@ -11,7 +11,7 @@ type module_ =
   ; cmt : string option
   ; cmti : string option
   }
-[@@deriving of_sexp]
+[@@deriving sexp]
 
 type executables =
   { names : string list
