@@ -3,4 +3,4 @@
 (cram enable)
 
 (package
- (name Simple))
+ (name Only_mli))

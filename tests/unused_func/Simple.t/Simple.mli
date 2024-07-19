@@ -1,5 +1,5 @@
 module Meow : sig
-  module InnerMeow : sig 
+  module InnerMeow : sig
     val inner : int
   end
   val woof : int
@@ -7,3 +7,4 @@ module Meow : sig
 end
 
 val meow : int
+val is_space : char -> bool

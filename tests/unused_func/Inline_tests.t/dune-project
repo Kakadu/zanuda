@@ -1,0 +1,18 @@
+(lang dune 3.7)
+
+(cram enable)
+
+(license LGPL-3.0-or-later)
+
+(package
+ (name CSharpOOP) ; FIXME and regenerate .opam file using 'dune build @install'
+ (allow_empty)
+ (synopsis "xxx")
+ (description "xxx")
+ (version 0.1)
+ (depends
+  dune
+  angstrom
+  (ppx_inline_test :with-test)
+  ppx_expect
+  ppx_deriving))
