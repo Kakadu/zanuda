@@ -124,7 +124,7 @@ let parse_args () =
     ; "-dir", Arg.String set_in_dir, "[FILE] Set root directory of dune project"
     ; ( "-unused-decls"
       , Arg.String set_in_unused_decls
-      , "[FILE] Set root directory of dune project" )
+      , "[FILE] Look for unused definitions" )
     ; "-ogolint", Arg.String set_out_golint, "Set output file in golint format"
     ; "-ordjsonl", Arg.String set_out_rdjsonl, "Set output file in rdjsonl format"
     ; ( "-del-prefix"

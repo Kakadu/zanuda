@@ -17,7 +17,11 @@ let all_decls = Hashtbl.create 100
 let used_decls = Hashtbl.create 100
 let add_decl dict decl = if not (Hashtbl.mem dict decl) then Hashtbl.add dict decl ()
 let add_used_decl decl = add_decl used_decls decl
-let add_just_decl decl = add_decl all_decls decl
+
+let add_just_decl decl =
+  (* printfn "%s: %s" __FUNCTION__ decl; *)
+  add_decl all_decls decl
+;;
 
 let print_decls info dict =
   Utils.printfn "%s:" info;
@@ -50,19 +54,19 @@ let collect_from_mli_tree (is_wrapped : LoadDune.w) filename tree =
         (function
           | { sig_desc = Tsig_value { val_id = id } } ->
             (*Format.printf "found value %s\n" (seed ^ Ident.name id);*)
-            add_just_decl (seed ^ module_name ^ "." ^ Ident.name id)
+            add_just_decl (seed ^ "." ^ Ident.name id)
           | { sig_desc =
                 Tsig_module
                   { md_id = Some id; md_type = { mty_desc = Tmty_signature sign } }
             } ->
             (*Format.printf "found module %s\n" (Ident.name id);*)
-            collect_from_module (seed ^ Ident.name id ^ ".") sign
+            collect_from_module (seed ^ "." ^ Ident.name id) sign
           | _ -> ())
         sig_items
   in
   collect_from_module
     (match is_wrapped with
-     | Wrapped name -> name ^ "."
-     | _ -> "")
+     | Wrapped name -> name ^ "." ^ module_name
+     | _ -> module_name)
     tree
 ;;

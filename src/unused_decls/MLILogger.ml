@@ -23,6 +23,8 @@ let describe_as_json () =
 ;;
 
 let run _ fallback =
+  (* TODO: remove this file *)
+  let _ = assert false in
   let extract_module_name loc =
     loc.Location.loc_start.Lexing.pos_fname
     |> String.split_on_char '/'
@@ -48,6 +50,7 @@ let run _ fallback =
           expr
           (fun id () ->
             let to_add = extract_module_name loc ^ Ident.unique_toplevel_name id in
+            printfn "right: %s%!" (Ident.unique_toplevel_name id);
             CollectedDecls.add_just_decl to_add)
           ();
         fallback.signature_item self expr)
