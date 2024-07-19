@@ -1,4 +1,4 @@
-(** Copyright 2021-2023, Kakadu. *)
+(** Copyright 2021-2024, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -152,14 +152,6 @@ let unused_decls_on_signature info =
     unused_decls_signature_linters
 ;;
 
-let unused_decls_on_structure info =
-  build_iterator
-    ~f:(fun o -> o.Tast_iterator.structure o)
-    ~compose:(fun (module L : LINT.UNUSED_DECLS) -> L.run info)
-    ~init:Tast_iterator.default_iterator
-    unused_decls_structure_linters
-;;
-
 let with_info filename f =
   Compile_common.with_info
     ~native:false
@@ -170,46 +162,33 @@ let with_info filename f =
     f
 ;;
 
-let process_cmt_typedtree filename typedtree =
+let process_cmt_typedtree _is_wrapped filename typedtree =
   if Config.verbose ()
-  then (
-    printfn "Analyzing cmt: %s" filename;
-    (*Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree*) 
-  ); 
+  then
+    printfn "process_cmt_typedtree cmt: %s" filename
+    (*Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree*);
   with_info filename (fun info ->
     process_per_file_linters_str info typedtree;
     typed_on_structure info typedtree)
 ;;
 
-let process_cmti_typedtree filename typedtree =
-  (* if Config.Options.verbose ()
-     then (
-     let () = printfn "Analyzing cmti: %s" filename in
-     printfn "%a" Printtyped.interface typedtree); *)
-  (* Format.printf "Typedtree MLI:\n%a\n%!" Printtyped.interface typedtree; *)
+let process_cmti_typedtree _is_wrapped filename typedtree =
   with_info filename (fun info ->
     process_per_file_linters_sig info typedtree;
     typed_on_signature info typedtree)
 ;;
 
-let find_unused_in_cmti_typedtree filename typedtree =
-  (*Format.printf "Analizing cmti %s\ntree:\n%a" filename Printtyped.interface typedtree;*)
-  CollectedDecls.collect_from_mli_tree filename typedtree;
-  (*with_info filename (fun info -> unused_decls_on_signature info typedtree)*)
+let find_unused_in_cmti_typedtree (is_wrapped : LoadDune.w) filename typedtree =
+  (* Format.printf "find_unused_in_cmti_typedtree %s\n%!" filename; *)
+  (* Format.printf "tree:\n%a" Printtyped.interface typedtree; *)
+  CollectedDecls.collect_from_mli_tree is_wrapped filename typedtree
 ;;
 
-(* if Config.Options.verbose ()
-   then (
-   let () = printfn "Analyzing cmti: %s" filename in
-   printfn "%a" Printtyped.interface typedtree); *)
-(* Format.printf "Typedtree MLI:\n%a\n%!" Printtyped.interface typedtree; *)
-(* with_info filename (fun info ->
-   process_per_file_linters_sig info typedtree;
-   typed_on_signature info typedtree)*)
-
-let find_unused_in_cmt_typedtree filename typedtree =
-  (*Format.printf "Analizing cmt %s\n" filename;*)
-  with_info filename (fun info -> unused_decls_on_structure info typedtree)
+let find_unused_in_cmt_typedtree is_wrapped filename typedtree =
+  let _ : string = filename in
+  (* Format.printf "find_unused_in_cmt_typedtree %s\n" filename; *)
+  let it = UnusedDecls.MLLogger.run is_wrapped Tast_iterator.default_iterator in
+  it.Tast_iterator.structure it typedtree
 ;;
 
 module Migr = Ppxlib_ast.Selected_ast.Of_ocaml
@@ -313,8 +292,8 @@ let () =
         ~cmt:find_unused_in_cmt_typedtree
         ~cmti:find_unused_in_cmti_typedtree
         path;
-      (*CollectedDecls.print_all_decls ();
-      CollectedDecls.print_used_decls ();*)
+      CollectedDecls.print_all_decls ();
+      CollectedDecls.print_used_decls ();
       CollectedDecls.collect_unused ()
     | Fix path -> Replacement.Log.promote path
   in
