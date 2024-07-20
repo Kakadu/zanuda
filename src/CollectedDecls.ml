@@ -15,7 +15,14 @@ module StringSet = Set.Make (String)
 
 let all_decls = Hashtbl.create 100
 let used_decls = Hashtbl.create 100
-let add_decl dict decl = if not (Hashtbl.mem dict decl) then Hashtbl.add dict decl ()
+
+let add_decl dict decl =
+  if String.starts_with ~prefix:"Stdlib." decl
+  then ()
+  else if not (Hashtbl.mem dict decl)
+  then Hashtbl.add dict decl ()
+;;
+
 let add_used_decl decl = add_decl used_decls decl
 
 let add_just_decl decl =
@@ -25,7 +32,8 @@ let add_just_decl decl =
 
 let print_decls info dict =
   Utils.printfn "%s:" info;
-  Hashtbl.iter (fun module_name () -> Format.printf "  %s\n" module_name) dict
+  let names = Hashtbl.to_seq_keys dict |> List.of_seq |> List.sort String.compare in
+  List.iter (Format.printf "  %s\n") names
 ;;
 
 let print_used_decls () = print_decls "used" used_decls
@@ -46,7 +54,14 @@ let collect_from_mli_tree (is_wrapped : LoadDune.w) filename tree =
     |> List.hd
     |> String.mapi (fun i c -> if i = 0 then Char.uppercase_ascii c else c)
   in
-  (* printfn "%s, modname = %s" __FUNCTION__ module_name; *)
+  let __ _ =
+    printfn
+      "%s, modname = %s,    wrapped = %a"
+      __FUNCTION__
+      module_name
+      LoadDune.pp_w
+      is_wrapped
+  in
   let rec collect_from_module seed = function
     | { Typedtree.sig_items } ->
       let open Typedtree in
