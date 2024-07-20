@@ -6,10 +6,17 @@
   SecondTU
   ;
   )
- ;  (flags
- ;   (:standard -dtypedtree))
  (inline_tests)
  (preprocess
-  (pps ppx_expect ppx_inline_test))
- ;(libraries base angstrom)
- )
+  (pps ppx_expect ppx_inline_test)))
+
+(library
+ (name custom_lib)
+ (public_name Simple.Custom)
+ ;(package Simple)
+ (modules custom_lib_impl))
+
+(executable
+ (name custom_demo)
+ (modules custom_demo)
+ (libraries custom_lib))
