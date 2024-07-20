@@ -16,13 +16,19 @@
   (contributed by @Artem-Rzhankoff)
 - #28: Add lint about nested if expressions.
   (contributed by @Artem-Rzhankoff)
-- #32: Add lint about constructor names that hide default constructor names 
+- #32: Add lint about constructor names that hide default constructor names
   (contributed by @nnemakin)
 - #35: Add lints that detects manual implementations of List.map/fold functions
   (contributed by @nnemakin)
 - #50: Propose eta reduction when available (contributed by @jegorpopow)
 - #51: Warn about pattern matching on boolean values (contributed by @jegorpopow)
 - #53: Warn about `"%s"` in formatted strings
+- #54: Detection of unused public declarations. (@Kakadu, initial implementation from @jegorpopow)
+  At the moment support is kind of flaky: it could be broken by several things.
+
+    * Custom `public_name` for library my broke detection of `.cmt[i]` files.
+    * We [need to](https://github.com/ocaml/dune/issues/9724) do 'dune build @check' to generate all required `cmt` files.
+
 
 ### Changed
 
