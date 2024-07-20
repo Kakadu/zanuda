@@ -6,6 +6,8 @@ type w =
   | Wrapped of string
   | Non_wrapped
 
+val pp_w : Format.formatter -> w -> unit
+
 val analyze_dir
   :  untyped:(string -> unit)
   -> cmt:(w -> string -> Typedtree.structure -> unit)

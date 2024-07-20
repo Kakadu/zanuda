@@ -25,7 +25,8 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
-let run _info fallback =
+let run _info filename fallback =
+  let _ : string = filename in
   let rec get_ident_string path =
     match path with
     | Path.Pident id -> Some (Ident.name id)
@@ -51,7 +52,11 @@ let run _info fallback =
           (fun path () ->
             (*Format.printf "path: %s\n" (String.concat ~sep:", " (List.map ~f:Ident.unique_toplevel_name (Path.heads path)));*)
             match path, get_ident_string path with
-            | Pdot (_, _), Some str -> CollectedDecls.add_used_decl str
+            | Pdot (_, _), Some str ->
+              (* if String.is_substring filename ~substring:"demo"
+                 then printfn "Adding used %S" str; *)
+              (* printfn " ... %a\n" (LoadDune.pp_w )  _info; *)
+              CollectedDecls.add_used_decl str
             | _, _ -> ()
             (*Format.printf "%s\n" (Ident.unique_toplevel_name (Path.head path))*))
           ();
