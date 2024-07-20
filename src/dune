@@ -23,8 +23,8 @@
   (pps
    ppx_optcomp
    ppx_sexp_conv
-   ppx_inline_test ; implies dependecy on base
-   ))
+   ;ppx_inline_test ; implies dependecy on base
+   ppx_expect))
  (instrumentation
   (backend bisect_ppx))
  (inline_tests))

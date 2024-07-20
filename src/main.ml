@@ -56,11 +56,6 @@ let unused_decls_signature_linters =
   [ (module MLILogger : LINT.UNUSED_DECLS) ]
 ;;
 
-let unused_decls_structure_linters =
-  let open UnusedDecls in
-  [ (module MLLogger : LINT.UNUSED_DECLS) ]
-;;
-
 (* prepare for disabling some lints *)
 let () =
   let enabled = Config.enabled_lints () in
@@ -187,7 +182,7 @@ let find_unused_in_cmti_typedtree (is_wrapped : LoadDune.w) filename typedtree =
 let find_unused_in_cmt_typedtree is_wrapped filename typedtree =
   let _ : string = filename in
   (* Format.printf "find_unused_in_cmt_typedtree %s\n" filename; *)
-  let it = UnusedDecls.MLLogger.run is_wrapped Tast_iterator.default_iterator in
+  let it = UnusedDecls.MLLogger.run is_wrapped filename Tast_iterator.default_iterator in
   it.Tast_iterator.structure it typedtree
 ;;
 
