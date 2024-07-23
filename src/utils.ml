@@ -3,7 +3,7 @@
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 open Base
-open Caml.Format
+open Stdlib.Format
 
 let printfn fmt = kfprintf (fun ppf -> fprintf ppf "\n%!") std_formatter fmt
 
