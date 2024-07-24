@@ -22,25 +22,96 @@ let fine_module { impl } =
   | _ -> true
 ;;
 
-let file_prefix_per_library name =
-  (* This function is kind of hack to support fully custom public names for libraries.
-     In 2024 the right way to deal with unbount cmt[i] files is to ban public_name for libraries *)
-  (* The module name construction is al little bit mysterious, for example
-     Ruby.Lib ~~> ruby_lib
-  *)
-  String.mapi name ~f:(fun i c ->
-    if i = 0 || (Char.is_uppercase c && i > 0 && Char.equal name.[i - 1] '.')
-    then Char.lowercase c
-    else if Char.equal c '.'
-    then '_'
-    else c)
+let to_module_name name =
+  if Char.is_uppercase name.[0]
+  then name
+  else String.mapi name ~f:(fun i c -> if i = 0 then Char.uppercase c else c)
+;;
+
+let discover_wrappness modules =
+  let module W = struct
+    type w =
+      | W of string * string
+      | NW of string
+
+    let pp_w ppf = function
+      | NW s -> Format.fprintf ppf "NW %S" s
+      | W (pref, suf) -> Format.fprintf ppf "W (%s __ %s)" pref suf
+    ;;
+
+    let is_NW = function
+      | NW _ -> true
+      | _ -> false
+    ;;
+
+    let is_W_with name = function
+      | W (s, _) when String.equal s name -> true
+      | _ -> false
+    ;;
+  end
+  in
+  let extract str =
+    let pos_slash = String.rindex_exn str '/' in
+    let pos_dot = String.rindex_exn str '.' in
+    let len = pos_dot - pos_slash - 1 in
+    assert (len > 0);
+    let name = String.sub str ~pos:(1 + pos_slash) ~len in
+    match String.substr_index name ~pattern:"__" with
+    | None -> [ W.NW name ]
+    | Some i ->
+      [ W.W (String.prefix name i, String.suffix name (String.length name - i - 2)) ]
+  in
+  let mm =
+    List.concat_map modules ~f:(fun m -> Option.value_map m.cmt ~default:[] ~f:extract)
+  in
+  let nonw, wrapp = List.partition_tf ~f:W.is_NW mm in
+  if List.for_all ~f:W.is_NW mm
+  then Some Non_wrapped
+  else (
+    match nonw with
+    | [ W.NW libname ] when List.for_all ~f:(W.is_W_with libname) wrapp ->
+      Some (Wrapped (to_module_name libname))
+    | _ -> None)
+;;
+
+let pp_maybe_wrapped ppf = function
+  | None -> Format.pp_print_string ppf "None"
+  | Some x -> Format.fprintf ppf "Some %a" pp_w x
+;;
+
+(* TODO: move these tests to a separate library *)
+
+let%expect_test _ =
+  let ans =
+    discover_wrappness
+      [ Dune_project.module_ "a" ~cmt:"/a.cmt" ~cmti:"/a.cmti"
+      ; Dune_project.module_ "b" ~cmt:"/b.cmt" ~cmti:"/b.cmti"
+      ]
+  in
+  Format.printf "%a\n%!" pp_maybe_wrapped ans;
+  [%expect {| Some Non_wrapped |}]
 ;;
 
 let%expect_test _ =
-  print_endline (file_prefix_per_library "Asdf");
-  [%expect "asdf"];
-  print_endline (file_prefix_per_library "Lib.Ruby");
-  [%expect "lib_ruby"]
+  let ans =
+    discover_wrappness
+      [ Dune_project.module_ "a" ~cmt:"/libname__a.cmt" ~cmti:"/libname__a.cmti"
+      ; Dune_project.module_ "b" ~cmt:"/libname__b.cmt" ~cmti:"/libname__b.cmti"
+      ]
+  in
+  Format.printf "%a\n%!" pp_maybe_wrapped ans;
+  [%expect {| None |}]
+;;
+
+let%expect_test _ =
+  let ans =
+    discover_wrappness
+      [ Dune_project.module_ "libname" ~cmt:"/libname.cmt"
+      ; Dune_project.module_ "a" ~cmt:"/libname__a.cmt" ~cmti:"/libname__a.cmti"
+      ]
+  in
+  Format.printf "%a\n%!" pp_maybe_wrapped ans;
+  [%expect {| Some Wrapped "Libname" |}]
 ;;
 
 let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti path =
@@ -125,47 +196,18 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
           (* Dune doesn't allow to specify 'wrapped' for executables *)
           if fine_module m then on_module Non_wrapped m)
       | Library { Library.modules; name; _ } ->
-        let lib_file_prefix = file_prefix_per_library name in
-        List.iter modules ~f:(fun m ->
-          let is_wrapped_cmt, is_wrapped_cmti =
-            ( Option.value_map
-                m.cmt
-                ~default:false
-                ~f:
-                  (Base.String.is_suffix
-                     ~suffix:(Printf.sprintf "/%s__%s.cmt" lib_file_prefix m.name))
-            , Option.value_map
-                m.cmti
-                ~default:false
-                ~f:
-                  (Base.String.is_suffix
-                     ~suffix:(Printf.sprintf "/%s__%s.cmti" lib_file_prefix m.name)) )
-          in
-          let __ _ =
-            Option.iter ~f:(printfn "cmt  = %S") m.cmt;
-            Option.iter ~f:(printfn "cmti = %S") m.cmti;
-            printfn "name = %S, m.name = %S," name m.name;
-            printfn
-              " is_wrapped_cmt = %b, is_wrapped_cmti = %b"
-              is_wrapped_cmt
-              is_wrapped_cmti
-          in
-          let is_wrapped =
-            if is_wrapped_cmt || is_wrapped_cmti
-            then
-              Wrapped
-                (if Char.is_uppercase name.[0]
-                 then name
-                 else
-                   String.mapi name ~f:(fun i c -> if i = 0 then Char.uppercase c else c))
-            else Non_wrapped
-          in
-          (* Format.printf "Trying module %a...\n%!" Sexp.pp (Dune_project.sexp_of_module_ m); *)
-          if fine_module m
-          then on_module is_wrapped m
-          else if (* Usually this happend with 'fake' warpped modules from dune *)
-                  not (String.equal name (String.lowercase m.name))
-          then printfn "module %S is omitted" m.name))
+        let wrappedness = discover_wrappness modules in
+        (match wrappedness with
+         | None -> Stdlib.Printf.eprintf "Can't detect wrappedness for a library %S" name
+         | Some wrappedness ->
+           (* printfn "Discovered wrappedness: %a" pp_w wrappedness; *)
+           List.iter modules ~f:(fun m ->
+             (* Format.printf "Trying module %a...\n%!" Sexp.pp (Dune_project.sexp_of_module_ m); *)
+             if fine_module m
+             then on_module wrappedness m
+             else if (* Usually this happend with 'fake' wrapped modules from dune *)
+                     not (String.equal name (String.lowercase m.name))
+             then printfn "module %S is omitted" m.name)))
   in
   loop_database ()
 ;;

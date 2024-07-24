@@ -13,6 +13,8 @@ type module_ =
   }
 [@@deriving sexp]
 
+let module_ ?cmt ?cmti name = { name; cmt; cmti; impl = None; intf = None }
+
 type executables =
   { names : string list
   ; modules : module_ list
