@@ -24,12 +24,12 @@ The function `Stdlib.List.length` evaluated length of standard OCaml linked list
 let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 
 let msg ppf () =
-  Caml.Format.fprintf ppf "Bad measurement of a list (with non-negative size)\n%!"
+  Stdlib.Format.fprintf ppf "Bad measurement of a list (with non-negative size)\n%!"
 ;;
 
 let msg_long ppf (l, r) =
   msg ppf ();
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Between '%a' and '%a'.%!"
     Pprintast.expression
@@ -66,7 +66,7 @@ let pat_list_length () : (expression, 'a, 'a) Tast_pattern.t =
 ;;
 
 let make_pat_op : 'a. string -> (expression, 'a, 'a) t =
- fun op ->
+  fun op ->
   texp_ident (path [ "Stdlib"; op ])
   ||| texp_ident (path [ "Stdlib!"; op ])
   ||| texp_ident (path [ "Base!"; op ])
@@ -74,8 +74,10 @@ let make_pat_op : 'a. string -> (expression, 'a, 'a) t =
 ;;
 
 let pat
-  : ( Typedtree.expression, Typedtree.expression -> Typedtree.expression -> 'a, 'a )
-  Tast_pattern.t
+  : ( Typedtree.expression
+      , Typedtree.expression -> Typedtree.expression -> 'a
+      , 'a )
+      Tast_pattern.t
   =
   let open Tast_pattern in
   let ops = [ ">=", "<=", 0; "<=", ">=", 0; ">", "<", 0; "<", ">", 0; "=", "=", 0 ] in
@@ -101,13 +103,13 @@ let pat
 ;;
 
 (* let%test _ =
-  Tast_pattern.parse
-    pat
-    Location.none
-    ~on_error:(fun _ -> true)
-    [%expr List.length xs = List.length ys]
-    (fun _ () -> true)
-;; *)
+   Tast_pattern.parse
+   pat
+   Location.none
+   ~on_error:(fun _ -> true)
+   [%expr List.length xs = List.length ys]
+   (fun _ () -> true)
+   ;; *)
 
 let run _ fallback =
   let open Tast_iterator in
@@ -122,13 +124,13 @@ let run _ fallback =
           expr
           (fun e1 e2 () ->
             (* let __ _ =
-              Format.printf
-                "List_length DEBUG: '%a' and '%a'\n%!"
-                MyPrinttyped.expr
-                e1
-                MyPrinttyped.expr
-                e2
-            in *)
+               Format.printf
+               "List_length DEBUG: '%a' and '%a'\n%!"
+               MyPrinttyped.expr
+               e1
+               MyPrinttyped.expr
+               e2
+               in *)
             CollectedLints.add
               ~loc
               (report loc.Location.loc_start.Lexing.pos_fname ~loc e1 e2))

@@ -19,7 +19,7 @@ let documentation =
 Proposes to rewrite 'match x with ... | true -> (1)  ... | false -> (2) ` to `if x then (1) else (2)`.
 
 ### Why?
-Using `if` is more readable way to examine boolean value. 
+Using `if` is more readable way to examine boolean value.
 |}
   |> Stdlib.String.trim
 ;;
@@ -35,7 +35,7 @@ let msg ppf e0 =
     let open Ast_helper in
     Format.asprintf "%a" Pprintast.expression e
   in
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Match is redundant. It's recommended to rewrite it as '%s'%!"
     si

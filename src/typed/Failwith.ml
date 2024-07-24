@@ -29,7 +29,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf () =
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Using `failwith` (or `assert false`) usually is a clue that a corner case is not \
      being handled properly. To report errors we recommend using error monad instead. In \
@@ -68,9 +68,9 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         (* if String.is_substring loc.loc_start.pos_fname ~substring:"Failwith"
-        then (
-          let u = Untypeast.(default_mapper.expr default_mapper expr) in
-          Format.printf "%a\n%a\n%!" Pprintast.expression u (Printast.expression 0) u); *)
+           then (
+           let u = Untypeast.(default_mapper.expr default_mapper expr) in
+           Format.printf "%a\n%a\n%!" Pprintast.expression u (Printast.expression 0) u); *)
         Tast_pattern.parse
           pat
           loc

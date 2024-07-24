@@ -223,7 +223,7 @@ let process_untyped filename =
       then process_signature info
       else (
         let () =
-          Caml.Format.eprintf
+          Stdlib.Format.eprintf
             "Don't know to do with file '%s'\n%s %d\n%!"
             info.source_file
             Caml.__FILE__

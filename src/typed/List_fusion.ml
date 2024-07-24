@@ -46,7 +46,7 @@ let msg ppf kind =
       , "List.filter_map (fun x -> let r = g x in if f r then Some y else None) xs" )
     | ConcatMap -> "List.concat (List.map f xs)", "List.concat_map f xs"
   in
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Performance issue. It's recommended to rewrite\n\t'%s'\nas\n\t'%s'\n%!"
     s1
@@ -88,9 +88,9 @@ let run _ fallback =
     texp_apply_nolabelled list_map (drop ^:: texp_apply list_map drop ^:: nil)
     |> map0 ~f:MapMap
     ||| (texp_apply_nolabelled list_filter (drop ^:: texp_apply list_map drop ^:: nil)
-        |> map0 ~f:FilterMap)
+         |> map0 ~f:FilterMap)
     ||| (texp_apply list_concat ((nolabel ** some (texp_apply list_map drop)) ^:: nil)
-        |> map0 ~f:ConcatMap)
+         |> map0 ~f:ConcatMap)
   in
   let open Tast_iterator in
   { fallback with
@@ -99,9 +99,9 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         (* if String.is_substring loc.loc_start.pos_fname ~substring:"Fusion"
-        then (
-          let u = Untypeast.(default_mapper.expr default_mapper expr) in
-          Format.printf "%a\n%a\n%!" Pprintast.expression u (Printast.expression 0) u); *)
+           then (
+           let u = Untypeast.(default_mapper.expr default_mapper expr) in
+           Format.printf "%a\n%a\n%!" Pprintast.expression u (Printast.expression 0) u); *)
         Tast_pattern.parse
           pat
           loc

@@ -3,7 +3,7 @@
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 open Base
-module Format = Caml.Format
+module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Tast_pattern
@@ -40,7 +40,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf expr =
-  Caml.Format.fprintf ppf "Rewrite record as '%a'%!" Pprintast.expression expr
+  Stdlib.Format.fprintf ppf "Rewrite record as '%a'%!" Pprintast.expression expr
 ;;
 
 let report filename ~loc expr =
@@ -151,9 +151,9 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         (* if String.is_substring loc.loc_start.pos_fname ~substring:"Record1"
-        then (
-          let u = Untypeast.(default_mapper.expr default_mapper expr) in
-          Format.printf "%a\n%a\n%!" Pprintast.expression u (Printast.expression 0) u); *)
+           then (
+           let u = Untypeast.(default_mapper.expr default_mapper expr) in
+           Format.printf "%a\n%a\n%!" Pprintast.expression u (Printast.expression 0) u); *)
         Tast_pattern.(parse (texp_record none __))
           loc
           ~on_error:(fun _desc () -> ())
@@ -165,18 +165,18 @@ let run _ fallback =
                   Tast_pattern.(
                     parse
                       (__ ** rld_kept
-                      |> map1 ~f:(State.add_kept acc)
-                      ||| (label_desc __
-                           ** rld_overriden
-                                (lident __)
-                                (as__ (texp_field (texp_ident __) __))
-                          |> map5 ~f:(fun _ field_lhs expr_rhs stru field_rhs ->
-                               if String.equal field_lhs field_rhs.Types.lbl_name
-                               then State.add_over_self acc field_rhs.lbl_name stru
-                               else State.add_over_other acc field_lhs expr_rhs))
-                      ||| (label_desc __ ** rld_overriden (lident __) __
-                          |> map3 ~f:(fun _ (field_lhs : string) field_rhs ->
-                               State.add_over_other acc field_lhs field_rhs))))
+                       |> map1 ~f:(State.add_kept acc)
+                       ||| (label_desc __
+                            ** rld_overriden
+                                 (lident __)
+                                 (as__ (texp_field (texp_ident __) __))
+                            |> map5 ~f:(fun _ field_lhs expr_rhs stru field_rhs ->
+                              if String.equal field_lhs field_rhs.Types.lbl_name
+                              then State.add_over_self acc field_rhs.lbl_name stru
+                              else State.add_over_other acc field_lhs expr_rhs))
+                       ||| (label_desc __ ** rld_overriden (lident __) __
+                            |> map3 ~f:(fun _ (field_lhs : string) field_rhs ->
+                              State.add_over_other acc field_lhs field_rhs))))
                     loc
                     ~on_error:(fun _ () -> acc)
                     (lab_desc, lab_def)
@@ -187,10 +187,10 @@ let run _ fallback =
               match State.get_result ans with
               | None -> ()
               | Some expr ->
-                (CollectedLints.add
+                CollectedLints.add
                   ~loc
                   (report loc.Location.loc_start.Lexing.pos_fname ~loc expr);
-                Refactoring.Record1.apply_fix loc expr)
+                Refactoring.Record1.apply_fix loc expr
             with
             | NotApplicable -> ())
           ();

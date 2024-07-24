@@ -27,7 +27,7 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
-let msg ppf () = Caml.Format.fprintf ppf "Antipattern: error swallowing%!"
+let msg ppf () = Stdlib.Format.fprintf ppf "Antipattern: error swallowing%!"
 
 let report filename ~loc =
   let module M = struct
@@ -65,7 +65,7 @@ let run _ fallback =
           expr
           (fun { loc } () ->
             (* Reported location is a location of whole match and not of pattern
-              TODO: understand how to fix it  *)
+               TODO: understand how to fix it *)
             (* Format.printf "%a\n%!" Location.print_loc loc; *)
             CollectedLints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc))
           ();

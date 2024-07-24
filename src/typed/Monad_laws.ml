@@ -3,7 +3,7 @@
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 open Base
-module Format = Caml.Format
+module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Format
@@ -31,7 +31,7 @@ Warns if monadic code could be simplified.
 let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 
 let msg ppf () =
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Applying monad laws allows to write monadic code in more compact way.%!"
 ;;
@@ -62,7 +62,7 @@ let run _ fallback =
             (tpat_var __)
             none
             (texp_apply1 (texp_ident (pident (string "return"))) (texp_ident (pident __)))
-         ^:: nil)
+          ^:: nil)
     (* TODO: invent monads to be able to check two identifiers during the matching *)
   in
   let open Tast_iterator in

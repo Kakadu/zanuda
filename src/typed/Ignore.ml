@@ -3,7 +3,7 @@
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 open Base
-module Format = Caml.Format
+module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Tast_pattern
@@ -43,7 +43,7 @@ let msg ppf e0 =
       Pprintast.expression
       e
   in
-  Caml.Format.fprintf ppf "Unsafe ingore. It's recommended to rewrite it as '%s'%!" si
+  Stdlib.Format.fprintf ppf "Unsafe ingore. It's recommended to rewrite it as '%s'%!" si
 ;;
 
 let report filename ~loc e =

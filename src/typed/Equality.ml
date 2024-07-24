@@ -3,7 +3,7 @@
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 open Base
-module Format = Caml.Format
+module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Format
@@ -39,7 +39,7 @@ let pp_kind ppf = function
 ;;
 
 let msg ppf kind =
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Using generic equality for type %a and other algebraic data types is not \
      recommended. Use pattern matching%!"
@@ -90,11 +90,11 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         (*         if String.is_substring loc.loc_start.pos_fname ~substring:"Equality"
-        then
-          Format.printf
-            "%a\n%!"
-            Pprintast.expression
-            Untypeast.(default_mapper.expr default_mapper expr); *)
+                   then
+                   Format.printf
+                   "%a\n%!"
+                   Pprintast.expression
+                   Untypeast.(default_mapper.expr default_mapper expr); *)
         Tast_pattern.parse
           pat
           loc

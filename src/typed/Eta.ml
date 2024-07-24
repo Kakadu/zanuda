@@ -3,7 +3,7 @@
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 open Base
-module Format = Caml.Format
+module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Tast_pattern
@@ -18,7 +18,7 @@ let lint_source = LINT.FPCourse
 let documentation =
   {|
 ### What it does
-Straightforward wrapper functions are excessive and may be reduced 
+Straightforward wrapper functions are excessive and may be reduced
 
 #### Explanation
 
@@ -45,7 +45,7 @@ let msg ppf e0 =
     let open Ast_helper in
     Format.asprintf "%a" Pprintast.expression e
   in
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Eta reduction proposed. It's recommended to rewrite it as '%s'%!"
     si

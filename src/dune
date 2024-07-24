@@ -5,7 +5,7 @@
 
 (library
  (name zanuda_core)
- (public_name zanuda.core)
+ ;(public_name zanuda.core)
  (synopsis "Core library for the linter")
  (modules
   Utils
@@ -18,7 +18,13 @@
   Dune_project
   LoadDune)
  (modules_without_implementation LINT)
- (libraries compiler-libs.common sexplib yojson dune-build-info)
+ (libraries
+  unix
+  compiler-libs.common
+  sexplib
+  yojson
+  dune-build-info
+  Tast_pattern)
  (preprocess
   (pps
    ppx_optcomp

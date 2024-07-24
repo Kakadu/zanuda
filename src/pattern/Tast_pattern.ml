@@ -25,7 +25,7 @@ end
 
 open Location
 open Base
-module Format = Caml.Format
+module Format = Stdlib.Format
 open Format
 open Ast_pattern0
 
@@ -375,8 +375,10 @@ let ebool =
       | Texp_construct ({ txt = Lident "false" }, _, []) ->
         ctx.matched <- ctx.matched + 1;
         k false
-      | _ -> fail loc (sprintf "ebool"))
+      | _ -> fail loc "ebool")
 ;;
+
+[%%if ocaml_version < (5, 0, 0)]
 
 let tpat_var (T fname) =
   T
@@ -387,6 +389,23 @@ let tpat_var (T fname) =
         k |> fname ctx loc txt
       | _ -> fail loc "tpat_var")
 ;;
+
+[%%else]
+
+let tpat_var (T fname) =
+  T
+    (fun (type kind) ctx loc (x : kind pattern_desc pattern_data) k ->
+      match x.pat_desc with
+      | Tpat_value v ->
+        (match (v :> pattern).pat_desc with
+         | Tpat_var (_, { txt }, _uid) ->
+           ctx.matched <- ctx.matched + 1;
+           k |> fname ctx loc txt
+         | _ -> fail loc "tpat_var")
+      | _ -> fail loc "tpat_var")
+;;
+
+[%%endif]
 
 let tpat_constructor (T fname) (T fargs) =
   T
@@ -461,15 +480,33 @@ let texp_ident_typ (T fpath) (T ftyp) =
       | _ -> fail loc "texp_ident_typ")
 ;;
 
+[%%if ocaml_version < (5, 0, 0)]
+
 let texp_assert (T fexp) =
   T
     (fun ctx loc x k ->
-      match x.exp_desc with
-      | Texp_assert e ->
-        ctx.matched <- ctx.matched + 1;
-        fexp ctx loc e k
-      | _ -> fail loc "texp_assert")
+       match x.exp_desc with
+       | Texp_assert e ->
+         ctx.matched <- ctx.matched + 1;
+         fexp ctx loc e k
+       | _ -> fail loc "texp_assert"
+     : context -> Warnings.loc -> expression -> 'a -> 'b)
 ;;
+
+[%%else]
+
+let texp_assert (T fexp) =
+  T
+    (fun ctx loc x k ->
+       match x.exp_desc with
+       | Texp_assert (e, _) ->
+         ctx.matched <- ctx.matched + 1;
+         fexp ctx loc e k
+       | _ -> fail loc "texp_assert"
+     : context -> Warnings.loc -> expression -> 'a -> 'b)
+;;
+
+[%%endif]
 
 let texp_apply (T f0) (T args0) =
   T
@@ -540,32 +577,39 @@ let labelled (T fstr) =
 let texp_apply1 f x = texp_apply f ((nolabel ** some x) ^:: nil)
 let texp_apply2 f x y = texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
 
-[%%if ocaml_version < (4, 11, 2)]
-
-(* 4.10 *)
-type case_val = Typedtree.case
-type case_comp = Typedtree.case
-type value_pat = pattern
-type comp_pat = pattern
-
-[%%else]
-
 type case_val = value case
 type case_comp = computation case
 type value_pat = value pattern_desc pattern_data
 type comp_pat = computation pattern_desc pattern_data
 
-[%%endif]
+(* [%%if ocaml_version < (5, 0, 0)] [%%else] [%%endif] *)
+[%%if ocaml_version < (5, 0, 0)]
 
-let texp_function (T fcases) =
+let texp_function (T fparam) (T fcases) =
   T
     (fun ctx loc e k ->
       match e.exp_desc with
-      | Texp_function { cases } ->
+      | Texp_function { param; cases } ->
         ctx.matched <- ctx.matched + 1;
-        k |> fcases ctx loc cases
+        k |> fparam ctx loc param |> fcases ctx loc cases
       | _ -> fail loc "texp_function")
 ;;
+
+[%%else]
+
+let texp_function (T fparam) (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_function (params, Tfunction_cases cases) ->
+        ctx.matched <- ctx.matched + 1;
+        k
+        |> fparam ctx loc (List.map ~f:(fun p -> p.fp_param) params)
+        |> fcases ctx loc cases.cases
+      | _ -> fail loc "texp_function")
+;;
+
+[%%endif]
 
 let case (T pat) (T guard) (T rhs) =
   T
@@ -729,14 +773,15 @@ let tsig_attribute (T fattr) =
       | _ -> fail loc "tsig_attribute")
 ;;
 
-let tsig_val_name (T fname) = 
+let tsig_val_name (T fname) =
   T
     (fun ctx loc str k ->
       match str.sig_desc with
-      | Tsig_value {val_id = txt} ->
+      | Tsig_value { val_id = txt } ->
         ctx.matched <- ctx.matched + 1;
         k |> fname ctx loc txt
       | _ -> fail loc "tsig_val_name")
+;;
 
 let attribute (T fname) (T fpayload) =
   T
@@ -790,3 +835,13 @@ type context = Ast_pattern0.context
 let of_func f = T f
 let to_func (T f) = f
 let fail = fail
+
+[%%if ocaml_version < (5, 0, 0)]
+
+let get_source_file info = info.Compile_common.source_file
+
+[%%else]
+
+let source_of_info info = Unit_info.source_file info.Compile_common.target
+
+[%%endif]

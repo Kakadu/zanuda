@@ -3,7 +3,7 @@
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 open Base
-open Caml.Format
+open Stdlib.Format
 open Zanuda_core
 open Utils
 
@@ -51,7 +51,8 @@ let report ~filename cname ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let run { Compile_common.source_file; _ } fallback =
+let run info fallback =
+  let source_file = Tast_pattern.source_of_info info in
   if Config.verbose () then printfn "Trying lint '%s' on file '%s'" lint_id source_file;
   if String.is_suffix ~suffix:"arsetree.mli" source_file
      || String.is_suffix ~suffix:"ast.mli" source_file

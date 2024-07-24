@@ -2,7 +2,7 @@
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
-module Format = Caml.Format
+module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 
@@ -36,7 +36,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf () =
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Concatenating a container of strings via fold-like iteration may lead to \
      performance issues."
@@ -65,15 +65,15 @@ let run _ fallback =
     let list_fold =
       texp_ident_typ
         (path [ "Stdlib"; "List"; "fold_left" ]
-        ||| path [ "Stdlib!"; "List"; "fold_left" ]
-        ||| path [ "Stdlib"; "Array"; "fold_left" ]
-        ||| path [ "Stdlib!"; "Array"; "fold_left" ])
+         ||| path [ "Stdlib!"; "List"; "fold_left" ]
+         ||| path [ "Stdlib"; "Array"; "fold_left" ]
+         ||| path [ "Stdlib!"; "Array"; "fold_left" ])
         (typ_arrow drop (typ_arrow drop drop))
     in
     let list_fold_labelled =
       texp_ident_typ
         (path [ "Stdlib"; "ListLabels"; "fold_left" ]
-        ||| path [ "Stdlib!"; "ListLabels"; "fold_left" ])
+         ||| path [ "Stdlib!"; "ListLabels"; "fold_left" ])
         (typ_arrow drop (typ_arrow drop drop))
     in
     let concat_op =

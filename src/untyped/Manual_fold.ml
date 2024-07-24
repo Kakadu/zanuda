@@ -3,7 +3,7 @@
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 open Base
-open Caml.Format
+open Stdlib.Format
 open Zanuda_core
 open Utils
 
@@ -17,7 +17,7 @@ let level = LINT.Warn
 let documentation =
   {|
 ### What it does
-Proposes to use `List.fold_left` or `List.fold_right` instead of manual 
+Proposes to use `List.fold_left` or `List.fold_right` instead of manual
 implementations, such as:
 
 ```ocaml

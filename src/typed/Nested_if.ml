@@ -2,7 +2,7 @@
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
-open Zanuda_core 
+open Zanuda_core
 open Zanuda_core.Utils
 
 type input = Tast_iterator.iterator
@@ -32,7 +32,7 @@ Adopted from camelot's lint list.
 let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 
 let msg ppf () =
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Using nested if expressions more than three layers deep is a bad practice. Use let \
      statements or helper methods or rethinking logic.%!"

@@ -38,9 +38,14 @@ let get_propose_function_payload ematch_case =
   set_empty_padding (pat_point extra_arg Start) (pat_point extra_arg End)
 ;;
 
-let apply_fix = function
-  | Texp_function { cases } ->
-    get_match_constr_payload cases;
-    get_propose_function_payload cases
-  | _ -> failwith "invalid_arg"
+let apply_fix expr =
+  Tast_pattern.(
+    parse
+      (texp_function drop __)
+      expr.exp_loc
+      expr
+      ~on_error:(fun _ -> failwith "invalid_arg")
+      (fun cases ->
+        get_match_constr_payload cases;
+        get_propose_function_payload cases))
 ;;

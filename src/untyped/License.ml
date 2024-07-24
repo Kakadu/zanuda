@@ -17,7 +17,7 @@
    (** */ *)
 *)
 
-open Caml.Format
+open Stdlib.Format
 open Zanuda_core
 open Utils
 
@@ -216,7 +216,7 @@ let run info fallback =
     in
     parse pm item.str_loc item ~on_error:(fun _ -> false) true
   in
-  let filename = info.Compile_common.source_file in
+  let filename = Tast_pattern.source_of_info info in
   let loc = Location.in_file filename in
   let open Tast_iterator in
   { fallback with

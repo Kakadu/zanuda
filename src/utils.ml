@@ -124,25 +124,48 @@ let describe_as_clippy_json
     ]
 ;;
 
+let _ =
+  let open Tast_pattern in
+  1
+;;
+
 let no_ident ident =
   let exception Found in
+  let pexpr loc expr ~on_error sk =
+    (let open Tast_pattern in
+     parse
+       (as__ (texp_ident __)
+        |> map2 ~f:(fun _ x -> `Ident x)
+        ||| (texp_function __ __ |> map2 ~f:(fun ps _cases -> `Function ps))))
+      loc
+      expr
+      ~on_error
+      sk
+  in
   let open Tast_iterator in
   let open Typedtree in
   let it =
     { default_iterator with
       expr =
         (fun self e ->
-          (* TODO: rewrite with FCPM *)
-          match e.exp_desc with
-          | Texp_ident (Path.Pident id, _, _) when Ident.equal id ident -> raise Found
-          | Texp_function { param } when Ident.equal ident param -> ()
-          | _ -> default_iterator.expr self e)
+          pexpr
+            e.exp_loc
+            e
+            ~on_error:(fun _ -> default_iterator.expr self e)
+            (function
+              | `Function (ids : Ident.t list) ->
+                if List.mem (ids : Ident.t list) ident ~equal:Ident.equal
+                then raise Found
+                else default_iterator.expr self e
+              | `Ident (Path.Pident id) when Ident.equal id ident -> raise Found
+              | `Ident _ -> default_iterator.expr self e))
     ; case =
         (fun (type a) self (c : a case) ->
           match c.c_lhs.pat_desc with
           | Tpat_value v ->
+            (* TODO: rewrite with FCPM *)
             (match (v :> pattern) with
-             | { pat_desc = Tpat_var (id, _) } ->
+             | { pat_desc = Tpat_var (id, _, _) } ->
                if Ident.equal ident id then () else default_iterator.case self c
              | _ -> default_iterator.case self c)
           | _ -> default_iterator.case self c)

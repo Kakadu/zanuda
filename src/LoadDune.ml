@@ -48,7 +48,7 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
   let s =
     let ch = Unix.open_process_in "dune describe" in
     let s = Sexplib.Sexp.input_sexp ch in
-    Caml.close_in ch;
+    Stdlib.close_in ch;
     s
   in
   let db = [%of_sexp: t list] s in
@@ -71,8 +71,8 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
         | Cmt_format.Implementation stru -> analyze_cmt is_wrapped source_file stru
         | Interface sign -> analyze_cmti is_wrapped source_file sign
         | Packed _ | Partial_implementation _ | Partial_interface _ ->
-          printfn "%s %d" Caml.__FILE__ Caml.__LINE__;
-          Caml.exit 1)
+          printfn "%s %d" __FILE__ __LINE__;
+          Stdlib.exit 1)
     in
     List.iter
       [ m.impl, m.cmt; m.intf, m.cmti ]
@@ -82,16 +82,16 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
           (* Format.printf "%s %d\n%!" __FILE__ __LINE__; *)
           ()
         | Some filename, None ->
-          Caml.Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
+          Stdlib.Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
         | None, Some filename ->
-          Caml.Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
+          Stdlib.Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
         | Some source_filename, Some cmt_filename ->
           let build_dir = "_build/default/" in
           let wrap =
             (* Format.printf "checking for prefix %S in %s\n%!" build_dir cmt_filename; *)
             if String.is_prefix ~prefix:build_dir cmt_filename
             then
-              if Caml.Sys.file_exists cmt_filename
+              if Stdlib.Sys.file_exists cmt_filename
               then (fun f ->
                 Unix.chdir build_dir;
                 let infos =
