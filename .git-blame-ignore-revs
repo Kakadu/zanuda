@@ -3,4 +3,5 @@
 
 # Rename many modules to snake_case
 6e75c5a2b460294d97b50055c4d7ed565a6e3984
-
+# Upgrade to ocamlformat.0.26.2
+f16ff96c44d3e1c6055a7fd081fb9b8140506e08

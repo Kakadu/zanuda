@@ -17,9 +17,9 @@
 
 (package
  (name zanuda)
- (synopsis "OCaml linter experiment")
+ (synopsis "Linter for OCaml+dune projects")
  (description
-  "Inspired by https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml")
+  "Lints for OCaml projects. Primary usage is for teaching/education")
  (tags
   (lint test))
  (depends
@@ -49,7 +49,7 @@
   (menhir :with-test)
   (ocamlformat
    (and
-    (= 0.26.1)
+    (= 0.26.2)
     :dev))
   (odoc :with-doc)
   (odig :with-doc)))
@@ -69,12 +69,10 @@
   ppx_expect
   bisect_ppx
   curly
-  ;stdio
   yojson
   stdune
   (angstrom
    (>= 0.15.0))
-  ;(base :with-test)
   (ocamlformat
    (and
     (= 0.26.1)
