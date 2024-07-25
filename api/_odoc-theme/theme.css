@@ -1,0 +1,16 @@
+/* Theme based on https://github.com/morhetz/gruvbox light */
+:root
+{ --color-bg: #fbf1c7; /* bg0 */
+  --color-bg-highlight: #bdae93; /* bg3 */
+  --color-fg: #655c54; /* fg3 */
+  --color-rule: #ebdbb2; /* bg1 */
+
+  --color-code-block-bg: #ebdbb2; /* bg1 */
+  --color-code-fg: #504945; /* fg2 */
+  --color-code-comment: #7c6f64; /* fg4 */
+  --color-code-keyword: #cc241d; /* red */
+  --color-code-type-id: #689d6a; /* aqua */
+  --color-code-string: #98971a; /* green */
+
+  --color-link: #076678; /* blue */
+  --color-broken-link: #cc241d; /* red */ }

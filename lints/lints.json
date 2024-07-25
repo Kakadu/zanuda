@@ -15,7 +15,7 @@
     "group": "correctness",
     "level": "deny",
     "impl": "untyped",
-    "docs": "### What it does\nProposes to use `List.fold_left` or `List.fold_right` instead of manual \nimplementations, such as:\n\n```ocaml\n  let rec fold_left f acc l = match l with\n  | [] -> acc\n  | x :: xs -> fold_left f (f acc a) l\n```\n\n### Why?\nIt is too verbose and reduces readability.",
+    "docs": "### What it does\nProposes to use `List.fold_left` or `List.fold_right` instead of manual\nimplementations, such as:\n\n```ocaml\n  let rec fold_left f acc l = match l with\n  | [] -> acc\n  | x :: xs -> fold_left f (f acc a) l\n```\n\n### Why?\nIt is too verbose and reduces readability.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -92,7 +92,7 @@
     "group": "nursery",
     "level": "warn",
     "impl": "typed",
-    "docs": "### What it does\n\nChecks if there are constructor names that hide default constructor names\nfrom `Stdlib`, such as `Some`, `None`, `Error`, `Ok`. \n\n### Why it is important\n\nShadowing names of default constructors may lead to name clashes within toplevel.\nUsing custom constructors is recommended.",
+    "docs": "### What it does\n\nChecks if there are constructor names that hide default constructor names\nfrom `Stdlib`, such as `Some`, `None`, `Error`, `Ok`.\n\n### Why it is important\n\nShadowing names of default constructors may lead to name clashes within toplevel.\nUsing custom constructors is recommended.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -125,7 +125,7 @@
     "group": "suspicious",
     "level": "warn",
     "impl": "typed",
-    "docs": "### What it does\nStraightforward wrapper functions are excessive and may be reduced \n\n#### Explanation\n\nLet's look at the expression 'let f x = g x'. It may be simply replaced with an expression, `let f = g` which has the same semantics. In general, wrappers like this may be confusing, so it is recommended to get rid of them",
+    "docs": "### What it does\nStraightforward wrapper functions are excessive and may be reduced\n\n#### Explanation\n\nLet's look at the expression 'let f x = g x'. It may be simply replaced with an expression, `let f = g` which has the same semantics. In general, wrappers like this may be confusing, so it is recommended to get rid of them",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -136,7 +136,7 @@
     "group": "correctness",
     "level": "deny",
     "impl": "typed",
-    "docs": "### What it does\nWarns about using of physical equality (of pointers) vs. structural equality (of values)\n\n### Why is is important?\nThe newcomers from C++ and C# may automatically write == to test for equality, \nand get unexpected results for complex values.\n\nIf you do low level performance hacking, this lint could give false positives.",
+    "docs": "### What it does\nWarns about using of physical equality (of pointers) vs. structural equality (of values)\n\n### Why is is important?\nThe newcomers from C++ and C# may automatically write == to test for equality,\nand get unexpected results for complex values.\n\nIf you do low level performance hacking, this lint could give false positives.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -158,7 +158,7 @@
     "group": "correctness",
     "level": "deny",
     "impl": "typed",
-    "docs": "### What it does\nOCaml formatted string are more powerful than C counterpart. \nYou should be aware of available features.\n\n### Why is is important?\nShorter code is more readable. Rewrite\n\n*  `\\\"%s\\\"` to `%S`",
+    "docs": "### What it does\nOCaml formatted string are more powerful than C counterpart.\nYou should be aware of available features.\n\n### Why is is important?\nShorter code is more readable. Rewrite\n\n*  `\\\"%s\\\"` to `%S`",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -324,6 +324,17 @@
     "level": "deny",
     "impl": "typed",
     "docs": "### What it does\n\nCheck too many (>= 3 levels) nested if expressions, for example\n* `if ... then (if ... then (if ... then (if ... then ... else ...) else ...) else ...) else ...`\n\n### Why it is important\n\nThe big problem with nested conditions is that they confuse the control flow of the code:\nthey make it almost impossible to determine what code will be executed and when.\n\nAdopted from camelot's lint list.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "lint_filesystem",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "typed",
+    "docs": "### What it does\nChecks that dune project tree is well formed\n\n### Why is is important?\n\nAll modules should have .mli interfaces.\nThe .mli files allow to\n\n* hide some structure items\n* write documentation for modules.\n* hide dependencies between modules (i.e. speedup compilation)\n\nWithout .mli files all your functions will be 'public' in the sence of C++ style OOP.\nUsually people autogenerate .mli files and all defined values in that time become public.\nZanuda is able to detect this via `zanuda -unused-decls .`.\nBut in some cases, .mli files may be too heavy, for example, when we write many type\ndeclarations (sort of AST) with deriving attributes.\nIn that case .mli file is almost identical to .ml.\nTo workaround this, this check allows file with a suffix 'ast.ml' not to have an .mli interface file.\n\nTODO: Add custom configuration for this.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
