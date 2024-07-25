@@ -18,8 +18,8 @@
   Monad_laws
   Mutually_rec_types
   Nested_if
-  Record1
   Propose_function
+  Record_punning
   String_concat
   String_concat_fold
   Ignore

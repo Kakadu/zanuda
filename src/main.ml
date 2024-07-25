@@ -44,7 +44,7 @@ let typed_linters =
   ; (module Match_Bool : LINT.TYPED)
   ; (module Monad_laws : LINT.TYPED)
   ; (module Propose_function : LINT.TYPED)
-  ; (module Record1 : LINT.TYPED)
+  ; (module Record_punning : LINT.TYPED)
   ; (module String_concat : LINT.TYPED)
   ; (module String_concat_fold : LINT.TYPED)
   ; (module UntypedLints.GuardInsteadOfIf : LINT.TYPED)
