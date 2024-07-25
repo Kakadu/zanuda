@@ -2,8 +2,8 @@
  (name UnusedDecls)
  (libraries zanuda_core Tast_pattern Refactoring)
  (modules
-   MLILogger
-   MLLogger
+  MLILogger
+  MLLogger
   ;
   )
  (preprocess

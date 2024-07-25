@@ -94,11 +94,11 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         (*         if String.is_substring loc.loc_start.pos_fname ~substring:"Equality"
-        then
-          Format.printf
-            "%a\n%!"
-            Pprintast.expression
-            Untypeast.(default_mapper.expr default_mapper expr); *)
+                   then
+                   Format.printf
+                   "%a\n%!"
+                   Pprintast.expression
+                   Untypeast.(default_mapper.expr default_mapper expr); *)
         Tast_pattern.parse
           pat
           loc

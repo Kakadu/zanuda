@@ -66,7 +66,7 @@ let run _ fallback =
             (tpat_var __)
             none
             (texp_apply1 (texp_ident (pident (string "return"))) (texp_ident (pident __)))
-         ^:: nil)
+          ^:: nil)
     (* TODO: invent monads to be able to check two identifiers during the matching *)
   in
   let open Tast_iterator in

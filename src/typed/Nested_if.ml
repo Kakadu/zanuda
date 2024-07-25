@@ -6,7 +6,7 @@
 
 [@@@ocaml.text "/*"]
 
-open Zanuda_core 
+open Zanuda_core
 open Zanuda_core.Utils
 
 type input = Tast_iterator.iterator

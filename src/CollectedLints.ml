@@ -18,29 +18,29 @@ let loc_lints f = Queue.map found_Lints ~f
 
 let report () =
   (* let mdfile =
-    match Config.Options.outfile () with
-    | Some s ->
-      (* Format.printf "Opening file '%s'...\n%!" s; *)
-      let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
-      let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
-      [ ( (fun (module M : LINT.REPORTER) ppf -> M.md ppf)
+     match Config.Options.outfile () with
+     | Some s ->
+     (* Format.printf "Opening file '%s'...\n%!" s; *)
+     let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
+     let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
+     [ ( (fun (module M : LINT.REPORTER) ppf -> M.md ppf)
         , Format.formatter_of_out_channel ch
         , ch )
       ]
-    | None -> []
-  in *)
+     | None -> []
+     in *)
   (*   let golint_files =
-    match Config.Options.out_golint () with
-    | Some s ->
-      let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
-      (* By some reason on CI Open_creat is not enough to create a file *)
-      let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
-      [ ( (fun (module M : LINT.REPORTER) ppf -> M.golint ppf)
+       match Config.Options.out_golint () with
+       | Some s ->
+       let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
+       (* By some reason on CI Open_creat is not enough to create a file *)
+       let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
+       [ ( (fun (module M : LINT.REPORTER) ppf -> M.golint ppf)
         , Format.formatter_of_out_channel ch
         , ch )
       ]
-    | None -> []
-  in *)
+       | None -> []
+       in *)
   let rdjsonl_files =
     match Config.out_rdjsonl () with
     | Some s ->

@@ -31,7 +31,7 @@ let bool_value e =
 (* Fix for unwise_conj assumes that the conj takes two arguments because at the time
    of implementation the linter can only detect the use of a conjuction with two arguments *)
 let check_bool args vbool =
-  let helper e e' f f' = 
+  let helper e e' f f' =
     let func = if vbool then f else f' in
     set_empty_padding (func e) (func e')
   in
