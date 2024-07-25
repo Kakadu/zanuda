@@ -50,7 +50,9 @@
   (ocamlformat
    (and
     (= 0.26.1)
-    :dev))))
+    :dev))
+  (odoc :with-doc)
+  (odig :with-doc)))
 
 (package
  (name reviewer)

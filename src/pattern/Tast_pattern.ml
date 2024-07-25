@@ -1,6 +1,10 @@
-(** Copyright 2021-2023, Kakadu. *)
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
+[@@@ocaml.text "/*"]
 
 module Ast_pattern0 = struct
   exception Expected of Location.t * string

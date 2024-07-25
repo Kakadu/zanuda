@@ -1,6 +1,10 @@
-(** Copyright 2021-2023, .... *)
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, .... *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
+[@@@ocaml.text "/*"]
 
 open Base
 open Zanuda_core

@@ -1,6 +1,10 @@
+[@@@ocaml.text "/*"]
+
 (** Copyright 2021-2024, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
+[@@@ocaml.text "/*"]
 
 (* TODO: It would be great not to depend on Base, but currently ppx_expect requires it *)
 open Base

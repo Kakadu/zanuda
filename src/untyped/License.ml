@@ -1,6 +1,10 @@
-(** Copyright 2021-2023, Dmitrii Kosarev a.k.a. Kakadu *)
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, Dmitrii Kosarev a.k.a. Kakadu *)
 
 (** SPDX-License-Identifier: LGPL-3.0-only *)
+
+[@@@ocaml.text "/*"]
 
 (*
    Checking that every file starts from SPDX copyright and license information.
@@ -11,10 +15,11 @@
 
 (* TODO: We can omit appearance of the license in the generated documentation.
    We should write like this:
-   (** /* *)
+
+   [@@@ocaml.text "/*"]
    (** Copyright ... *)
    (** SPDX-License-Identifier: ... *)
-   (** */ *)
+   [@@@ocaml.text "/*"]
 *)
 
 open Caml.Format

@@ -1,6 +1,10 @@
-(** Copyright 2021-2023, Kakadu. *)
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
+[@@@ocaml.text "/*"]
 
 (** A type of lint's impelementation.
     Typed and untyped lints inspect OCaml's Parsetree/Typedtree respectively.

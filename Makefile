@@ -16,8 +16,8 @@ promote:
 	dune test --auto-promote
 
 install:
-	dune build @install
-	dune install
+	dune build @install -p reviewer,zanuda
+	dune install reviewer zanuda
 
 uninstall:
 	dune build @install
@@ -31,6 +31,13 @@ deps:
 	opam install --confirm-level=yes \
 		ppx_blob curly dune ppx_expect stdune angstrom sexplib \
 		ppx_fields_conv ppx_show
+
+ODIG_SWITCHES = --odoc-theme=odig.gruvbox.light
+ODIG_SWITCHES += --no-tag-index
+ODIG_SWITCHES += --no-pkg-deps
+odig:
+	odig odoc $(ODIG_SWITCHES) zanuda reviewer
+	@echo 'To look at the doc run: xdg-open $$(odig cache path)/html/index.html'
 
 TEST_COV_D = /tmp/zanudacov
 COVERAGE_OPTS = --coverage-path $(TEST_COV_D) --expect src/ --expect review/

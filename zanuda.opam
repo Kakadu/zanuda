@@ -28,6 +28,7 @@ depends: [
   "menhir" {with-test}
   "ocamlformat" {= "0.26.1" & dev}
   "odoc" {with-doc}
+  "odig" {with-doc}
 ]
 build: [
   ["dune" "subst"] {dev}

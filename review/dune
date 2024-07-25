@@ -13,17 +13,12 @@
   (backend bisect_ppx)))
 
 (library
- (package reviewer)
  (name diff_parser)
+ (public_name reviewer.diff_parser)
  (synopsis "Parser for diff file format")
  (modules types line_parser diff_parser)
  (wrapped false)
- (libraries
-  angstrom
-  ;ppx_show.runtime
-  )
- ;  (preprocess
- ;   (pps ppx_show))
+ (libraries angstrom)
  (instrumentation
   (backend bisect_ppx)))
 
