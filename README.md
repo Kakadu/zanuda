@@ -6,13 +6,15 @@
 
 [![](http://github-actions.40ants.com/Kakadu/zanuda/matrix.svg)](https://github.com/Kakadu/zanuda)
 
-## An OCaml linter experiment
+## A linter for OCaml+dune projects
 
 Inspired by:
 * [How possible is a clippy-like linter for OCaml?](https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml)
 * My experience in teaching OCaml at my local university.
 
-At the moment most of implemented lints are inspired by me teaching experience. But I'm aware that there are other linters like [Camelot](https://github.com/upenn-cis1xx/camelot) for OCaml and [Clippy](https://github.com/rust-lang/rust-clippy) Rust.
+At the moment most of implemented lints are inspired by me teaching experience.
+But I'm aware that there are other linters like [Camelot](https://github.com/upenn-cis1xx/camelot) for OCaml and [Clippy](https://github.com/rust-lang/rust-clippy) Rust.
+[These is a list of currently supported ones.](https://kakadu.github.io/zanuda/lints/index.html)
 
 From techinical point of view, most of the lints study Typedtree, so the input for linter should be a **fully compiled dune project**. There is a support of linters that study untyped tree, but I don't expect them to be widely used. These two abstract trees don't allow to find all possible code quirks. Currently, we delegate job of detecting something like `f(1)(2)(3)` to [ocamlformat](https://github.com/ocaml-ppx/ocamlformat).
 
@@ -23,7 +25,7 @@ Examples of 'zanuda' usage could be found in the 'tests' directory. But in short
 * Compile your dune project and run this linter via
 
     ````
-    dune build . @runtest -j3
+    dune build @check @runtest -j3
     zanuda -dir .
     ````
 
@@ -31,22 +33,25 @@ Examples of 'zanuda' usage could be found in the 'tests' directory. But in short
 
 * You could read the documentation about supported lints via `zanuda -dump`. CI runs regularly uploads [information about available lints](https://kakadu.github.io/zanuda/lints/index.html) to GitHub Pages.
 
-* You could run linter and dump the results in short JSON form. They could be processed later, for example as review comment via GitHub API. (This reporting is not implemented yet.)
+* You could run linter and dump the results in short JSON form: `zanuda -dir . -ordjsonl /tmp/1.rdjsonl`.
+  They could be processed later, for example as review comment via GitHub API.
+  (This reporting is not implemented yet.)
 
 
 ##### Developping
 
-Current dependecies:
+To get dependecies you could use standard dune/opam machinery:
 
-    opam install ppx_fields_conv ppx_blob base angstrom ppx_expect ppx_assert sexplib --yes
+    opam pin add ./ -n
+    opam install . --deps-only --with-test --with-doc
 
 Running a single test:
 
-    dune build && dune build @ifbool --force
+    dune b @tests/typed/License
 
 Running all tests:
 
-    dune build && dune runtest --force
+    dune test
 
 
 ##### See also

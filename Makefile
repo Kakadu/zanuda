@@ -30,11 +30,12 @@ clean:
 deps:
 	opam install --confirm-level=yes \
 		ppx_blob curly dune ppx_expect stdune angstrom sexplib \
-		ppx_fields_conv ppx_show
+		ppx_fields_conv ppx_show bisect_ppx
 
 ODIG_SWITCHES = --odoc-theme=odig.gruvbox.light
 ODIG_SWITCHES += --no-tag-index
 ODIG_SWITCHES += --no-pkg-deps
+.PHONY: odig
 odig:
 	odig odoc $(ODIG_SWITCHES) zanuda reviewer
 	@echo 'To look at the doc run: xdg-open $$(odig cache path)/html/index.html'
