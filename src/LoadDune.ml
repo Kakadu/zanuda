@@ -118,7 +118,7 @@ let%expect_test _ =
   [%expect {| Some Wrapped "Libname" |}]
 ;;
 
-let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti path =
+let load_description path =
   Unix.chdir path;
   let s =
     let ch = Unix.open_process_in "dune describe" in
@@ -126,7 +126,11 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
     Caml.close_in ch;
     s
   in
-  let db = [%of_sexp: t list] s in
+  [%of_sexp: t list] s
+;;
+
+let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti path =
+  let db = load_description path in
   (* List.iter db ~f:(fun x -> Format.printf "%a\n%!" Sexplib.Sexp.pp_hum (sexp_of_t x)); *)
   Lint_filesystem.check db;
   let on_module (is_wrapped : w) m =

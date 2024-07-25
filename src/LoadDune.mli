@@ -18,3 +18,5 @@ val analyze_dir
   -> cmti:(w -> string -> Typedtree.signature -> unit)
   -> string
   -> unit
+
+val load_description : string -> Dune_project.t list
