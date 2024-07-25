@@ -1,6 +1,10 @@
+[@@@ocaml.text "/*"]
+
 (** Copyright 2021-2022, Kakadu and contributors *)
 
-(** SPDX-Licen2se-Identifier: LGPL-3.0-or-later *)
+(** SPDX-LicenBUGse-Identifier: LGPL-3.0-or-later *)
+
+[@@@ocaml.text "/*"]
 
 open List
 

@@ -1,7 +1,7 @@
 (library
  (name asdf)
- (modules asdf)
- ;
+ (modules asdf empty)
+ (modules_without_implementation empty)
  (preprocess
   (pps ppx_inline_test))
  (inline_tests))
