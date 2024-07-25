@@ -6,15 +6,14 @@
 
 [@@@ocaml.text "/*"]
 
-(** A type of lint's impelementation.
+(** A type of lint's implementation.
     Typed and untyped lints inspect OCaml's Parsetree/Typedtree respectively.
-    In Clippy it corresponds to {{: https://doc.rust-lang.org/nightly/clippy/development/lint_passes.html } early and late} lint passes.
-    *)
+    In Clippy it corresponds to {{:https://doc.rust-lang.org/nightly/clippy/development/lint_passes.html} early and late} lint passes. *)
 type impl =
   | Untyped
   | Typed
 
-(** Group of lints. The same as {{: https://doc.rust-lang.org/nightly/clippy }Rust's Clippy} *)
+(** Group of lints. The same as {{:https://doc.rust-lang.org/nightly/clippy} Rust's Clippy} *)
 type group =
   | Style (** Code that should be written in a more idiomatic way *)
   | Correctness (** Code that is outright wrong or useless *)
@@ -92,10 +91,9 @@ module type REPORTER = sig
 
   (** Report lint info as RDJSONL format.
 
-    Originally, it was used with ReviewDog tool to publish Github review.
-    But nowadays we are abandoning it.
+      Originally, it was used with ReviewDog tool to publish Github review.
+      But nowadays we are abandoning it.
 
-    @deprecated
-  *)
+      @deprecated *)
   val rdjsonl : Format.formatter -> unit -> unit
 end
