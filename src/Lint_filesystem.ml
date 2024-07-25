@@ -50,3 +50,33 @@ let check db =
         | Library l -> on_library l)
       db
 ;;
+
+let docs =
+  {|
+### What it does
+Checks that dune project tree is well formed
+
+### Why is is important?
+
+All modules should have .mli interfaces.
+The .mli files allow to
+
+* hide some structure items
+* write documentation for modules.
+* hide dependencies between modules (i.e. speedup compilation)
+
+Without .mli files all your functions will be 'public' in the sence of C++ style OOP.
+Usually people autogenerate .mli files and all defined values in that time become public.
+Zanuda is able to detect this via `zanuda -unused-decls .`.
+But in some cases, .mli files may be too heavy, for example, when we write many type
+declarations (sort of AST) with deriving attributes.
+In that case .mli file is almost identical to .ml.
+To workaround this, this check allows file with a suffix 'ast.ml' not to have an .mli interface file.
+
+TODO: Add custom configuration for this.
+
+|}
+  |> Stdlib.String.trim
+;;
+
+let describe_as_json () = Utils.describe_as_clippy_json "lint_filesystem" ~docs

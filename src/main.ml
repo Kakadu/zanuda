@@ -266,6 +266,7 @@ let () =
               L.describe_as_json ())
           ; List.map typed_linters ~f:(fun (module L : LINT.TYPED) ->
               L.describe_as_json ())
+          ; [ Lint_filesystem.describe_as_json () ]
           ]
       in
       let ch = Caml.open_out filename in
