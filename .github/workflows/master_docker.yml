@@ -89,13 +89,20 @@ jobs:
 
       - name: Build API documentation
         if: github.event_name != 'pull_request'
-        run: opam exec -- dune build @doc
+        run: |
+          opam exec -- make install odig
+          echo "ODIG_DOC_LOC=$(odig cache path)/html" >> $GITHUB_ENV
+        #opam exec -- gh-pages-amend $(odig cache path)/html doc
+
+      - name: Test
+        if: github.event_name != 'pull_request'
+        run: echo ${{ env.ODIG_DOC_LOC }}
 
       - name: Deploy API documentation
         if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_build/default/_doc/_html
+          publish_dir: ${{ env.ODIG_DOC_LOC }}
           keep_files: true
           destination_dir: api
