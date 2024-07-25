@@ -11,7 +11,7 @@ open Base
 open Zanuda_core
 open Utils
 
-let per_file_linters = [ (module UntypedLints.License : LINT.TYPED) ]
+let per_file_linters = [ (module TypedLints.License : LINT.TYPED) ]
 
 let untyped_linters =
   let open UntypedLints in

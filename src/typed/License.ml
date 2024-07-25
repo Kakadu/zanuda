@@ -187,7 +187,7 @@ let run info fallback =
             | Some s when not (verify_line2 s) ->
               panic ~loc:(get_loc l2) ~filename Bad_copyright_info
             | _ -> () (* success *))
-         | Some s ->
+         | Some _ ->
            (* We skip unsuited lines. We hope that these lines were added by PPX rewriters,
               and actual license information is below *)
            loop (l2 :: tl))
