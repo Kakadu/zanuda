@@ -27,7 +27,7 @@ jobs:
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: master
+      cancel-in-progress: true
 
     steps:
       # https://github.com/styfle/cancel-workflow-action
