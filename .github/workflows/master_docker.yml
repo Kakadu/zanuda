@@ -10,7 +10,8 @@ on:
 
 env:
   OPAMROOT: /home/opam/.opam
-  OPAMYES: true
+  #OPAMYES: true
+  OPAMCONFIRMLEVEL: unsafe-yes
 jobs:
   build:
     strategy:
@@ -24,11 +25,16 @@ jobs:
       image: ocaml/opam:ubuntu-lts-ocaml-4.14
       options: --user root               # dirty hack
 
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: master
+
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ github.token }}
+      # https://github.com/styfle/cancel-workflow-action
+      # - name: Cancel Previous Runs
+      #   uses: styfle/cancel-workflow-action@0.11.0
+      #   with:
+      #     access_token: ${{ github.token }}
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -42,8 +48,8 @@ jobs:
       - name: Installing dependencies
         run: |
           opam pin add ./ -n
-          opam depext zanuda reviewer -y
           opam install . --deps-only --with-test --with-doc
+        #opam depext zanuda reviewer -y
 
       - name: Building...
         run: opam exec -- dune build --profile=release
