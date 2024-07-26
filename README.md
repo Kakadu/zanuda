@@ -8,15 +8,18 @@
 
 ## A linter for OCaml+dune projects
 
-Inspired by:
+A *linter* is a tool that discovers bugs and obscurities in the code. The name was invented in 1978 paper of S. C. Johnson: [Lint, a C Program Checker](http://squoze.net/UNIX/v7/files/doc/15_lint.pdf).
+
+At the moment most of implemented lints are inspired by my teaching experience.
+But I'm aware that there are other linters like [Camelot](https://github.com/upenn-cis1xx/camelot) for OCaml and [Clippy](https://github.com/rust-lang/rust-clippy) Rust.
+[This is a list of currently supported analyses.](https://kakadu.github.io/zanuda/lints/index.html)
+
+From techinical point of view, most of the lints study Typedtree, so the input for linter should be a **fully compiled dune project**. There is a support of linters that study untyped tree, but I don't expect them to be widely used. These two abstract trees don't allow to find all possible code quirks. Currently, we delegate job of detecting something like `f(1)(2)(3)` to [ocamlformat](https://github.com/ocaml-ppx/ocamlformat).
+
+This linter is inspired by:
 * [How possible is a clippy-like linter for OCaml?](https://discuss.ocaml.org/t/how-possible-is-a-clippy-like-linter-for-ocaml)
 * My experience in teaching OCaml at my local university.
 
-At the moment most of implemented lints are inspired by me teaching experience.
-But I'm aware that there are other linters like [Camelot](https://github.com/upenn-cis1xx/camelot) for OCaml and [Clippy](https://github.com/rust-lang/rust-clippy) Rust.
-[These is a list of currently supported ones.](https://kakadu.github.io/zanuda/lints/index.html)
-
-From techinical point of view, most of the lints study Typedtree, so the input for linter should be a **fully compiled dune project**. There is a support of linters that study untyped tree, but I don't expect them to be widely used. These two abstract trees don't allow to find all possible code quirks. Currently, we delegate job of detecting something like `f(1)(2)(3)` to [ocamlformat](https://github.com/ocaml-ppx/ocamlformat).
 
 ##### Usage
 
