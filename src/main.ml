@@ -173,11 +173,9 @@ let find_unused_in_cmti_typedtree (is_wrapped : LoadDune.w) filename typedtree =
 let find_unused_in_cmt_typedtree is_wrapped filename typedtree =
   let _ : string = filename in
   (* Format.printf "find_unused_in_cmt_typedtree %s\n" filename; *)
-  let it = UnusedDecls.MLLogger.run is_wrapped filename Tast_iterator.default_iterator in
+  let it = Unused_ML_logger.run is_wrapped filename Tast_iterator.default_iterator in
   it.Tast_iterator.structure it typedtree
 ;;
-
-module Migr = Ppxlib_ast.Selected_ast.Of_ocaml
 
 let process_untyped filename =
   if not (Caml.Sys.file_exists filename)

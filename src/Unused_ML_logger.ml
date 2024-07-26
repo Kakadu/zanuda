@@ -1,3 +1,7 @@
+(** Collect used values from structure files.
+
+    An initial implementation was contributed by GitHub user [jegorpopow] *)
+
 [@@@ocaml.text "/*"]
 
 (** Copyright 2021-2024, Kakadu. *)
@@ -7,27 +11,7 @@
 [@@@ocaml.text "/*"]
 
 open Base
-open Zanuda_core
-open Zanuda_core.Utils
-
-type input = Tast_iterator.iterator
-
-(* TODO: collect garbage, because it is not a standard analyzer yet *)
-let lint_id = "propose_function"
-let lint_source = LINT.FPCourse
-let group = LINT.Style
-let level = LINT.Warn
-
-let documentation = {|
-### What it does
-
-### Why?
-
-|} |> Stdlib.String.trim
-
-let describe_as_json () =
-  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
-;;
+open Utils
 
 let run _info filename fallback =
   let _ : string = filename in

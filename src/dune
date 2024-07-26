@@ -18,9 +18,10 @@
   LINT
   Lint_filesystem
   LoadDune
+  Unused_ML_logger
   Utils)
  (modules_without_implementation LINT)
- (libraries compiler-libs.common sexplib yojson dune-build-info)
+ (libraries compiler-libs.common sexplib yojson dune-build-info Tast_pattern)
  (preprocess
   (pps
    ppx_optcomp
@@ -41,7 +42,6 @@
   compiler-libs.common
   Tast_pattern
   zanuda_core
-  UnusedDecls
   TypedLints
   UntypedLints)
  (preprocess
