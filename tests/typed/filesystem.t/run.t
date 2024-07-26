@@ -1,3 +1,3 @@
   $ dune build
-  $ zanuda -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-top_file_license -dir .  -ordjsonl /dev/null
   File '_build/default/No_iface.ml' doesn't have corresponding .mli interface

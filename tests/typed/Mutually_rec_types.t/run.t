@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "Mutually_rec_types.ml", lines 3-9, characters 2-19:
   3 | ..type t1 =
   4 |   | A of

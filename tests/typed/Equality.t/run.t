@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -no-match_bool -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-match_bool -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "Equality.ml", line 1, characters 11-36:
   1 | let __ x = if x = None then 1 else 1
                  ^^^^^^^^^^^^^^^^^^^^^^^^^

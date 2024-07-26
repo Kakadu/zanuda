@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "list_len.ml", line 1, characters 12-30:
   1 | let __ xs = List.length xs < 0
                   ^^^^^^^^^^^^^^^^^^

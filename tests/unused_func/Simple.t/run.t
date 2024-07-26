@@ -1,6 +1,6 @@
   $ dune build @check
 $ dune describe
-  $ zanuda -unused-decls .
+  $ ../zanuda.exe -unused-decls .
   module "Custom_lib" is omitted
   Unused declarations:
    0: Simple.Meow.meow

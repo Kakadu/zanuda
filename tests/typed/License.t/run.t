@@ -1,6 +1,6 @@
   $ dune build @default ./REPL.exe
 
-  $ zanuda -no-check-filesystem -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -dir .  -ordjsonl /dev/null
   module "Asdf__" is omitted
   File "REPL.ml", line 1, characters 0-9:
   1 | open List

@@ -4,7 +4,7 @@
                            ^
   Error (warning 27 [unused-var-strict]): unused variable x.
   [1]
-  $ zanuda  -no-check-filesystem -no-top_file_license -dir . -ordjsonl /dev/null
+  $ ../zanuda.exe  -no-check-filesystem -no-top_file_license -dir . -ordjsonl /dev/null
   File "Eta.ml", line 3, characters 12-23:
   3 | let wrapper x = my_id x
                   ^^^^^^^^^^^

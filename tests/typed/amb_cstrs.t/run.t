@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "amb_cstrs.ml", lines 2-4, characters 2-14:
   2 | ..type 'a result = 
   3 |     | Error of string 

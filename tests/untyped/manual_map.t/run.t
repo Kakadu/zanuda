@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-top_file_license -no-propose_function_untyped -no-propose_function -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe  -no-check-filesystem -no-top_file_license -no-propose_function_untyped -no-propose_function -dir .  -ordjsonl /dev/null
   File "manual_map.ml", lines 2-4, characters 0-31:
   2 | let rec map1 f = function 
   3 |   | [] -> []

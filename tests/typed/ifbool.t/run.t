@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "IfBool.ml", line 2, characters 2-23:
   2 |   if true then 1 else 2
         ^^^^^^^^^^^^^^^^^^^^^
@@ -25,3 +25,4 @@
                 ^^^^^^^^^^^^
   Alert zanuda-linter: Conjunction with boolean smells bad
   
+

@@ -1,2 +1,8 @@
 (cram
- (deps %{bin:zanuda}))
+ (deps ./zanuda.exe))
+
+(rule
+ (deps %{project_root}/src/main.exe)
+ (target zanuda.exe)
+ (action
+  (copy %{deps} %{target})))

@@ -1,5 +1,5 @@
   $ dune build
-  $ zanuda  -no-check-filesystem -no-propose_function_untyped -no-top_file_license -no-propose_function -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-propose_function_untyped -no-top_file_license -no-propose_function -dir .  -ordjsonl /dev/null
   File "MatchBool.ml", lines 1-3, characters 20-14:
   1 | ....................match a with 
   2 |   | true -> 1
