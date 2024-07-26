@@ -157,7 +157,7 @@ let run _ fallback =
                   Some (Ast_helper.Str.type_ Recursive mtly_decls)))
             |> Array.to_list
           in
-          CollectedLints.add ~loc (report msg ~loc correct_strcts));
+          Collected_lints.add ~loc (report msg ~loc correct_strcts));
         fallback.type_declarations self typ_decls)
   }
 ;;

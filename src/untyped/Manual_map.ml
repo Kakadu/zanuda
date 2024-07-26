@@ -118,7 +118,7 @@ let run _ fallback =
       (fun fun_name tail f args () ->
         if is_applied_to_tail fun_name tail f args
         then
-          CollectedLints.add
+          Collected_lints.add
             ~loc
             (report ~filename:loc.Location.loc_start.Lexing.pos_fname ~loc fun_name))
       ()

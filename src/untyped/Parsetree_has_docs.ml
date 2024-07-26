@@ -66,7 +66,7 @@ let run { Compile_common.source_file; _ } fallback =
           let loc = cd.pcd_loc in
           let filename = loc.Location.loc_start.Lexing.pos_fname in
           if not (List.exists cd.pcd_attributes ~f:is_doc_attribute)
-          then CollectedLints.add ~loc (report ~filename cd.pcd_name.txt ~loc);
+          then Collected_lints.add ~loc (report ~filename cd.pcd_name.txt ~loc);
           fallback.constructor_declaration self cd)
     }
   else fallback

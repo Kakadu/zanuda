@@ -71,7 +71,7 @@ let run _ fallback =
             (* Reported location is a location of whole match and not of pattern
                TODO: understand how to fix it *)
             (* Format.printf "%a\n%!" Location.print_loc loc; *)
-            CollectedLints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc))
+            Collected_lints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc))
           ();
         fallback.expr self expr)
   }

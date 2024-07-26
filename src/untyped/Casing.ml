@@ -66,7 +66,7 @@ let run _ fallback =
         if not (is_good_name tname)
         then (
           let filename = loc.Location.loc_start.Lexing.pos_fname in
-          CollectedLints.add ~loc (report ~loc ~filename tname));
+          Collected_lints.add ~loc (report ~loc ~filename tname));
         fallback.type_declaration self tdecl)
   }
 ;;

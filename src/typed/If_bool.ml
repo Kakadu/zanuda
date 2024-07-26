@@ -10,7 +10,8 @@ open Base
 module Format = Caml.Format
 open Zanuda_core
 open Zanuda_core.Utils
-open Refactoring.IfBool
+
+(* open Refactoring.If_bool *)
 open Parsetree
 
 type input = Tast_iterator.iterator
@@ -67,6 +68,7 @@ let do_check = ref true
 
 let run _ fallback =
   let pat =
+    let open Refactoring.If_bool in
     let open Tast_pattern in
     let ite =
       texp_ite ebool drop drop
@@ -97,7 +99,7 @@ let run _ fallback =
         (if !do_check
          then
            let open Typedtree in
-           let __ _ = Format.eprintf "%a\n%!" MyPrinttyped.expr expr in
+           let __ _ = Format.eprintf "%a\n%!" My_printtyped.expr expr in
            let loc = expr.exp_loc in
            Tast_pattern.parse
              pat
@@ -105,10 +107,10 @@ let run _ fallback =
              ~on_error:(fun _desc () -> ())
              expr
              (fun (s, unwise_type) () ->
-               CollectedLints.add
+               Collected_lints.add
                  ~loc
                  (report loc.Location.loc_start.Lexing.pos_fname ~loc s);
-               Refactoring.IfBool.apply_fix expr unwise_type)
+               Refactoring.If_bool.apply_fix expr unwise_type)
              ());
         fallback.expr self expr)
   ; structure_item =

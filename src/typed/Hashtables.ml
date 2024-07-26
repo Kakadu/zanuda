@@ -91,7 +91,7 @@ let run _ fallback =
       ~on_error:(fun _desc () -> ())
       x
       (fun () ->
-        CollectedLints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc ()))
+        Collected_lints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc ()))
       ()
   in
   let open Tast_iterator in
@@ -109,7 +109,7 @@ let run _ fallback =
         | Type_record (labels, _) ->
           List.iter labels ~f:(function
             | { ld_mutable = Mutable; ld_loc = loc; _ } ->
-              CollectedLints.add
+              Collected_lints.add
                 ~loc
                 (report loc.Location.loc_start.Lexing.pos_fname ~loc ())
             | _ -> ())
@@ -125,7 +125,7 @@ let run _ fallback =
           ~on_error:(fun _desc () -> ())
           expr
           (fun () ->
-            CollectedLints.add
+            Collected_lints.add
               ~loc
               (report loc.Location.loc_start.Lexing.pos_fname ~loc ()))
           ();

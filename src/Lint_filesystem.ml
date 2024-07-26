@@ -17,7 +17,7 @@ let on_module { impl; intf } =
     let filename = Config.recover_filepath ml in
     if not (String.ends_with ~suffix:".ml-gen" filename)
     then
-      CollectedLints.add
+      Collected_lints.add
         ~loc:Location.none
         (module struct
           let msg ppf file =

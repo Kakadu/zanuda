@@ -2,15 +2,17 @@
  (name TypedLints)
  (libraries zanuda_core Tast_pattern Refactoring)
  (modules
-  AmbiguousConstructors
-  ExcTryWithWildcard
+  Ambiguous_constructors
+  Exc_try_with_wildcard
   Equality
   Equality_phys
   Eta
   Failwith
   Format
+  Guard_instead_of_if
   Hashtables
   If_bool
+  Ignore
   License
   List_fusion
   List_length
@@ -22,7 +24,6 @@
   Record_punning
   String_concat
   String_concat_fold
-  Ignore
   Tuple_matching
   ;
   )

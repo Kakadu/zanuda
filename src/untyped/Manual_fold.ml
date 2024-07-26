@@ -21,7 +21,7 @@ let level = LINT.Warn
 let documentation =
   {|
 ### What it does
-Proposes to use `List.fold_left` or `List.fold_right` instead of manual 
+Proposes to use `List.fold_left` or `List.fold_right` instead of manual
 implementations, such as:
 
 ```ocaml
@@ -150,7 +150,7 @@ let run _ fallback =
           (fun tail f args () ->
             match is_fold fun_name tail f args with
             | Some kind ->
-              CollectedLints.add
+              Collected_lints.add
                 ~loc
                 (report
                    ~filename:loc.Location.loc_start.Lexing.pos_fname

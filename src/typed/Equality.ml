@@ -105,7 +105,7 @@ let run _ fallback =
           ~on_error:(fun _desc () -> ())
           expr
           (fun k ->
-            CollectedLints.add
+            Collected_lints.add
               ~loc
               (report loc.Location.loc_start.Lexing.pos_fname ~loc k))
           ();

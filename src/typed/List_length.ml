@@ -135,7 +135,7 @@ let run _ fallback =
                MyPrinttyped.expr
                e2
                in *)
-            CollectedLints.add
+            Collected_lints.add
               ~loc
               (report loc.Location.loc_start.Lexing.pos_fname ~loc e1 e2))
           ~on_error:(fun _desc () -> fallback.expr self expr)

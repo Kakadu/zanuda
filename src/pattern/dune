@@ -6,7 +6,7 @@
 (library
  (name Tast_pattern)
  (public_name zanuda.tast_pattern)
- (modules Tast_pattern MyPrinttyped MyUntype)
+ (modules Tast_pattern My_printtyped My_untype)
  (wrapped false)
  (libraries ppxlib)
  (preprocess

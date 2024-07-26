@@ -17,4 +17,4 @@ val collect_unused : unit -> unit
 (* TODO: Where is the code to analyze structure? *)
 
 (** Analyze signature. See also {!MLLogger.run} *)
-val collect_from_mli_tree : LoadDune.w -> string -> Typedtree.signature -> unit
+val collect_from_mli_tree : Load_dune.w -> string -> Typedtree.signature -> unit

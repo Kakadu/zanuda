@@ -3,14 +3,13 @@
  (libraries Tast_pattern zanuda_core angstrom)
  (modules
   Casing
-  GuardInsteadOfIf
   Dollar
   Manual_fold
   Manual_map
-  ParsetreeHasDocs
+  Parsetree_has_docs
   Propose_function
-  ToplevelEval
-  VarShouldNotBeUsed
+  Toplevel_eval
+  Var_should_not_be_used
   ;
   )
  (preprocess

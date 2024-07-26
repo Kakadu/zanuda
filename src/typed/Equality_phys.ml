@@ -24,7 +24,7 @@ let documentation =
 Warns about using of physical equality (of pointers) vs. structural equality (of values)
 
 ### Why is is important?
-The newcomers from C++ and C# may automatically write == to test for equality, 
+The newcomers from C++ and C# may automatically write == to test for equality,
 and get unexpected results for complex values.
 
 If you do low level performance hacking, this lint could give false positives.
@@ -76,7 +76,7 @@ let run _ fallback =
           ~on_error:(fun _msg () -> ())
           expr
           (fun _ ->
-            CollectedLints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc))
+            Collected_lints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc))
           ();
         fallback.expr self expr)
   }

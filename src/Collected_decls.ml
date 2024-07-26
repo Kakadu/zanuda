@@ -60,7 +60,7 @@ let not_skippable_ident id =
   && not (Base.String.equal name "let+")
 ;;
 
-let collect_from_mli_tree (is_wrapped : LoadDune.w) filename tree =
+let collect_from_mli_tree (is_wrapped : Load_dune.w) filename tree =
   let module_name =
     filename
     |> String.split_on_char '/'
@@ -75,7 +75,7 @@ let collect_from_mli_tree (is_wrapped : LoadDune.w) filename tree =
       "%s, modname = %s,    wrapped = %a"
       __FUNCTION__
       module_name
-      LoadDune.pp_w
+      Load_dune.pp_w
       is_wrapped
   in
   let rec collect_from_module seed = function

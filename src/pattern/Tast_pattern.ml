@@ -436,12 +436,12 @@ let tpat_any =
 let texp_ident (T fpath) =
   T
     (fun ctx loc x k ->
-      let __ _ = log "texp_ident %a\n%!" MyPrinttyped.expr x in
+      let __ _ = log "texp_ident %a\n%!" My_printtyped.expr x in
       match x.exp_desc with
       | Texp_ident (path, _, _) ->
         ctx.matched <- ctx.matched + 1;
         let ans = fpath ctx loc path k in
-        log "texp_ident + %a\n%!" MyPrinttyped.expr x;
+        log "texp_ident + %a\n%!" My_printtyped.expr x;
         ans
       | _ -> fail loc "texp_ident")
 ;;

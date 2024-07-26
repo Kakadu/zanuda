@@ -22,7 +22,7 @@ let lint_source = LINT.FPCourse
 let documentation =
   {|
 ### What it does
-Straightforward wrapper functions are excessive and may be reduced 
+Straightforward wrapper functions are excessive and may be reduced
 
 #### Explanation
 
@@ -128,7 +128,7 @@ let run _ fallback =
                && (not (Base.List.contains_dup ~compare:String.compare ids))
                && List.for_all idents ~f:(fun ident -> no_ident ident func)
             then
-              CollectedLints.add
+              Collected_lints.add
                 ~loc
                 (report loc.Location.loc_start.Lexing.pos_fname ~loc func))
           ();

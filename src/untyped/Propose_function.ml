@@ -119,7 +119,7 @@ let run _ fallback : input =
               (* Stdlib.Printf.printf "argname = %S, id = %S\n%!" argname id; *)
               if String.equal argname id && List.for_all cases ~f:(no_ident id)
               then
-                CollectedLints.add
+                Collected_lints.add
                   ~loc
                   (report loc.Location.loc_start.Lexing.pos_fname ~loc)
             | _ -> ())

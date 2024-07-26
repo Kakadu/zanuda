@@ -18,10 +18,10 @@ let untyped_linters =
   [ (module Casing : LINT.UNTYPED)
   ; (module Manual_fold : LINT.UNTYPED)
   ; (module Manual_map : LINT.UNTYPED)
-  ; (module ParsetreeHasDocs : LINT.UNTYPED)
+  ; (module Parsetree_has_docs : LINT.UNTYPED)
   ; (module UntypedLints.Propose_function : LINT.UNTYPED)
-  ; (module ToplevelEval : LINT.UNTYPED)
-  ; (module VarShouldNotBeUsed : LINT.UNTYPED)
+  ; (module Toplevel_eval : LINT.UNTYPED)
+  ; (module Var_should_not_be_used : LINT.UNTYPED)
   ; (module UntypedLints.Dollar : LINT.UNTYPED)
   ]
 ;;
@@ -29,8 +29,8 @@ let untyped_linters =
 let typed_linters =
   let open TypedLints in
   [ (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
-    (module AmbiguousConstructors : LINT.TYPED)
-  ; (module ExcTryWithWildcard : LINT.TYPED)
+    (module Ambiguous_constructors : LINT.TYPED)
+  ; (module Exc_try_with_wildcard : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
   ; (module Eta : LINT.TYPED)
   ; (module Equality_phys : LINT.TYPED)
@@ -47,7 +47,7 @@ let typed_linters =
   ; (module Record_punning : LINT.TYPED)
   ; (module String_concat : LINT.TYPED)
   ; (module String_concat_fold : LINT.TYPED)
-  ; (module UntypedLints.GuardInsteadOfIf : LINT.TYPED)
+  ; (module Guard_instead_of_if : LINT.TYPED)
   ; (module Tuple_matching : LINT.TYPED)
   ; (module Mutually_rec_types : LINT.TYPED)
   ; (module Nested_if : LINT.TYPED)
@@ -63,7 +63,7 @@ let () =
   assert (Hash_set.length all = 0);
   List.iter untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
     Hash_set.add all L.lint_id;
-    if not (String.equal L.lint_id UntypedLints.ToplevelEval.lint_id)
+    if not (String.equal L.lint_id UntypedLints.Toplevel_eval.lint_id)
     then Hash_set.add enabled L.lint_id);
   List.iter typed_linters ~f:(fun (module L : LINT.TYPED) ->
     Hash_set.add all L.lint_id;
@@ -164,10 +164,10 @@ let process_cmti_typedtree _is_wrapped filename typedtree =
     typed_on_signature info typedtree)
 ;;
 
-let find_unused_in_cmti_typedtree (is_wrapped : LoadDune.w) filename typedtree =
+let find_unused_in_cmti_typedtree is_wrapped filename typedtree =
   (* Format.printf "find_unused_in_cmti_typedtree %s\n%!" filename; *)
   (* Format.printf "tree:\n%a" Printtyped.interface typedtree; *)
-  CollectedDecls.collect_from_mli_tree is_wrapped filename typedtree
+  Collected_decls.collect_from_mli_tree is_wrapped filename typedtree
 ;;
 
 let find_unused_in_cmt_typedtree is_wrapped filename typedtree =
@@ -261,27 +261,27 @@ let () =
       Caml.exit 0
     | File file ->
       process_untyped file;
-      CollectedLints.report ();
+      Collected_lints.report ();
       if Config.gen_replacements () then Replacement.Refill.apply_all ()
     | Dir path ->
-      LoadDune.analyze_dir
+      Load_dune.analyze_dir
         ~untyped:process_untyped
         ~cmt:process_cmt_typedtree
         ~cmti:process_cmti_typedtree
         path;
-      CollectedLints.report ();
+      Collected_lints.report ();
       if Config.gen_replacements () then Replacement.Refill.apply_all ()
     | UnusedDecls path ->
-      LoadDune.analyze_dir
+      Load_dune.analyze_dir
         ~untyped:process_untyped
         ~cmt:find_unused_in_cmt_typedtree
         ~cmti:find_unused_in_cmti_typedtree
         path;
       if Config.verbose ()
       then (
-        CollectedDecls.print_all_decls ();
-        CollectedDecls.print_used_decls ());
-      CollectedDecls.collect_unused ()
+        Collected_decls.print_all_decls ();
+        Collected_decls.print_used_decls ());
+      Collected_decls.collect_unused ()
     | Fix path -> Replacement.Log.promote path
   in
   ()

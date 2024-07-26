@@ -21,7 +21,7 @@ let level = LINT.Warn
 let documentation =
   {|
 ### What it does
-OCaml formatted string are more powerful than C counterpart. 
+OCaml formatted string are more powerful than C counterpart.
 You should be aware of available features.
 
 ### Why is is important?
@@ -78,7 +78,7 @@ let run _ fallback =
           (fun fmt_string () ->
             if String.is_substring fmt_string ~substring:"\"%s\""
             then
-              CollectedLints.add
+              Collected_lints.add
                 ~loc
                 (report loc.Location.loc_start.Lexing.pos_fname ~loc))
           ();

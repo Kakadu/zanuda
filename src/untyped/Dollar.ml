@@ -83,7 +83,7 @@ let run _ fallback =
               , [ _; (Nolabel, { pexp_desc = Pexp_record _ }) ] ) ->
             let loc = e.pexp_loc in
             let filename = loc.Location.loc_start.Lexing.pos_fname in
-            CollectedLints.add ~loc (report ~loc ~filename ())
+            Collected_lints.add ~loc (report ~loc ~filename ())
           | _ -> ()
         in
         fallback.expr self e)

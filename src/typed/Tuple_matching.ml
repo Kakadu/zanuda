@@ -78,7 +78,7 @@ let run _ fallback =
           (fun case () ->
             if with_Tpat_tuple case
             then
-              CollectedLints.add
+              Collected_lints.add
                 ~loc
                 (report loc.Location.loc_start.Lexing.pos_fname ~loc)
             else ())

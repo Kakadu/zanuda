@@ -22,7 +22,7 @@ let documentation =
 ### What it does
 
 Checks if there are constructor names that hide default constructor names
-from `Stdlib`, such as `Some`, `None`, `Error`, `Ok`. 
+from `Stdlib`, such as `Some`, `None`, `Error`, `Ok`.
 
 ### Why it is important
 
@@ -106,7 +106,7 @@ let run _ fallback =
         if (not is_stdlib_alias) && not (List.is_empty names)
         then (
           let filename = loc.Location.loc_start.Lexing.pos_fname in
-          CollectedLints.add ~loc (report ~loc ~filename names));
+          Collected_lints.add ~loc (report ~loc ~filename names));
         fallback.type_declaration self tdecl)
   }
 ;;

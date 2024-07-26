@@ -121,7 +121,7 @@ type panic_mode =
   | Bad_license_info
 
 let panic ~loc ~filename mode =
-  CollectedLints.add
+  Collected_lints.add
     ~loc
     (match mode with
      | No_license_at_all ->

@@ -102,13 +102,13 @@ let run { Compile_common.source_file; _ } fallback =
             (try check_occurances_exn txt ebody with
              | Found ->
                let loc = pat.ppat_loc in
-               CollectedLints.add ~loc (report ~loc ~filename:source_file txt))
+               Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
           | Pexp_let (_, [ ({ pvb_pat = { ppat_desc = Ppat_var { txt } } } as vb) ], ebody)
             when is_name_suspicious txt ->
             (try check_occurances_exn txt ebody with
              | Found ->
                let loc = vb.pvb_pat.ppat_loc in
-               CollectedLints.add ~loc (report ~loc ~filename:source_file txt))
+               Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
           | _ -> ()
         in
         fallback.expr self expr)
@@ -123,7 +123,7 @@ let run { Compile_common.source_file; _ } fallback =
                it.expr it vb.pvb_expr;
                List.iter ~f:(it.structure_item it) wher
              with
-             | Found -> CollectedLints.add ~loc (report ~loc ~filename:source_file txt))
+             | Found -> Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
           | _ ->
             (* TODO: support Ppat_as ... *)
             ()

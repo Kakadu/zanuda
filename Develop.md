@@ -13,12 +13,12 @@ It parses the output of `dune describe` to get information about the files in th
 Main executable:
   * `src/main.ml`
   * `src/Config.ml` -- handling command line parameters
-  * `src/LoadDune.ml[i]` -- parsing dune project configuration
+  * `src/Load_dune.ml[i]` -- parsing dune project configuration
   * `src/utils.ml` -- various functions to output found lints as JSON
   * `LINT.mli` -- module type which every lint should implement
-  * `src/CollectedLints.ml` -- storing lints found in the file
+  * `src/Collected_lints.ml` -- storing lints found in the file
 
-A library implementing first class pattern matching on OCaml 4.14.1's typedtree
+A library implementing first class pattern matching on OCaml 4.14.x's typedtree
   * `src/pattern/`
 
 Typed lints that has been implemented. They analyze OCaml's TypedTree

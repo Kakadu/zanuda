@@ -96,7 +96,7 @@ let run _ fallback =
         ~on_error:(fun _ -> ())
         (fun { Location.loc } ->
           let filename = loc.Location.loc_start.Lexing.pos_fname in
-          CollectedLints.add ~loc (report ~loc ~filename ()))
+          Collected_lints.add ~loc (report ~loc ~filename ()))
     with
     | Location.Error e -> Format.printf "%a\n%!" Location.print_report e
   in

@@ -23,7 +23,7 @@ let documentation =
 Proposes to rewrite 'match x with ... | true -> (1)  ... | false -> (2) ` to `if x then (1) else (2)`.
 
 ### Why?
-Using `if` is more readable way to examine boolean value. 
+Using `if` is more readable way to examine boolean value.
 |}
   |> Stdlib.String.trim
 ;;
@@ -99,14 +99,14 @@ let run _ fallback =
                           (expr2string rhs2); *)
             match Longident.flatten id1, Longident.flatten id2 with
             | [ "true" ], [ "false" ] ->
-              CollectedLints.add
+              Collected_lints.add
                 ~loc
                 (report
                    loc.Location.loc_start.Lexing.pos_fname
                    ~loc
                    { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) })
             | [ "false" ], [ "true" ] ->
-              CollectedLints.add
+              Collected_lints.add
                 ~loc
                 (report
                    loc.Location.loc_start.Lexing.pos_fname

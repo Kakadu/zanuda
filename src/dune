@@ -12,12 +12,12 @@
  (synopsis "Core library for the linter")
  (modules
   Dune_project
-  CollectedLints
-  CollectedDecls
+  Collected_lints
+  Collected_decls
   Config
   LINT
   Lint_filesystem
-  LoadDune
+  Load_dune
   Unused_ML_logger
   Utils)
  (modules_without_implementation LINT)

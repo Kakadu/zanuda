@@ -44,7 +44,7 @@ let run _info filename fallback =
               (* if String.is_substring filename ~substring:"demo"
                  then printfn "Adding used %S" str; *)
               (* printfn " ... %a\n" (LoadDune.pp_w )  _info; *)
-              CollectedDecls.add_used_decl str
+              Collected_decls.add_used_decl str
             | _, _ -> ()
             (*Format.printf "%s\n" (Ident.unique_toplevel_name (Path.head path))*))
           ();
