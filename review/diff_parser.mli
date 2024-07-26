@@ -1,12 +1,16 @@
-(** Copyright 2021-2023, Kakadu. *)
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
+[@@@ocaml.text "/*"]
 
 (** Parser of the diff file. The grammar is similar too
 
     diff ::= ( head chunk* )*
 
-    See also [file_head] and [a_chunk]. *)
+    See also {!file_head} and {!a_chunk}. *)
 val parse_whole_file : Types.file_info list Angstrom.t
 
 (** Main entry point. Uses [parse_whole_file] under the hood *)

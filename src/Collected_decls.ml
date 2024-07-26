@@ -1,21 +1,5 @@
-[@@@ocaml.text "/*"]
-
-(** Copyright 2021-2024, Kakadu. *)
-
-(** SPDX-License-Identifier: LGPL-3.0-or-later *)
-
-[@@@ocaml.text "/*"]
-
 open Utils
 module StringSet = Set.Make (String)
-
-(** Sonmething like Hastbl is needed **)
-
-(* let rec print_path = function
-  | Path.Pident ident -> "<ident>(" ^ Ident.unique_toplevel_name ident ^ ")"
-  | Path.Pdot (lhs, rhs) -> "<arrow>(" ^ print_path lhs ^ " -> " ^ rhs ^ ")"
-  | Path.Papply (lhs, rhs) -> "<apply>(" ^ print_path lhs ^ " @ " ^ print_path rhs ^ ")"
-;; *)
 
 let all_decls = Hashtbl.create 100
 let used_decls = Hashtbl.create 100

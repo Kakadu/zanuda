@@ -1,6 +1,15 @@
 (** Global storage for defined names. Is used to detect public but not used library fields.
 
-    Mutable. Not thread safe. *)
+    Mutable. Not thread safe.
+    See also {!Unused_ML_logger} *)
+
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, Kakadu. *)
+
+(** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
+[@@@ocaml.text "/*"]
 
 (** Report definition of a value. Usually is called from signature analyzer. *)
 val add_just_decl : string -> unit

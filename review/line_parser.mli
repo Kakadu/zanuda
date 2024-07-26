@@ -1,6 +1,10 @@
-(** Copyright 2021-2024, Kakadu and contributors *)
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
+[@@@ocaml.text "/*"]
 
 (** [run ?info p] trims line break in the input string and runs parser [p]. *)
 val run : ?info:string -> 'a Angstrom.t -> 'a Angstrom.t
