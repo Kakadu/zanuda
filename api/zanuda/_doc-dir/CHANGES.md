@@ -9,9 +9,9 @@
 - Add command line switch '-skip-level-allow <bool>' to enable/disable lints
   with level=Allow. False has higher priority than per-lint command line switch
   (for example, `-no-string_concat`)
+- Add check for configuration file '.zanuda' in CWD.
 - #22: Add 'reviewer' tool to report lint's a Github review.
   (contributed by @s-khechnev)
-- Expose library to parse DIFF format. It is available as 'zanuda.diff_parser' ocamlfind package.
 - #23: Implement a trial version of the Fix module for auto-correction of lints
   (contributed by @Artem-Rzhankoff)
 - #28: Add lint about nested if expressions.
@@ -30,13 +30,14 @@
     * We [need to](https://github.com/ocaml/dune/issues/9724) do 'dune build @check' to generate all required `cmt` files.
 - #56: Simplify lint about license. We look for required doc-comments anywhere in the file,
   not only in the beginning.
+- #60: Skip mutability check for some source files (configured via '.zanuda').
 
 ### Changed
 
 - #15: Split 'string_concat' lint to check separately patterns 'a^b^c' (level=Allow) and 'List.fold_left (^)' (level=Warn).
   (reported by @edwintorok)
 - #16: Calculate test coverage.
-- The lint 'mutable_hashtables' now check for mutability in general: references, mutable record fields, etc.
+- The lint 'mutability_check' now checks for mutability in general: references, mutable record fields, etc.
 
 
 ## 1.0.0 (24-03-2023)

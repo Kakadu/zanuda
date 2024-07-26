@@ -1,10 +1,10 @@
 [
   {
     "id": "camel_cased_types",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "untyped",
-    "docs": "### What it does\nChecks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp`) popular in Python and Haskell.\n\n### Why is this bad?\nWrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Modules names' in standard library are in camel case but in most Janestreet libraries (ppxlib, base) they are in snake case too.",
+    "docs": "### What it does\nChecks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp`) popular in Python and Haskell.\n\n### Why is this bad?\nWrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case.\nModules names' in standard library are in camel case but in most Janestreet libraries (ppxlib, base) they are in snake case too.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -12,7 +12,7 @@
   },
   {
     "id": "manual_fold",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "untyped",
     "docs": "### What it does\nProposes to use `List.fold_left` or `List.fold_right` instead of manual\nimplementations, such as:\n\n```ocaml\n  let rec fold_left f acc l = match l with\n  | [] -> acc\n  | x :: xs -> fold_left f (f acc a) l\n```\n\n### Why?\nIt is too verbose and reduces readability.",
@@ -23,7 +23,7 @@
   },
   {
     "id": "manual_map",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "untyped",
     "docs": "### What it does\nProposes to use `List.map` instead of manual implementation, such as\n\n```ocaml\n  let rec map f = function\n  | [] -> []\n  | x :: xs -> f x :: map f xs\n```\n\n### Why?\nIt is too verbose and most likely less performant.",
@@ -34,10 +34,10 @@
   },
   {
     "id": "no_docs_parsetree",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "untyped",
-    "docs": "### What it does\nIt checks that file `Parsetree.mli` has documentation comments for all constructors. Usually files like this are used to describe abstract syntax tree (AST) of a language. In this case it's recommended to annotate every constructor with a documentation about meaning of the constructors, for example, which real syntax if supposed to be parsed to this part of AST.\n\nAs example of this kind of documentation you can consult [OCaml 4.13 parse tree](https://github.com/ocaml/ocaml/blob/4.13/parsing/parsetree.mli#L282)",
+    "docs": "### What it does\nIt checks that file `Parsetree.mli` has documentation comments for all constructors.\nUsually files like this are used to describe abstract syntax tree (AST) of a language.\nIn this case it's recommended to annotate every constructor with a documentation about meaning of the constructors, for example, which real syntax if supposed to be parsed to this part of AST.\n\nAs example of this kind of documentation you can consult [OCaml 4.14.2 parse tree](https://github.com/ocaml/ocaml/blob/4.14.2/parsing/parsetree.mli#L286)",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -56,7 +56,7 @@
   },
   {
     "id": "no_toplevel_eval",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "untyped",
     "docs": "### What it does\nAdding toplevel evaluation statements is not recommended because it forces to add `;;`. Rewrite using `let () = ...`",
@@ -67,7 +67,7 @@
   },
   {
     "id": "var_should_not_be_used",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "untyped",
     "docs": "### What it does\nReport identifier starting with '_' and used later\n\n### Why is this bad?\nOCaml compiler has a tendency to report warning 26 about unused variables. Usually this warning could be supressed by adding '_' in the beginning of identifier to make it look like wildcard variable. But if that identifier is used later it contradicts the purpose of adding undescore in the beginnning.",
@@ -78,7 +78,7 @@
   },
   {
     "id": "camel_extra_dollar",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "untyped",
     "docs": "### What it does\nThe `@@` operator is used for writing less parentheses in expression.\nCode like `f (g (h x))` could be rewritten as `f @@ g (h x)`.\nBut is some cases it is not required, like `print_int @@ 1`.\nSome of these cases are reported by this lint.",
@@ -122,7 +122,7 @@
   },
   {
     "id": "eta_reduction",
-    "group": "suspicious",
+    "group": "style",
     "level": "warn",
     "impl": "typed",
     "docs": "### What it does\nStraightforward wrapper functions are excessive and may be reduced\n\n#### Explanation\n\nLet's look at the expression 'let f x = g x'. It may be simply replaced with an expression, `let f = g` which has the same semantics. In general, wrappers like this may be confusing, so it is recommended to get rid of them",
@@ -187,11 +187,11 @@
     }
   },
   {
-    "id": "mutable_hashtables",
-    "group": "correctness",
+    "id": "mutability_check",
+    "group": "style",
     "level": "deny",
     "impl": "typed",
-    "docs": "### What it does\nUsing mutable data structures for teaching purposes is usually discouraged. Replace \\\nHashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT).\n\n##### How to fix?\nUse mutable `ref`erences and mutable structure fields only if it is really required. Usually, mutability is added for performance reasons. For example,\n\n  * [Effective generalization](https://okmij.org/ftp/ML/generalization.html) in OCaml type checher\n  * Functions, that count number of invocations and/or generate unique names.\n  * Implementing memoization or laziness",
+    "docs": "### What it does\nUsing mutable data structures for teaching purposes is usually discouraged. Replace \\\nHashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT).\n\n##### How to fix?\nUse mutable `ref`erences and mutable record fields only if it is really required.\nUsually, mutability is added for performance reasons. For example,\n\n  * [Effective generalization](https://okmij.org/ftp/ML/generalization.html) in OCaml type checher\n  * Functions, that count number of invocations and/or generate unique names.\n  * Implementing memoization or laziness",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -210,10 +210,10 @@
   },
   {
     "id": "list_length_comparisons",
-    "group": "correctness",
+    "group": "perf",
     "level": "deny",
     "impl": "typed",
-    "docs": "### What it does\nThe function `Stdlib.List.length` evaluated length of standard OCaml linked lists (`'a list`). There return values supposed to be non-negative, so all code like `List.length .. <= 0` smells bad. If they need to check that list is empty it is more recommended to use pattern matching instead of calculating length, because for large list we will do full iteration, and it will not be too efficient.",
+    "docs": "### What it does\nThe function `Stdlib.List.length` evaluated length of standard OCaml linked lists (`'a list`).\nThe return values supposed to be non-negative, so all code like `List.length .. <= 0` smells bad.\nIf we need to check that list is (not) empty, it is recommended to use pattern matching instead of calculating length (for example, `Base.List.is_empty`).\nIf we do do full iteration, and it will be too inefficient.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -232,7 +232,7 @@
   },
   {
     "id": "monad_laws_simplify",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "typed",
     "docs": "### What it does?\nWarns if monadic code could be simplified.\n\n### Monad laws\n  1) **return x >>= f === f x** for any  f and x\n  2) **m >>= return === m** for any monadic value m\n  3) **(m >>= g) >>= k  ===  m >>= fun x -> ((g x) >>= k)** for any monadic values m,g,k",
@@ -254,7 +254,7 @@
   },
   {
     "id": "record_punning",
-    "group": "suspicious",
+    "group": "style",
     "level": "warn",
     "impl": "typed",
     "docs": "### What it does\nSimplyfies record construction using OCaml-specific field punning.\n\n[Chapter](https://dev.realworldocaml.org/records.html) in 'Real World OCaml'.\n\n##### Examples\n\n```ocaml\n{ x = r.x; y = r.y; z = 15}\n```\nvs\n```ocaml\n{ r with z = 15 }\n```",
@@ -287,7 +287,7 @@
   },
   {
     "id": "use_guard_instead_of_if",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "untyped",
     "docs": "### What it does\nPattern matching guards are not very common in mainstream languages so it easy to forget about them for OCaml wannabies.\nThis lint looks for if-then-else expressions in right hand sides of pattern matching, and recommends to use pattern guards.\n\n### Why is this bad?\nSometimes guards allow you to write less error-prone code. For example, you are matching three values and want to\n. if 1st fits predicate then do something and return, check other components otherwise.\n. if 2nd fits predicate then do something and return, check other components otherwise.\n. if 3rd ..., do something else otherwise.\n\nThe implementation with if-then-else could be like this.\n```ocaml\nmatch ... with\n| (a,b,c) ->\n    if pred1 a then ...\n    else if pred2 b then ...\n    else if pred3 c then ...\n    else ... something_else ...\n| ...\n```\nIn this case all three bindings are in scope in the right hand side of matching, you can by mistake use them for something. And you can't use wildcards because all three bindings are required in right hand side.\n\nLet's rewrite it with guards:\n```ocaml\nmatch ... with\n| (a,_,_) when pred1 a -> ...\n| (_,b,_) when pred2 b -> ...\n| (_,_,c) when pred3 c -> ...\n| ...\n```\n\nIn this variant you have less potential for copy-paste mistake",
@@ -320,7 +320,7 @@
   },
   {
     "id": "forbid_many_nested_if_expressions",
-    "group": "correctness",
+    "group": "style",
     "level": "deny",
     "impl": "typed",
     "docs": "### What it does\n\nCheck too many (>= 3 levels) nested if expressions, for example\n* `if ... then (if ... then (if ... then (if ... then ... else ...) else ...) else ...) else ...`\n\n### Why it is important\n\nThe big problem with nested conditions is that they confuse the control flow of the code:\nthey make it almost impossible to determine what code will be executed and when.\n\nAdopted from camelot's lint list.",
@@ -334,7 +334,7 @@
     "group": "correctness",
     "level": "deny",
     "impl": "typed",
-    "docs": "### What it does\nChecks that dune project tree is well formed\n\n### Why is is important?\n\nAll modules should have .mli interfaces.\nThe .mli files allow to\n\n* hide some structure items\n* write documentation for modules.\n* hide dependencies between modules (i.e. speedup compilation)\n\nWithout .mli files all your functions will be 'public' in the sence of C++ style OOP.\nUsually people autogenerate .mli files and all defined values in that time become public.\nZanuda is able to detect this via `zanuda -unused-decls .`.\nBut in some cases, .mli files may be too heavy, for example, when we write many type\ndeclarations (sort of AST) with deriving attributes.\nIn that case .mli file is almost identical to .ml.\nTo workaround this, this check allows file with a suffix 'ast.ml' not to have an .mli interface file.\n\nTODO: Add custom configuration for this.",
+    "docs": "### What it does\nChecks that dune project tree is well formed\n\n### Why is is important?\n\nAll modules should have .mli interfaces.\nThe .mli files allow to\n\n* hide some structure items\n* write documentation for modules.\n* hide dependencies between modules (i.e. speedup compilation)\n\nWithout .mli files all your functions will be 'public' in the sence of C++ style OOP.\nUsually people autogenerate .mli files and all defined values in that time become public.\nZanuda is able to detect this via `zanuda -unused-decls .`.\nBut in some cases, .mli files may be too heavy, for example, when we write many type\ndeclarations (sort of AST) with deriving attributes.\nIn that case .mli file is almost identical to .ml.\nTo workaround this, this check allows file with a suffix `ast.ml` not to have an .mli interface file.\n\nTODO: Add custom configuration for this.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
