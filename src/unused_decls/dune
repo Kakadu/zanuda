@@ -1,13 +1,14 @@
 (library
  (name UnusedDecls)
- (libraries zanuda_core Tast_pattern Refactoring)
+ (public_name zanuda.unused_decls)
+ (libraries zanuda_core Tast_pattern)
  (modules
   MLILogger
   MLLogger
   ;
   )
  (preprocess
-  (pps ppx_inline_test ppxlib.metaquot))
+  (pps ppx_inline_test))
  (instrumentation
   (backend bisect_ppx))
  (inline_tests))

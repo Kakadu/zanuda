@@ -1,3 +1,6 @@
+(** These extra functions are an extension of {!Untypeast} module from compiler libs.
+    Maybe in new versions of compiler they will be available out of box. *)
+
 [@@@ocaml.text "/*"]
 
 (** Copyright 2021-2024, Kakadu. *)
@@ -7,6 +10,8 @@
 [@@@ocaml.text "/*"]
 
 include Untypeast
+
+(** {2 New functions} *)
 
 [%%if ocaml_version < (4, 11, 0)]
 

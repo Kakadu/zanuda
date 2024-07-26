@@ -1,3 +1,6 @@
+(** These extra functions are an extension of {!Printtyped} module from compiler libs.
+    Maybe in new versions of compiler they will be available out of box. *)
+
 [@@@ocaml.text "/*"]
 
 (** Copyright 2021-2024, Kakadu. *)
@@ -13,6 +16,8 @@ include Printtyped
 let untype_expression = default_mapper.expr default_mapper
 
 [%%endif]
+
+(** {2 New functions} *)
 
 let expr ppf e =
   let open Typedtree in

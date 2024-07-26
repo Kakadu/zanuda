@@ -6,28 +6,24 @@
 
 [@@@ocaml.text "/*"]
 
+(* TODO: remove this file *)
+
 open Zanuda_core
 open Zanuda_core.Utils
 
 type input = Tast_iterator.iterator
+(*
+   let lint_source = LINT.FPCourse
+   let group = LINT.Style
+   let level = LINT.Warn *)
 
-let lint_id = "meow"
-let lint_source = LINT.FPCourse
-let group = LINT.Style
-let level = LINT.Warn
-
-let documentation =
+(* let documentation =
   {|
 Technical Lint for collecting all declarations from MLI's
 |} |> Stdlib.String.trim
-;;
-
-let describe_as_json () =
-  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
-;;
+;; *)
 
 let run _ fallback =
-  (* TODO: remove this file *)
   let _ = assert false in
   let extract_module_name loc =
     loc.Location.loc_start.Lexing.pos_fname

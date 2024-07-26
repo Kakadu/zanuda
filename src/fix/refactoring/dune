@@ -1,5 +1,6 @@
 (library
  (name Refactoring)
+ (package zanuda)
  (libraries zanuda_core Tast_pattern Replacement)
  (instrumentation
   (backend bisect_ppx)))

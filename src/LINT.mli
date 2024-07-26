@@ -1,3 +1,5 @@
+(** Module types for program tree analyzers *)
+
 [@@@ocaml.text "/*"]
 
 (** Copyright 2021-2024, Kakadu. *)

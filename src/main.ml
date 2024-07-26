@@ -55,11 +55,6 @@ let typed_linters =
   ]
 ;;
 
-let unused_decls_signature_linters =
-  let open UnusedDecls in
-  [ (module MLILogger : LINT.UNUSED_DECLS) ]
-;;
-
 (* prepare for disabling some lints *)
 let () =
   let enabled = Config.enabled_lints () in
@@ -141,14 +136,6 @@ let typed_on_signature info =
     ~compose:(fun (module L : LINT.TYPED) -> L.run info)
     ~init:Tast_iterator.default_iterator
     typed_linters
-;;
-
-let unused_decls_on_signature info =
-  build_iterator
-    ~f:(fun o -> o.Tast_iterator.signature o)
-    ~compose:(fun (module L : LINT.UNUSED_DECLS) -> L.run info)
-    ~init:Tast_iterator.default_iterator
-    unused_decls_signature_linters
 ;;
 
 let with_info filename f =

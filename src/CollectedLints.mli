@@ -1,3 +1,7 @@
+(** Global storage for found defects.
+
+    Mutable. Not thread safe. *)
+
 [@@@ocaml.text "/*"]
 
 (** Copyright 2021-2024, Kakadu. *)
@@ -7,7 +11,10 @@
 [@@@ocaml.text "/*"]
 
 val clear : unit -> unit
-val is_empty : unit -> bool
 val add : loc:Warnings.loc -> (module LINT.REPORTER) -> unit
+
+(** Report found lints
+
+    - In RdJSONl format. Change {!Config.out_rdjsonl} to modify output file name
+    - As plain text to stdout *)
 val report : unit -> unit
-val loc_lints : (Warnings.loc * (module LINT.REPORTER) -> 'a) -> 'a Base.Queue.t

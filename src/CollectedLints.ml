@@ -6,15 +6,19 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
-open Caml.Format
+module Format = Stdlib.Format
 open Utils
 
-let found_Lints : (Location.t * (module LINT.REPORTER)) Queue.t = Queue.create ()
-let clear () = Queue.clear found_Lints
-let is_empty () = Queue.is_empty found_Lints
-let add ~loc m = Queue.enqueue found_Lints (loc, m)
-let loc_lints f = Queue.map found_Lints ~f
+include struct
+  open Base
+
+  let found_Lints : (Location.t * (module LINT.REPORTER)) Queue.t = Queue.create ()
+  let clear () = Queue.clear found_Lints
+  let is_empty () = Queue.is_empty found_Lints
+  let add ~loc m = Queue.enqueue found_Lints (loc, m)
+  let loc_lints f = Queue.map found_Lints ~f
+  let iter_lints f = Queue.iter found_Lints ~f
+end
 
 let report () =
   (* let mdfile =
@@ -44,7 +48,7 @@ let report () =
   let rdjsonl_files =
     match Config.out_rdjsonl () with
     | Some s ->
-      let (_ : int) = Caml.Sys.command (asprintf "touch %s" s) in
+      let (_ : int) = Sys.command (Format.asprintf "touch %s" s) in
       (* By some reason on CI Open_creat is not enough to create a file *)
       let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
       [ ( (fun (module M : LINT.REPORTER) ppf -> M.rdjsonl ppf)
@@ -62,13 +66,13 @@ let report () =
   in
   Base.Exn.protect
     ~f:(fun () ->
-      Queue.iter found_Lints ~f:(fun (_loc, ((module M : LINT.REPORTER) as m)) ->
-        M.txt Caml.Format.std_formatter ();
-        List.iter all_files ~f:(fun (f, ppf, _) -> f m ppf ())))
+      iter_lints (fun (_loc, ((module M : LINT.REPORTER) as m)) ->
+        M.txt Format.std_formatter ();
+        ListLabels.iter all_files ~f:(fun (f, ppf, _) -> f m ppf ())))
     ~finally:(fun () ->
       let f (_, ppf, ch) =
-        Caml.Format.fprintf ppf "%!";
+        Format.fprintf ppf "%!";
         Caml.close_out ch
       in
-      List.iter ~f all_files)
+      List.iter f all_files)
 ;;

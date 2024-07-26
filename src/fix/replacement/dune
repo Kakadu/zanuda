@@ -1,5 +1,6 @@
 (library
  (name Replacement)
+ (package zanuda)
  (libraries zanuda_core angstrom)
  (instrumentation
   (backend bisect_ppx)))

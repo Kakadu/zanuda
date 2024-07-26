@@ -3,20 +3,22 @@
   (flags
    (:standard -w -3-9-32-33-39 -warn-error -26-27))))
 
+(documentation
+ (package zanuda))
+
 (library
  (name zanuda_core)
  (public_name zanuda.core)
  (synopsis "Core library for the linter")
  (modules
-  Utils
-  ;
-  LINT
-  Config
+  Dune_project
   CollectedLints
   CollectedDecls
+  Config
+  LINT
   Lint_filesystem
-  Dune_project
-  LoadDune)
+  LoadDune
+  Utils)
  (modules_without_implementation LINT)
  (libraries compiler-libs.common sexplib yojson dune-build-info)
  (preprocess

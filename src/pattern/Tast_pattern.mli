@@ -1,3 +1,7 @@
+(** Matching combinators for {!Typedtree}.
+
+    Inspired by {!Ppxlib.Ast_pattern} module. *)
+
 [@@@ocaml.text "/*"]
 
 (** Copyright 2021-2024, Kakadu. *)
@@ -5,6 +9,8 @@
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
+
+(** {2 Generic combinators} *)
 
 type ('a, 'b, 'c) t
 
@@ -75,6 +81,8 @@ val eint : (int, 'a, 'b) t -> (expression, 'a, 'b) t
 val ebool : (expression, bool -> 'a, 'a) t
 val estring : (expression, string -> 'a, 'a) t
 val econst : (Asttypes.constant, 'a, 'b) t -> (expression, 'a, 'b) t
+
+(** {2 Typedtree-specific combinators} *)
 
 [%%if ocaml_version < (4, 11, 0)]
 
