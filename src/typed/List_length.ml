@@ -20,12 +20,17 @@ let level = LINT.Warn
 let documentation =
   {|
 ### What it does
-The function `Stdlib.List.length` evaluated length of standard OCaml linked lists (`'a list`). There return values supposed to be non-negative, so all code like `List.length .. <= 0` smells bad. If they need to check that list is empty it is more recommended to use pattern matching instead of calculating length, because for large list we will do full iteration, and it will not be too efficient.
+The function `Stdlib.List.length` evaluated length of standard OCaml linked lists (`'a list`).
+The return values supposed to be non-negative, so all code like `List.length .. <= 0` smells bad.
+If we need to check that list is (not) empty, it is recommended to use pattern matching instead of calculating length (for example, `Base.List.is_empty`).
+If we do do full iteration, and it will be too inefficient.
   |}
   |> Stdlib.String.trim
 ;;
 
-let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
+let describe_as_json () =
+  describe_as_clippy_json ~group:LINT.Perf lint_id ~docs:documentation
+;;
 
 let msg ppf () =
   Caml.Format.fprintf ppf "Bad measurement of a list (with non-negative size)\n%!"

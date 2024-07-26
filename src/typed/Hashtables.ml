@@ -36,7 +36,9 @@ Use mutable `ref`erences and mutable structure fields only if it is really requi
   |> Stdlib.String.trim
 ;;
 
-let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
+let describe_as_json () =
+  describe_as_clippy_json ~group:LINT.Style lint_id ~docs:documentation
+;;
 
 let msg ppf () =
   Format.fprintf

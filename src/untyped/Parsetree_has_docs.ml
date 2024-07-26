@@ -18,15 +18,17 @@ let level = LINT.Warn
 let documentation =
   {|
 ### What it does
-It checks that file `Parsetree.mli` has documentation comments for all constructors. Usually files like this are used to describe abstract syntax tree (AST) of a language. In this case it's recommended to annotate every constructor with a documentation about meaning of the constructors, for example, which real syntax if supposed to be parsed to this part of AST.
+It checks that file `Parsetree.mli` has documentation comments for all constructors.
+Usually files like this are used to describe abstract syntax tree (AST) of a language.
+In this case it's recommended to annotate every constructor with a documentation about meaning of the constructors, for example, which real syntax if supposed to be parsed to this part of AST.
 
-As example of this kind of documentation you can consult [OCaml 4.13 parse tree](https://github.com/ocaml/ocaml/blob/4.13/parsing/parsetree.mli#L282)
+As example of this kind of documentation you can consult [OCaml 4.14.2 parse tree](https://github.com/ocaml/ocaml/blob/4.14.2/parsing/parsetree.mli#L286)
   |}
   |> Stdlib.String.trim
 ;;
 
 let describe_as_json () =
-  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
+  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~group:LINT.Style ~docs:documentation
 ;;
 
 open Parsetree

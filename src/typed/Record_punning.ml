@@ -15,7 +15,6 @@ open Tast_pattern
 type input = Tast_iterator.iterator
 
 let lint_id = "record_punning"
-let group = LINT.Suspicious
 let level = LINT.Warn
 let lint_source = LINT.FPCourse
 
@@ -40,7 +39,7 @@ vs
 ;;
 
 let describe_as_json () =
-  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
+  describe_as_clippy_json lint_id ~group:LINT.Style ~level ~docs:documentation
 ;;
 
 let msg ppf expr =

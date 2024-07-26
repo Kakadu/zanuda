@@ -32,7 +32,9 @@ Warns if monadic code could be simplified.
   |> Stdlib.String.trim
 ;;
 
-let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
+let describe_as_json () =
+  describe_as_clippy_json lint_id ~group:LINT.Style ~docs:documentation
+;;
 
 let msg ppf () =
   Caml.Format.fprintf

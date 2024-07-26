@@ -15,7 +15,6 @@ open Tast_pattern
 type input = Tast_iterator.iterator
 
 let lint_id = "eta_reduction"
-let group = LINT.Suspicious
 let level = LINT.Warn
 let lint_source = LINT.FPCourse
 
@@ -32,7 +31,7 @@ Let's look at the expression 'let f x = g x'. It may be simply replaced with an 
 ;;
 
 let describe_as_json () =
-  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
+  describe_as_clippy_json lint_id ~group:LINT.Style ~level ~docs:documentation
 ;;
 
 let expr2string e0 =

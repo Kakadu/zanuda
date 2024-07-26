@@ -12,7 +12,6 @@ open Zanuda_core.Utils
 type input = Tast_iterator.iterator
 
 let lint_id = "forbid_many_nested_if_expressions"
-let group = LINT.Nursery
 let level = LINT.Warn
 let lint_source = LINT.Camelot
 
@@ -33,7 +32,9 @@ Adopted from camelot's lint list.
   |> Stdlib.String.trim
 ;;
 
-let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
+let describe_as_json () =
+  describe_as_clippy_json ~group:LINT.Style lint_id ~docs:documentation
+;;
 
 let msg ppf () =
   Caml.Format.fprintf

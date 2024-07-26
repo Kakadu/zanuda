@@ -38,7 +38,7 @@ It is too verbose and reduces readability.
 ;;
 
 let describe_as_json () =
-  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
+  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~group:LINT.Style ~docs:documentation
 ;;
 
 open Parsetree

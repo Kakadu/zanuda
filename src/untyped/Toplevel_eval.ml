@@ -24,7 +24,7 @@ Adding toplevel evaluation statements is not recommended because it forces to ad
 ;;
 
 let describe_as_json () =
-  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
+  describe_as_clippy_json lint_id ~group:LINT.Style ~impl:LINT.Untyped ~docs:documentation
 ;;
 
 open Parsetree

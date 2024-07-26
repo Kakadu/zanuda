@@ -29,7 +29,7 @@ Wrong casing is not exactly bad but OCaml tradition says that types' and module 
 ;;
 
 let describe_as_json () =
-  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
+  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~group:LINT.Style ~docs:documentation
 ;;
 
 type input = Ast_iterator.iterator

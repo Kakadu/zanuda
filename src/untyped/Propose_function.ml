@@ -14,7 +14,6 @@ type input = Ast_iterator.iterator
 
 let lint_id = "propose_function_untyped"
 let lint_source = LINT.FPCourse
-let group = LINT.Style
 let level = LINT.Warn
 
 let documentation =
@@ -46,7 +45,7 @@ And this piece of code is discouraged:
 ;;
 
 let describe_as_json () =
-  describe_as_clippy_json lint_id ~group ~level ~docs:documentation
+  describe_as_clippy_json lint_id ~level ~group:LINT.Style ~docs:documentation
 ;;
 
 let msg ppf () = Caml.Format.fprintf ppf "Using `function` is recommended%!"

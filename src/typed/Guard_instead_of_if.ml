@@ -54,7 +54,7 @@ In this variant you have less potential for copy-paste mistake
 ;;
 
 let describe_as_json () =
-  describe_as_clippy_json lint_id ~impl:LINT.Untyped ~docs:documentation
+  describe_as_clippy_json lint_id ~group:LINT.Style ~impl:LINT.Untyped ~docs:documentation
 ;;
 
 open Parsetree
