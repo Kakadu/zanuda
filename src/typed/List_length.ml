@@ -37,9 +37,9 @@ let msg_long ppf (l, r) =
     ppf
     "Between '%a' and '%a'.%!"
     Pprintast.expression
-    (MyUntype.expr l)
+    (My_untype.expr l)
     Pprintast.expression
-    (MyUntype.expr r)
+    (My_untype.expr r)
 ;;
 
 let report filename ~loc l r =

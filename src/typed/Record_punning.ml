@@ -115,7 +115,7 @@ module State = struct
                         (ident (mk_loc @@ Untypeast.lident_of_path ident_path))
                         (make_lident fname)) ))
           ; List.map st_over_other ~f:(function fname, expr ->
-              make_lident fname, MyUntype.untype_expression expr)
+              make_lident fname, My_untype.expr expr)
           ]
       in
       let record_id_untyped =
