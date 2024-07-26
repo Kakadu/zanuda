@@ -3,3 +3,8 @@ _build
 .ocamlinit
 /_coverage
 
+
+# install files are auto generated
+reviewer.install
+zanuda.install
+
