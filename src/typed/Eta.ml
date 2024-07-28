@@ -41,22 +41,20 @@ let expr2string e0 =
   Format.asprintf "let (_: %a) = %a" Printtyp.type_expr e0.exp_type Pprintast.expression e
 ;;
 
-let msg ppf e0 =
+let msg ppf (old_expr, new_expr) =
   let open Parsetree in
-  let e = My_untype.untype_expression e0 in
-  let si =
-    let open Ast_helper in
-    Format.asprintf "%a" Pprintast.expression e
-  in
   Caml.Format.fprintf
     ppf
-    "Eta reduction proposed. It's recommended to rewrite it as '%s'%!"
-    si
+    "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
+    Pprintast.expression
+    (My_untype.expr old_expr)
+    Pprintast.expression
+    (My_untype.expr new_expr)
 ;;
 
-let report filename ~loc e =
+let report filename ~loc ~old_expr new_expr =
   let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg e
+    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg (old_expr, new_expr)
 
     let rdjsonl ppf () =
       RDJsonl.pp
@@ -64,7 +62,7 @@ let report filename ~loc e =
         ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
         ~line:loc.loc_start.pos_lnum
         msg
-        e
+        (old_expr, new_expr)
     ;;
   end
   in
@@ -89,7 +87,7 @@ let run _ fallback =
     | Texp_function
         { arg_label = Nolabel; cases = { c_lhs; c_guard = None; c_rhs } :: [] } ->
       pattern_cons_map k |> var_pattern_func ctx lc c_lhs |> pat_func ctx lc c_rhs
-    | Texp_apply (body, args) ->
+    | Texp_apply (({ Typedtree.exp_desc = Texp_ident _; _ } as body), args) ->
       let paths = List.filter_map ~f:extract_path args in
       if List.length args = List.length paths
       then k ([], body, paths)
@@ -130,7 +128,7 @@ let run _ fallback =
             then
               Collected_lints.add
                 ~loc
-                (report loc.Location.loc_start.Lexing.pos_fname ~loc func))
+                (report loc.Location.loc_start.Lexing.pos_fname ~loc ~old_expr:expr func))
           ();
         fallback.expr self expr)
   }

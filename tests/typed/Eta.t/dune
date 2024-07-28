@@ -2,4 +2,8 @@
  (name test_Eta)
  (wrapped false)
  (libraries base)
- (modules Eta))
+ (modules Eta deriv)
+ ; (flags
+ ;  (:standard -dsource))
+ (preprocess
+  (pps ppx_deriving.show)))
