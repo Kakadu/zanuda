@@ -6,7 +6,9 @@ The tool accepts a directory where [dune](https://dune.rtfd.io)-based project is
 
     zanuda -dir <DIR>
 
-It parses the output of `dune describe` to get information about the files in the project. After that it applies lints on these files, one by one. Everything is tested with OCaml 4.14.1, and kind of specialized for this version of compiler, because we implemented Typedtree-specific first class patterns.
+It parses the output of `dune describe` to get information about the files in the project.
+After that it applies lints on these files, one by one.
+Everything is tested with OCaml 4.14.1, and kind of specialized for this version of compiler, because we implemented Typedtree-specific first class patterns.
 
 ##### Source tree mapping
 
@@ -24,5 +26,6 @@ A library implementing first class pattern matching on OCaml 4.14.x's typedtree
 Typed lints that has been implemented. They analyze OCaml's TypedTree
   * `src/typed/`
 
-Untyped lints analyze OCaml's ParseTree. They are needed in rare cases, for example, compiler desugars `@@` before construction of typedtree.
+Untyped lints analyze OCaml's ParseTree.
+They are needed in rare cases, for example, compiler desugars `@@` before construction of typedtree.
   * `src/untyped/`
