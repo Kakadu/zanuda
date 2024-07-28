@@ -36,11 +36,11 @@ let create_file name =
 ;;
 
 let rec rm path =
-  match Sys.is_directory path with
-  | true ->
+  if Sys.is_directory path
+  then (
     Sys.readdir path |> Array.iter (fun f -> rm (fix_dir ^ f));
-    Sys.rmdir path
-  | false -> Sys.remove path
+    Sys.rmdir path)
+  else Sys.remove path
 ;;
 
 let prepare_env () =

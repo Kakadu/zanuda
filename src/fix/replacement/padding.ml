@@ -68,9 +68,9 @@ let payload_between_repls (loc_end_buf, loc_start_repl) flines =
     loc_start_repl.pos_lnum, loc_start_repl.pos_cnum - loc_start_repl.pos_bol
   in
   let payload =
-    match end_buf_line = repl_line with
-    | true -> String.sub flines.(repl_line - 1) end_buf_col (repl_col - end_buf_col)
-    | false ->
+    if end_buf_line = repl_line
+    then String.sub flines.(repl_line - 1) end_buf_col (repl_col - end_buf_col)
+    else (
       let lines =
         String.sub
           flines.(end_buf_line - 1)
@@ -83,8 +83,7 @@ let payload_between_repls (loc_end_buf, loc_start_repl) flines =
           (Format.sprintf "%s\n" lines)
           (Array.sub flines end_buf_line (repl_line - end_buf_line - 1))
       in
-      let lines = lines ^ String.sub flines.(repl_line - 1) 0 repl_col in
-      lines
+      lines ^ String.sub flines.(repl_line - 1) 0 repl_col)
   in
   payload
 ;;
@@ -123,9 +122,9 @@ let comments_inside_loc comms fix_loc =
 let relative_pos st_pos pos =
   let rel_lnum = pos.pos_lnum - st_pos.pos_lnum in
   let rel_bol, rel_cnum =
-    match rel_lnum = 0 with
-    | true -> pos.pos_bol - st_pos.pos_bol, pos.pos_cnum - st_pos.pos_cnum
-    | false -> pos.pos_bol, pos.pos_cnum
+    if rel_lnum = 0
+    then pos.pos_bol - st_pos.pos_bol, pos.pos_cnum - st_pos.pos_cnum
+    else pos.pos_bol, pos.pos_cnum
   in
   { pos with pos_bol = rel_bol; pos_cnum = rel_cnum; pos_lnum = rel_lnum + 1 }
 ;;

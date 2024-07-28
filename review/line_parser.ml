@@ -79,7 +79,7 @@ let pos_num : int parser =
     | '0' .. '9' -> true
     | _ -> false
   in
-  take_while1 is_digit >>| fun s -> int_of_string s
+  take_while1 is_digit >>| int_of_string
 ;;
 
 let chunk_head : chunk_info parser =

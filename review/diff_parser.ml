@@ -76,7 +76,7 @@ let file_head : _ option parser =
 
 let a_chunk : chunk parser =
   log "%d: a_chunk" __LINE__;
-  let* info = Line_parser.(run ~info:"chunk_head" @@ chunk_head <?> "chunk_head") in
+  let* info = Line_parser.(run ~info:"chunk_head" chunk_head <?> "chunk_head") in
   (* The string '\ No new line in the end of file' could be
      in an arbitrary place of the diff. So we do filter of result *)
   let* diffs =

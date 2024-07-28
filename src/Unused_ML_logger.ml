@@ -15,8 +15,7 @@ open Utils
 
 let run _info filename fallback =
   let _ : string = filename in
-  let rec get_ident_string path =
-    match path with
+  let rec get_ident_string = function
     | Path.Pident id -> Some (Ident.name id)
     | Path.Pdot (lhs, rhs) ->
       get_ident_string lhs |> Option.map ~f:(fun str -> str ^ "." ^ rhs)

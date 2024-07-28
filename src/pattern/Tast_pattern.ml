@@ -304,8 +304,7 @@ let path xs =
   T (helper (List.rev xs))
 ;;
 
-let path_of_list xs =
-  match xs with
+let path_of_list = function
   | [] -> failwith "Bad argument: path_of_list"
   | s :: tl ->
     List.fold_left

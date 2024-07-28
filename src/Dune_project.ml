@@ -1,3 +1,11 @@
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, Kakadu. *)
+
+(** SPDX-License-Identifier: LGPL-3.0-or-later *)
+
+[@@@ocaml.text "/*"]
+
 let string_of_sexp = Base.string_of_sexp
 let sexp_of_string = Base.sexp_of_string
 let option_of_sexp = Base.option_of_sexp

@@ -121,8 +121,9 @@ let run _ fallback =
                             (List.length ids)
                             (List.length args); *)
             let idents = List.filter_map ~f:extract_ident args in
-            if List.length args > 0
-               && List.length args = List.length idents
+            let args_len = List.length args in
+            if args_len > 0
+               && args_len = List.length idents
                && List.equal String.equal ids (List.map idents ~f:Ident.name)
                && (not (Base.List.contains_dup ~compare:String.compare ids))
                && List.for_all idents ~f:(fun ident -> no_ident ident func)
