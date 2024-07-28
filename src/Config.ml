@@ -25,7 +25,6 @@ type t =
       (* Spec: https://github.com/reviewdog/reviewdog/tree/master/proto/rdf#rdjson *)
   ; mutable mode : mode
       (* Below options to manage file paths. Not sure are they really required *)
-  ; mutable workspace : string option
   ; mutable prefix_to_cut : string option
   ; mutable prefix_to_add : string option
   ; mutable extra_includes : string list
@@ -42,7 +41,6 @@ let opts =
   ; outgolint = None
   ; out_rdjsonl = None
   ; mode = Unspecified
-  ; workspace = None
   ; prefix_to_cut = Some "_build/default/"
   ; prefix_to_add = None
   ; extra_includes = []
@@ -72,7 +70,6 @@ let add_include s = opts.extra_includes <- s :: opts.extra_includes
 let set_out_file s = opts.outfile <- Some s
 let set_out_golint s = opts.outgolint <- Some s
 let set_out_rdjsonl s = opts.out_rdjsonl <- Some s
-let set_workspace s = opts.workspace <- Some s
 let set_prefix_to_cut s = opts.prefix_to_cut <- Some s
 let set_prefix_to_add s = opts.prefix_to_add <- Some s
 let includes () = opts.extra_includes
@@ -138,7 +135,6 @@ let parse_args () =
       , Arg.String set_prefix_to_add
       , "Set prefix to prepend to pathes in OUTPUT file" )
     ; "-I", Arg.String add_include, "Add extra include path for type checking"
-      (* ; "-ws", Arg.String set_workspace, "[FILE] Set dune workspace root" *)
     ; ( "-skip-level-allow"
       , Arg.Bool set_skip_level_allow
       , "[bool] Skip lints with level = Allow" )
