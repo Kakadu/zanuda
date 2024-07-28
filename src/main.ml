@@ -16,13 +16,13 @@ let per_file_linters = [ (module TypedLints.License : LINT.TYPED) ]
 let untyped_linters =
   let open UntypedLints in
   [ (module Casing : LINT.UNTYPED)
+  ; (module UntypedLints.Dollar : LINT.UNTYPED)
   ; (module Manual_fold : LINT.UNTYPED)
   ; (module Manual_map : LINT.UNTYPED)
   ; (module Parsetree_has_docs : LINT.UNTYPED)
-  ; (module UntypedLints.Propose_function : LINT.UNTYPED)
   ; (module Toplevel_eval : LINT.UNTYPED)
+  ; (module UntypedLints.Propose_function : LINT.UNTYPED)
   ; (module Var_should_not_be_used : LINT.UNTYPED)
-  ; (module UntypedLints.Dollar : LINT.UNTYPED)
   ]
 ;;
 
@@ -31,26 +31,26 @@ let typed_linters =
   [ (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
     (module Ambiguous_constructors : LINT.TYPED)
   ; (module Exc_try_with_wildcard : LINT.TYPED)
-  ; (module Equality : LINT.TYPED)
-  ; (module Eta : LINT.TYPED)
-  ; (module Equality_phys : LINT.TYPED)
   ; (module Failwith : LINT.TYPED)
+  ; (module Equality : LINT.TYPED)
+  ; (module Equality_phys : LINT.TYPED)
+  ; (module Eta : LINT.TYPED)
   ; (module Format : LINT.TYPED)
+  ; (module Guard_instead_of_if : LINT.TYPED)
+  ; (module Hashtables : LINT.TYPED)
   ; (module If_bool : LINT.TYPED)
   ; (module Ignore : LINT.TYPED)
-  ; (module Hashtables : LINT.TYPED)
   ; (module List_fusion : LINT.TYPED)
   ; (module List_length : LINT.TYPED)
   ; (module Match_Bool : LINT.TYPED)
   ; (module Monad_laws : LINT.TYPED)
+  ; (module Mutually_rec_types : LINT.TYPED)
+  ; (module Nested_if : LINT.TYPED)
   ; (module Propose_function : LINT.TYPED)
   ; (module Record_punning : LINT.TYPED)
   ; (module String_concat : LINT.TYPED)
   ; (module String_concat_fold : LINT.TYPED)
-  ; (module Guard_instead_of_if : LINT.TYPED)
   ; (module Tuple_matching : LINT.TYPED)
-  ; (module Mutually_rec_types : LINT.TYPED)
-  ; (module Nested_if : LINT.TYPED)
     (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
   ]
 ;;
@@ -74,6 +74,7 @@ let () =
   ()
 ;;
 
+(* TODO(Kakadu): Functions below are a little bit copy-pasty. Rework them *)
 let process_per_file_linters_str info parsetree =
   let is_enabled = Config.is_enabled () in
   List.iter per_file_linters ~f:(fun ((module L : LINT.TYPED) as lint) ->
@@ -92,7 +93,6 @@ let process_per_file_linters_sig info parsetree =
       (L.run info default_iterator).signature default_iterator parsetree)
 ;;
 
-(* TODO: Functions below are a little bit copy-pasty. Rework them *)
 let build_iterator ~init ~compose ~f xs =
   let o = List.fold_left ~f:(fun acc lint -> compose lint acc) ~init xs in
   f o
@@ -120,23 +120,18 @@ let untyped_on_signature info =
     untyped_linters
 ;;
 
-let typed_on_structure info =
+let run_typed_lints entry info =
   let is_enabled = Config.is_enabled () in
   build_iterator
-    ~f:(fun o -> o.Tast_iterator.structure o)
+    ~f:entry
     ~compose:(fun ((module L : LINT.TYPED) as lint) acc ->
       if is_enabled (lint :> (module LINT.GENERAL)) then L.run info acc else acc)
     ~init:Tast_iterator.default_iterator
     typed_linters
 ;;
 
-let typed_on_signature info =
-  build_iterator
-    ~f:(fun o -> o.Tast_iterator.signature o)
-    ~compose:(fun (module L : LINT.TYPED) -> L.run info)
-    ~init:Tast_iterator.default_iterator
-    typed_linters
-;;
+let typed_on_structure = run_typed_lints (fun o -> o.Tast_iterator.structure o)
+let typed_on_signature = run_typed_lints (fun o -> o.Tast_iterator.signature o)
 
 let with_info filename f =
   Compile_common.with_info

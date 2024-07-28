@@ -6,6 +6,9 @@
 
 [@@@ocaml.text "/*"]
 
+(* TODO(Kakadu): Think again: do we need both typed and untyped
+   version of this lint? *)
+
 open Zanuda_core
 open Zanuda_core.Utils
 

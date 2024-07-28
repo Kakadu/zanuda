@@ -23,7 +23,9 @@ let documentation =
 Report identifier starting with '_' and used later
 
 ### Why is this bad?
-OCaml compiler has a tendency to report warning 26 about unused variables. Usually this warning could be supressed by adding '_' in the beginning of identifier to make it look like wildcard variable. But if that identifier is used later it contradicts the purpose of adding undescore in the beginnning.
+OCaml compiler has a tendency to report warning 26 about unused variables.
+Usually this warning could be supressed by adding '_' in the beginning of identifier to make it look like wildcard variable.
+But if that identifier is used later it contradicts the purpose of adding undescore in the beginnning.
   |}
   |> Stdlib.String.trim
 ;;
@@ -84,7 +86,13 @@ let check_occurances_exn txt e =
 ;;
 
 let is_name_suspicious txt =
+  (* TODO(Kakadu): Invent better solution to deal with menhir generated files. *)
   String.is_prefix txt ~prefix:"_"
+  && (not (String.equal txt "_startpos"))
+  && (not (String.equal txt "_endpos"))
+  && (not (String.equal txt "_2"))
+  && (not (String.equal txt "_tok"))
+  && (not (String.equal txt "_v"))
   && (not (String.is_prefix txt ~prefix:"__ocaml_lex"))
   && not (String.is_prefix txt ~prefix:"_menhir_")
 ;;

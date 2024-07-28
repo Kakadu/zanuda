@@ -211,7 +211,7 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
              then on_module wrappedness m
              else if (* Usually this happend with 'fake' wrapped modules from dune *)
                      not (String.equal name (String.lowercase m.name))
-             then printfn "module %S is omitted" m.name)))
+             then if Config.verbose () then printfn "module %S is omitted" m.name)))
   in
   loop_database ()
 ;;
