@@ -223,13 +223,19 @@ let () =
     let s = In_channel.with_open_text config_filename In_channel.input_all in
     String.split s ~on:'\n'
     |> List.iter ~f:(fun s ->
+      let s = Stdlib.String.trim s in
       if String.is_empty s
       then ()
       else if String.is_prefix s ~prefix:"-no-"
       then (
         let lint_name = String.chop_prefix_exn s ~prefix:"-no-" in
         Config.(Hash_set.remove opts.enabled_lints lint_name))
-      else Format.eprintf ".zanuda: Don't know what to do with %S\n%!" s))
+      else (
+        match String.split ~on:' ' s with
+        | "forward" :: lint_id :: rest
+          when String.equal lint_id TypedLints.Hashtables.lint_id ->
+          TypedLints.Hashtables.process_switches rest
+        | _ -> Format.eprintf ".zanuda: Don't know what to do with %S\n%!" s)))
 ;;
 
 let () =

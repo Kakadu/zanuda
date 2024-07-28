@@ -6,8 +6,7 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
-module Format = Caml.Format
+open Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Format
@@ -15,9 +14,7 @@ open Format
 type input = Tast_iterator.iterator
 
 let lint_source = LINT.FPCourse
-let lint_id = "mutable_hashtables"
-
-(* TODO: rename that it checks mutability in general *)
+let lint_id = "mutability_check"
 let level = LINT.Warn
 
 let documentation =
@@ -27,13 +24,28 @@ Using mutable data structures for teaching purposes is usually discouraged. Repl
 Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT).
 
 ##### How to fix?
-Use mutable `ref`erences and mutable structure fields only if it is really required. Usually, mutability is added for performance reasons. For example,
+Use mutable `ref`erences and mutable record fields only if it is really required.
+Usually, mutability is added for performance reasons. For example,
 
   * [Effective generalization](https://okmij.org/ftp/ML/generalization.html) in OCaml type checher
   * Functions, that count number of invocations and/or generate unique names.
   * Implementing memoization or laziness
 |}
   |> Stdlib.String.trim
+;;
+
+type config = { mutable files_to_skip : string list }
+
+let config = { files_to_skip = [] }
+
+let process_switches = function
+  | [ "ignore"; files ] ->
+    config.files_to_skip <- Stdlib.String.split_on_char ',' files @ config.files_to_skip
+  | other ->
+    Stdlib.Printf.eprintf
+      "Lint %s: Unsuported switches: %s\n"
+      lint_id
+      (String.concat " " other)
 ;;
 
 let describe_as_json () =
@@ -52,15 +64,20 @@ let msg ppf () =
 
 let report filename ~loc kind =
   let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg kind
+    let txt ppf () =
+      if not (Base.List.mem config.files_to_skip filename ~equal:String.equal)
+      then Utils.Report.txt ~filename ~loc ppf msg kind
+    ;;
 
     let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        kind
+      if not (Base.List.mem config.files_to_skip filename ~equal:String.equal)
+      then
+        RDJsonl.pp
+          ppf
+          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
+          ~line:loc.loc_start.pos_lnum
+          msg
+          kind
     ;;
   end
   in
@@ -109,14 +126,14 @@ let run _ fallback =
         match td.Typedtree.typ_type.Types.type_kind with
         | Types.Type_abstract | Type_open -> ()
         | Type_record (labels, _) ->
-          List.iter labels ~f:(function
-            | { ld_mutable = Mutable; ld_loc = loc; _ } ->
+          ListLabels.iter labels ~f:(function
+            | { Types.ld_mutable = Mutable; ld_loc = loc; _ } ->
               Collected_lints.add
                 ~loc
                 (report loc.Location.loc_start.Lexing.pos_fname ~loc ())
             | _ -> ())
         | Type_variant _ ->
-          (* TODO(Kakadu): Algbraic constuctors could have mutable record arguments *)
+          (* TODO(Kakadu): Algebraic constuctors could have mutable record arguments (issue #59) *)
           ())
   ; expr =
       (fun self expr ->
