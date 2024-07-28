@@ -32,3 +32,11 @@
   24 | type args = { mutable count: int }
                      ^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.
+  File "Counter.ml", line 3, characters 18-22:
+  3 |   (fun () -> incr last; !last)
+                        ^^^^
+  Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.
+  File "Counter.ml", line 3, characters 25-29:
+  3 |   (fun () -> incr last; !last)
+                               ^^^^
+  Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.
