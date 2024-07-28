@@ -1,3 +1,7 @@
+(** Detection of possible eta-conversion.
+
+    Initial implementation was contrivbuted by Github user jegorpopow *)
+
 [@@@ocaml.text "/*"]
 
 (** Copyright 2021-2024, Kakadu *)
@@ -6,8 +10,6 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
-module Format = Caml.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Tast_pattern
@@ -25,7 +27,9 @@ Straightforward wrapper functions are excessive and may be reduced
 
 #### Explanation
 
-Let's look at the expression 'let f x = g x'. It may be simply replaced with an expression, `let f = g` which has the same semantics. In general, wrappers like this may be confusing, so it is recommended to get rid of them
+Let's look at the expression 'let f x = g x'.
+It may be simply replaced with an expression, `let f = g` which has the same semantics.
+In general, wrappers like this may be confusing, so it is recommended to get rid of them.
 |}
   |> Stdlib.String.trim
 ;;
@@ -38,7 +42,12 @@ let expr2string e0 =
   let open Parsetree in
   let e = My_untype.untype_expression e0 in
   let open Ast_helper in
-  Format.asprintf "let (_: %a) = %a" Printtyp.type_expr e0.exp_type Pprintast.expression e
+  Stdlib.Format.asprintf
+    "let (_: %a) = %a"
+    Printtyp.type_expr
+    e0.exp_type
+    Pprintast.expression
+    e
 ;;
 
 let msg ppf (old_expr, new_expr) =
@@ -69,7 +78,7 @@ let report filename ~loc ~old_expr new_expr =
   (module M : LINT.REPORTER)
 ;;
 
-let no_ident ident c = Utils.no_ident ident (fun it -> it.expr it c)
+let no_ident c ident = Utils.no_ident ident (fun it -> it.expr it c)
 
 let run _ fallback =
   let pattern_cons_map f id = function
@@ -88,11 +97,11 @@ let run _ fallback =
         { arg_label = Nolabel; cases = { c_lhs; c_guard = None; c_rhs } :: [] } ->
       pattern_cons_map k |> var_pattern_func ctx lc c_lhs |> pat_func ctx lc c_rhs
     | Texp_apply (({ Typedtree.exp_desc = Texp_ident _; _ } as body), args) ->
-      let paths = List.filter_map ~f:extract_path args in
+      let paths = List.filter_map extract_path args in
       if List.length args = List.length paths
       then k ([], body, paths)
-      else fail lc "eta_redex"
-    | _ -> fail lc "eta-redex"
+      else fail lc "eta-reduction FC pattern"
+    | _ -> fail lc "eta-reduction FC pattern"
   in
   let pat = of_func pat_func in
   let open Tast_iterator in
@@ -110,7 +119,7 @@ let run _ fallback =
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun (ids, func, args) () ->
+          (fun (ids, new_expr, args) () ->
             (*              Format.printf "Expr: `%s`\nInner=`%s`\nFormal args=`%s`\nReal args=`%s`\nLengths: %d %d\n"
                             (expr2string expr)
                             (expr2string func)
@@ -118,17 +127,21 @@ let run _ fallback =
                             (String.concat ~sep:", " (List.map ~f:ident2string args))
                             (List.length ids)
                             (List.length args); *)
-            let idents = List.filter_map ~f:extract_ident args in
+            let idents = List.filter_map extract_ident args in
             let args_len = List.length args in
             if args_len > 0
                && args_len = List.length idents
-               && List.equal String.equal ids (List.map idents ~f:Ident.name)
+               && List.equal String.equal ids (List.map Ident.name idents)
                && (not (Base.List.contains_dup ~compare:String.compare ids))
-               && List.for_all idents ~f:(fun ident -> no_ident ident func)
+               && List.for_all (no_ident new_expr) idents
             then
               Collected_lints.add
                 ~loc
-                (report loc.Location.loc_start.Lexing.pos_fname ~loc ~old_expr:expr func))
+                (report
+                   loc.Location.loc_start.Lexing.pos_fname
+                   ~loc
+                   ~old_expr:expr
+                   new_expr))
           ();
         fallback.expr self expr)
   }
