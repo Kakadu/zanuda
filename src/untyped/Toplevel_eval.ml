@@ -6,10 +6,12 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
 open Caml.Format
 open Zanuda_core
 open Utils
+open Parsetree
+
+type input = Ast_iterator.iterator
 
 let lint_id = "no_toplevel_eval"
 let lint_source = LINT.FPCourse
@@ -26,11 +28,6 @@ Adding toplevel evaluation statements is not recommended because it forces to ad
 let describe_as_json () =
   describe_as_clippy_json lint_id ~group:LINT.Style ~impl:LINT.Untyped ~docs:documentation
 ;;
-
-open Parsetree
-open Ast_iterator
-
-type input = Ast_iterator.iterator
 
 let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
 let msg ppf () = fprintf ppf "Toplevel eval not recommended"

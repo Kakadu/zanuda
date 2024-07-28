@@ -10,6 +10,7 @@ open Base
 open Caml.Format
 open Zanuda_core
 open Utils
+open Parsetree
 
 type input = Ast_iterator.iterator
 
@@ -39,9 +40,6 @@ It is too verbose and most likely less performant.
 let describe_as_json () =
   describe_as_clippy_json lint_id ~impl:LINT.Untyped ~group:LINT.Style ~docs:documentation
 ;;
-
-open Parsetree
-open Ast_iterator
 
 let msg ppf name = Format.fprintf ppf "Consider using `List.map` instead of `%s`%!" name
 
@@ -76,7 +74,7 @@ let is_applied_to_tail fun_name tail f args =
   | _ -> false
 ;;
 
-let run _ fallback =
+let run _ (fallback : Ast_iterator.iterator) =
   let pat =
     let open Ppxlib.Ast_pattern in
     let cases =

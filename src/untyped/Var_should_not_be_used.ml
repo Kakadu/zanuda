@@ -11,6 +11,8 @@ open Caml.Format
 open Zanuda_core
 open Utils
 
+type input = Ast_iterator.iterator
+
 let lint_id = "var_should_not_be_used"
 let lint_source = LINT.FPCourse
 let level = LINT.Warn
@@ -29,10 +31,6 @@ OCaml compiler has a tendency to report warning 26 about unused variables. Usual
 let describe_as_json () =
   describe_as_clippy_json lint_id ~group:LINT.Style ~impl:LINT.Untyped ~docs:documentation
 ;;
-
-type input = Ast_iterator.iterator
-
-open Ast_iterator
 
 let msg ppf name =
   fprintf ppf "Identifier `%s` used somewhere else but supposed to be unused." name
@@ -91,7 +89,7 @@ let is_name_suspicious txt =
   && not (String.is_prefix txt ~prefix:"_menhir_")
 ;;
 
-let run { Compile_common.source_file; _ } fallback =
+let run { Compile_common.source_file; _ } (fallback : Ast_iterator.iterator) =
   { fallback with
     expr =
       (fun self expr ->

@@ -6,10 +6,12 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
-open Caml.Format
+open Format
 open Zanuda_core
 open Utils
+open Parsetree
+
+type input = Ast_iterator.iterator
 
 let lint_id = "no_docs_parsetree"
 let lint_source = LINT.FPCourse
@@ -30,11 +32,6 @@ As example of this kind of documentation you can consult [OCaml 4.14.2 parse tre
 let describe_as_json () =
   describe_as_clippy_json lint_id ~impl:LINT.Untyped ~group:LINT.Style ~docs:documentation
 ;;
-
-open Parsetree
-open Ast_iterator
-
-type input = Ast_iterator.iterator
 
 let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
 let msg ppf name = fprintf ppf "Constructor '%s' has no documentation attribute" name
@@ -57,17 +54,17 @@ let report ~filename cname ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let run { Compile_common.source_file; _ } fallback =
+let run { Compile_common.source_file; _ } (fallback : Ast_iterator.iterator) =
   if Config.verbose () then printfn "Trying lint '%s' on file '%s'" lint_id source_file;
-  if String.is_suffix ~suffix:"arsetree.mli" source_file
-     || String.is_suffix ~suffix:"ast.mli" source_file
+  if Base.String.is_suffix ~suffix:"arsetree.mli" source_file
+     || Base.String.is_suffix ~suffix:"ast.mli" source_file
   then
     { fallback with
       constructor_declaration =
         (fun self cd ->
           let loc = cd.pcd_loc in
           let filename = loc.Location.loc_start.Lexing.pos_fname in
-          if not (List.exists cd.pcd_attributes ~f:is_doc_attribute)
+          if not (ListLabels.exists cd.pcd_attributes ~f:is_doc_attribute)
           then Collected_lints.add ~loc (report ~filename cd.pcd_name.txt ~loc);
           fallback.constructor_declaration self cd)
     }
