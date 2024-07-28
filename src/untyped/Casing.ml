@@ -6,13 +6,18 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
-open Caml.Format
+open Format
 open Zanuda_core
 open Utils
 
+type input = Ast_iterator.iterator
+
 let is_camel_case s = String.(lowercase s <> s)
-let is_good_name s = String.is_prefix s ~prefix:"_menhir_cell1_" || not (is_camel_case s)
+
+let is_good_name s =
+  String.starts_with s ~prefix:"_menhir_cell1_" || not (is_camel_case s)
+;;
+
 let lint_id = "camel_cased_types"
 let lint_source = LINT.FPCourse
 let level = LINT.Warn
@@ -23,7 +28,8 @@ let documentation =
 Checks that type names are using snake case (`very_useful_typ`) and not using camel case (`veryUsefulTyp`) popular in Python and Haskell.
 
 ### Why is this bad?
-Wrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case. Modules names' in standard library are in camel case but in most Janestreet libraries (ppxlib, base) they are in snake case too.
+Wrong casing is not exactly bad but OCaml tradition says that types' and module types' names should be snake case.
+Modules names' in standard library are in camel case but in most Janestreet libraries (ppxlib, base) they are in snake case too.
   |}
   |> Stdlib.String.trim
 ;;
@@ -31,10 +37,6 @@ Wrong casing is not exactly bad but OCaml tradition says that types' and module 
 let describe_as_json () =
   describe_as_clippy_json lint_id ~impl:LINT.Untyped ~group:LINT.Style ~docs:documentation
 ;;
-
-type input = Ast_iterator.iterator
-
-open Ast_iterator
 
 let msg ppf name = fprintf ppf "Type name `%s` should be in snake case" name
 
@@ -56,7 +58,7 @@ let report ~loc ~filename typ_name =
   (module M : LINT.REPORTER)
 ;;
 
-let run _ fallback =
+let run _ (fallback : Ast_iterator.iterator) =
   { fallback with
     type_declaration =
       (fun self tdecl ->

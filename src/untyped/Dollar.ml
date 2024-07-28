@@ -6,11 +6,11 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
-module Format = Caml.Format
 open Format
 open Zanuda_core
 open Utils
+
+type input = Ast_iterator.iterator
 
 (* let is_camel_case s = String.(lowercase s <> s) *)
 let lint_id = "camel_extra_dollar"
@@ -32,8 +32,6 @@ Some of these cases are reported by this lint.
 let describe_as_json () =
   describe_as_clippy_json lint_id ~group:LINT.Style ~impl:LINT.Untyped ~docs:documentation
 ;;
-
-type input = Ast_iterator.iterator
 
 let msg ppf () = fprintf ppf "Extranous `@@@@`."
 

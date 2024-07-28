@@ -6,7 +6,6 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
 open Zanuda_core
 open Zanuda_core.Utils
 
@@ -116,7 +115,7 @@ let run _ fallback : input =
             match ident with
             | Lident id ->
               (* Stdlib.Printf.printf "argname = %S, id = %S\n%!" argname id; *)
-              if String.equal argname id && List.for_all cases ~f:(no_ident id)
+              if String.equal argname id && ListLabels.for_all cases ~f:(no_ident id)
               then
                 Collected_lints.add
                   ~loc

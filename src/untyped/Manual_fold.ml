@@ -42,7 +42,6 @@ let describe_as_json () =
 ;;
 
 open Parsetree
-open Ast_iterator
 
 type kind =
   | Fold_left
@@ -107,7 +106,7 @@ let rec fun_body expr =
   | _ -> result
 ;;
 
-let run _ fallback =
+let run _ (fallback : Ast_iterator.iterator) =
   let open Ppxlib.Ast_pattern in
   let cases =
     let empty_case () =

@@ -1,6 +1,6 @@
 (library
  (name UntypedLints)
- (libraries Tast_pattern zanuda_core angstrom)
+ (libraries Tast_pattern zanuda_core)
  (modules
   Casing
   Dollar
@@ -12,8 +12,5 @@
   Var_should_not_be_used
   ;
   )
- (preprocess
-  (pps ppxlib.metaquot ppx_expect))
  (instrumentation
-  (backend bisect_ppx))
- (inline_tests))
+  (backend bisect_ppx)))
