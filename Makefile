@@ -41,7 +41,7 @@ odig:
 	@echo 'To look at the doc run: xdg-open $$(odig cache path)/html/index.html'
 
 TEST_COV_D = /tmp/zanudacov
-COVERAGE_OPTS = --coverage-path $(TEST_COV_D) --expect src/ --expect review/
+COVERAGE_OPTS = --coverage-path $(TEST_COV_D) --expect src/ --expect review/ --expect review_tests/
 
 .PHONY: test_coverage coverage
 test_coverage: coverage

@@ -1,17 +1,16 @@
-(** Copyright 2021-2023, Kakadu. *)
+(** A tool to public reviews on GitHub. *)
+
+(* It communicates a lot via REST API, so test coverage will be poor *)
+
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
-(* https://docs.github.com/en/rest/pulls/reviews#create-a-review-for-a-pull-request *)
+[@@@ocaml.text "/*"]
 
-let _example () =
-  match Curly.(run (Request.make ~url:"https://opam.ocaml.org" ~meth:`GET ())) with
-  | Ok x ->
-    Format.printf "status: %d\n" x.Curly.Response.code;
-    Format.printf "headers: %a\n" Curly.Header.pp x.Curly.Response.headers;
-    Format.printf "body: %s\n" x.Curly.Response.body
-  | Error e -> Format.printf "Failed: %a" Curly.Error.pp e
-;;
+(* https://docs.github.com/en/rest/pulls/reviews#create-a-review-for-a-pull-request *)
 
 type info =
   { mutable commit_id : string option
