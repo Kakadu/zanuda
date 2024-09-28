@@ -17,6 +17,7 @@ let untyped_linters =
   let open UntypedLints in
   [ (module Casing : LINT.UNTYPED)
   ; (module UntypedLints.Dollar : LINT.UNTYPED)
+  ; (module Expect_names : LINT.UNTYPED)
   ; (module Manual_fold : LINT.UNTYPED)
   ; (module Manual_map : LINT.UNTYPED)
   ; (module Parsetree_has_docs : LINT.UNTYPED)
