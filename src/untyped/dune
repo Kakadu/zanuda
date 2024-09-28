@@ -4,6 +4,7 @@
  (modules
   Casing
   Dollar
+  Expect_names
   Manual_fold
   Manual_map
   Parsetree_has_docs

@@ -1,0 +1,17 @@
+(library
+ (name test_expect_names)
+ (wrapped false)
+ (modules expect_names)
+ (modes byte)
+ ; TODO: Maybe we should compile in byte mode everywhere to speedup tests?
+ (inline_tests)
+ (preprocess
+  (pps ppx_expect))
+ (flags
+  (:standard
+   ;-dsource
+   ;
+   )))
+
+(cram
+ (deps %{bin:zanuda.exe}))
