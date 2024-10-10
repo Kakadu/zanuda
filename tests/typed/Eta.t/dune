@@ -6,4 +6,4 @@
  ; (flags
  ;  (:standard -dsource))
  (preprocess
-  (pps ppx_deriving.show)))
+  (pps ppx_deriving.show ppx_deriving.eq)))

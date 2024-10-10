@@ -18,60 +18,20 @@ let lint_id = "misc_aggregate_defs"
 let level = LINT.Warn
 let lint_source = LINT.FPCourse
 
-let documentation = {|
-### What it does
+let documentation =
+  {|
+It is not really a lint. It collects locations in the file where types are declared and saves them.
+If PPX-expanded expressions have issues and locations corresponding type declarations,
+we don't report these false-positive lints (at the moment, only about possible eta-conversion)
 
-
-#### Explanation
-
-
-|} |> Stdlib.String.trim
+|}
+  |> Stdlib.String.trim
+;;
 
 let describe_as_json () =
   describe_as_clippy_json lint_id ~group:LINT.Style ~level ~docs:documentation
 ;;
 
-let expr2string e0 =
-  let open Parsetree in
-  let e = My_untype.untype_expression e0 in
-  let open Ast_helper in
-  Stdlib.Format.asprintf
-    "let (_: %a) = %a"
-    Printtyp.type_expr
-    e0.exp_type
-    Pprintast.expression
-    e
-;;
-
-let msg ppf (old_expr, new_expr) =
-  let open Parsetree in
-  Caml.Format.fprintf
-    ppf
-    "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
-    Pprintast.expression
-    (My_untype.expr old_expr)
-    Pprintast.expression
-    (My_untype.expr new_expr)
-;;
-
-let report filename ~loc ~old_expr new_expr =
-  let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg (old_expr, new_expr)
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        (old_expr, new_expr)
-    ;;
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
-
-(* let no_ident c ident = Utils.no_ident ident (fun it -> it.expr it c) *)
 let has_deriving_attribute (attrs : Typedtree.attributes) =
   try
     let open Parsetree in
@@ -90,19 +50,17 @@ let has_deriving_attribute (attrs : Typedtree.attributes) =
 let run _ fallback =
   let open Tast_iterator in
   { fallback with
-    (* type_declarations =
-       (fun self tdecls ->
-
-       fallback.type_declarations self tdecls)
-       ; *)
     type_declaration =
       (fun self tdecl ->
         (match tdecl.typ_kind, tdecl.Typedtree.typ_manifest with
-         | (Ttype_variant _ | Ttype_open | Ttype_record _), _ -> ()
-         | Ttype_abstract, None -> ()
+         | Ttype_variant cds, _ when has_deriving_attribute tdecl.typ_attributes ->
+           (* Adding locations of constructor definitions is kind of misuse of
+              [Collected_lints.add_tdecl] but is required for ppx_deriving.eq *)
+           List.iter (fun cd -> Collected_lints.add_tdecl cd.Typedtree.cd_loc) cds
          | Ttype_abstract, Some t when has_deriving_attribute tdecl.typ_attributes ->
            Collected_lints.add_tdecl t.ctyp_loc
-         | _ -> ());
+         | (Ttype_variant _ | Ttype_open | Ttype_record _), _ | Ttype_abstract, None | _
+           -> ());
         fallback.type_declaration self tdecl)
   }
 ;;
