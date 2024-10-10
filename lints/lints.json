@@ -11,6 +11,17 @@
     }
   },
   {
+    "id": "camel_extra_dollar",
+    "group": "style",
+    "level": "deny",
+    "impl": "untyped",
+    "docs": "### What it does\nThe `@@` operator is used for writing less parentheses in expression.\nCode like `f (g (h x))` could be rewritten as `f @@ g (h x)`.\nBut is some cases it is not required, like `print_int @@ 1`.\nSome of these cases are reported by this lint.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "manual_fold",
     "group": "style",
     "level": "deny",
@@ -44,17 +55,6 @@
     }
   },
   {
-    "id": "propose_function_untyped",
-    "group": "style",
-    "level": "warn",
-    "impl": "typed",
-    "docs": "### What it does\nProposes to rewrite 'fun x -> match x with ...' to `function`.\n\n### Why?\nThe `function` keyword allows more shorter syntax for pattern matching on last argument.\nThe lint should not be raised if scrutinee variable is used later in the code.\n\nThe following code is recommended:\n\n```ocaml\n  let f = function\n    | [] -> ...\n    | (x::xs) as arg -> ... x ... xs ... arg\n```\n\nAnd this piece of code is discouraged:\n\n```ocaml\n  let f arg  = match arg with\n    | [] -> ...\n    | (x::xs) -> ... x ... xs ... arg\n```",
-    "applicability": {
-      "is_multi_part_suggestion": false,
-      "applicability": "Unresolved"
-    }
-  },
-  {
     "id": "no_toplevel_eval",
     "group": "style",
     "level": "deny",
@@ -66,22 +66,33 @@
     }
   },
   {
-    "id": "var_should_not_be_used",
+    "id": "propose_function_untyped",
     "group": "style",
-    "level": "deny",
-    "impl": "untyped",
-    "docs": "### What it does\nReport identifier starting with '_' and used later\n\n### Why is this bad?\nOCaml compiler has a tendency to report warning 26 about unused variables. Usually this warning could be supressed by adding '_' in the beginning of identifier to make it look like wildcard variable. But if that identifier is used later it contradicts the purpose of adding undescore in the beginnning.",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\nProposes to rewrite 'fun x -> match x with ...' to `function`.\n\n### Why?\nThe `function` keyword allows more shorter syntax for pattern matching on last argument.\nThe lint should not be raised if scrutinee variable is used later in the code.\n\nThe following code is recommended:\n\n```ocaml\n  let f = function\n    | [] -> ...\n    | (x::xs) as arg -> ... x ... xs ... arg\n```\n\nAnd this piece of code is discouraged:\n\n```ocaml\n  let f arg  = match arg with\n    | [] -> ...\n    | (x::xs) -> ... x ... xs ... arg\n```",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
     }
   },
   {
-    "id": "camel_extra_dollar",
+    "id": "var_should_not_be_used",
     "group": "style",
     "level": "deny",
     "impl": "untyped",
-    "docs": "### What it does\nThe `@@` operator is used for writing less parentheses in expression.\nCode like `f (g (h x))` could be rewritten as `f @@ g (h x)`.\nBut is some cases it is not required, like `print_int @@ 1`.\nSome of these cases are reported by this lint.",
+    "docs": "### What it does\nReport identifier starting with '_' and used later\n\n### Why is this bad?\nOCaml compiler has a tendency to report warning 26 about unused variables.\nUsually this warning could be supressed by adding '_' in the beginning of identifier to make it look like wildcard variable.\nBut if that identifier is used later it contradicts the purpose of adding undescore in the beginnning.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "misc_aggregate_defs",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "It is not really a lint. It collects locations in the file where types are declared and saves them.\nIf PPX-expanded expressions have issues and locations corresponding type declarations,\nwe don't report these false-positive lints (at the moment, only about possible eta-conversion)",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -110,22 +121,22 @@
     }
   },
   {
-    "id": "use_match_instead_of_equality",
-    "group": "correctness",
-    "level": "deny",
+    "id": "exc_failwith",
+    "group": "suspicious",
+    "level": "warn",
     "impl": "typed",
-    "docs": "### What it does\nFor most algebraic datatypes it's better to use pattern matching then equality `(=)`. This lint reports that for\nstandard lists, options and bools.\n\nAdopted from camelot's lint list.",
+    "docs": "### What it does\nThe usage of 'Stdlib.failwith' in production code could be error-prone. The constructions `failwith \"not implemented\"` should be implemented sooner or later.\n\nConstructions `failwith \"should not happen\"` smells. Maybe techniques from https://doi.org/10.1145/3299711.3242755 could help.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
     }
   },
   {
-    "id": "eta_reduction",
-    "group": "style",
-    "level": "warn",
+    "id": "use_match_instead_of_equality",
+    "group": "correctness",
+    "level": "deny",
     "impl": "typed",
-    "docs": "### What it does\nStraightforward wrapper functions are excessive and may be reduced\n\n#### Explanation\n\nLet's look at the expression 'let f x = g x'. It may be simply replaced with an expression, `let f = g` which has the same semantics. In general, wrappers like this may be confusing, so it is recommended to get rid of them",
+    "docs": "### What it does\nFor most algebraic datatypes it's better to use pattern matching then equality `(=)`. This lint reports that for\nstandard lists, options and bools.\n\nAdopted from camelot's lint list.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -143,11 +154,11 @@
     }
   },
   {
-    "id": "exc_failwith",
-    "group": "suspicious",
+    "id": "eta_reduction",
+    "group": "style",
     "level": "warn",
     "impl": "typed",
-    "docs": "### What it does\nThe usage of 'Stdlib.failwith' in production code could be error-prone. The constructions `failwith \"not implemented\"` should be implemented sooner or later.\n\nConstructions `failwith \"should not happen\"` smells. Maybe techniques from https://doi.org/10.1145/3299711.3242755 could help.",
+    "docs": "### What it does\nStraightforward wrapper functions are excessive and may be reduced\n\n#### Explanation\n\nLet's look at the expression 'let f x = g x'.\nIt may be simply replaced with an expression, `let f = g` which has the same semantics.\nIn general, wrappers like this may be confusing, so it is recommended to get rid of them.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -159,6 +170,28 @@
     "level": "deny",
     "impl": "typed",
     "docs": "### What it does\nOCaml formatted string are more powerful than C counterpart.\nYou should be aware of available features.\n\n### Why is is important?\nShorter code is more readable. Rewrite\n\n*  `\\\"%s\\\"` to `%S`",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "use_guard_instead_of_if",
+    "group": "style",
+    "level": "deny",
+    "impl": "untyped",
+    "docs": "### What it does\nPattern matching guards are not very common in mainstream languages so it easy to forget about them for OCaml wannabies.\nThis lint looks for if-then-else expressions in right hand sides of pattern matching, and recommends to use pattern guards.\n\n### Why is this bad?\nSometimes guards allow you to write less error-prone code. For example, you are matching three values and want to\n. if 1st fits predicate then do something and return, check other components otherwise.\n. if 2nd fits predicate then do something and return, check other components otherwise.\n. if 3rd ..., do something else otherwise.\n\nThe implementation with if-then-else could be like this.\n```ocaml\nmatch ... with\n| (a,b,c) ->\n    if pred1 a then ...\n    else if pred2 b then ...\n    else if pred3 c then ...\n    else ... something_else ...\n| ...\n```\nIn this case all three bindings are in scope in the right hand side of matching, you can by mistake use them for something. And you can't use wildcards because all three bindings are required in right hand side.\n\nLet's rewrite it with guards:\n```ocaml\nmatch ... with\n| (a,_,_) when pred1 a -> ...\n| (_,b,_) when pred2 b -> ...\n| (_,_,c) when pred3 c -> ...\n| ...\n```\n\nIn this variant you have less potential for copy-paste mistake",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "mutability_check",
+    "group": "style",
+    "level": "deny",
+    "impl": "typed",
+    "docs": "### What it does\nUsing mutable data structures for teaching purposes is usually discouraged. Replace \\\nHashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT).\n\n##### How to fix?\nUse mutable `ref`erences and mutable record fields only if it is really required.\nUsually, mutability is added for performance reasons. For example,\n\n  * [Effective generalization](https://okmij.org/ftp/ML/generalization.html) in OCaml type checher\n  * Functions, that count number of invocations and/or generate unique names.\n  * Implementing memoization or laziness",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -181,17 +214,6 @@
     "level": "warn",
     "impl": "typed",
     "docs": "### What it does\nUsing 'Stdlib.ignore' is discouraged. It's better to rewrite it with let.\n\n#### Explanation\n\nLet's look at expression 'ignore (f x)'. If in the future the function 'f' will accept one more argument or change return type the code above may become buggy, because the function will not be fully applied and executead (although the warning may be raised here if this warning is not masked). It's recommended to rewrite the code as 'let (_ : int) = f x in ...` where 'int' is an example of return type of the function 'f'.",
-    "applicability": {
-      "is_multi_part_suggestion": false,
-      "applicability": "Unresolved"
-    }
-  },
-  {
-    "id": "mutability_check",
-    "group": "style",
-    "level": "deny",
-    "impl": "typed",
-    "docs": "### What it does\nUsing mutable data structures for teaching purposes is usually discouraged. Replace \\\nHashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT).\n\n##### How to fix?\nUse mutable `ref`erences and mutable record fields only if it is really required.\nUsually, mutability is added for performance reasons. For example,\n\n  * [Effective generalization](https://okmij.org/ftp/ML/generalization.html) in OCaml type checher\n  * Functions, that count number of invocations and/or generate unique names.\n  * Implementing memoization or laziness",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
@@ -242,6 +264,28 @@
     }
   },
   {
+    "id": "mutually_rec_types",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "### What it does\nUsing `and` where there is no mutual recursion is discouraged.\n\n#### Explanation\nThe keyword `and` should be used only to declare mutually recursive types or functions.\nIncorrect use of `and` can lead to confusion.\nIt's recommended to rewrite type declarations without `and` where mutual recursion is not required.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "forbid_many_nested_if_expressions",
+    "group": "style",
+    "level": "deny",
+    "impl": "typed",
+    "docs": "### What it does\n\nCheck too many (>= 3 levels) nested if expressions, for example\n* `if ... then (if ... then (if ... then (if ... then ... else ...) else ...) else ...) else ...`\n\n### Why it is important\n\nThe big problem with nested conditions is that they confuse the control flow of the code:\nthey make it almost impossible to determine what code will be executed and when.\n\nAdopted from camelot's lint list.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "propose_function",
     "group": "style",
     "level": "warn",
@@ -286,44 +330,11 @@
     }
   },
   {
-    "id": "use_guard_instead_of_if",
-    "group": "style",
-    "level": "deny",
-    "impl": "untyped",
-    "docs": "### What it does\nPattern matching guards are not very common in mainstream languages so it easy to forget about them for OCaml wannabies.\nThis lint looks for if-then-else expressions in right hand sides of pattern matching, and recommends to use pattern guards.\n\n### Why is this bad?\nSometimes guards allow you to write less error-prone code. For example, you are matching three values and want to\n. if 1st fits predicate then do something and return, check other components otherwise.\n. if 2nd fits predicate then do something and return, check other components otherwise.\n. if 3rd ..., do something else otherwise.\n\nThe implementation with if-then-else could be like this.\n```ocaml\nmatch ... with\n| (a,b,c) ->\n    if pred1 a then ...\n    else if pred2 b then ...\n    else if pred3 c then ...\n    else ... something_else ...\n| ...\n```\nIn this case all three bindings are in scope in the right hand side of matching, you can by mistake use them for something. And you can't use wildcards because all three bindings are required in right hand side.\n\nLet's rewrite it with guards:\n```ocaml\nmatch ... with\n| (a,_,_) when pred1 a -> ...\n| (_,b,_) when pred2 b -> ...\n| (_,_,c) when pred3 c -> ...\n| ...\n```\n\nIn this variant you have less potential for copy-paste mistake",
-    "applicability": {
-      "is_multi_part_suggestion": false,
-      "applicability": "Unresolved"
-    }
-  },
-  {
     "id": "tuple_matching",
     "group": "style",
     "level": "warn",
     "impl": "typed",
     "docs": "### What it does\nUsing match with single tuple is discouraged. It's better to rewrite it with `let (a, b) = scru in rhs`.\n\n#### Explanation\nIt's recommended to rewrite the code as 'let ... in` because is more clearly.",
-    "applicability": {
-      "is_multi_part_suggestion": false,
-      "applicability": "Unresolved"
-    }
-  },
-  {
-    "id": "mutually_rec_types",
-    "group": "style",
-    "level": "warn",
-    "impl": "typed",
-    "docs": "### What it does\nUsing `and` where there is no mutual recursion is discouraged.\n\n#### Explanation\nThe keyword `and` should be used only to declare mutually recursive types or functions.\nIncorrect use of `and` can lead to confusion.\nIt's recommended to rewrite type declarations without `and` where mutual recursion is not required.",
-    "applicability": {
-      "is_multi_part_suggestion": false,
-      "applicability": "Unresolved"
-    }
-  },
-  {
-    "id": "forbid_many_nested_if_expressions",
-    "group": "style",
-    "level": "deny",
-    "impl": "typed",
-    "docs": "### What it does\n\nCheck too many (>= 3 levels) nested if expressions, for example\n* `if ... then (if ... then (if ... then (if ... then ... else ...) else ...) else ...) else ...`\n\n### Why it is important\n\nThe big problem with nested conditions is that they confuse the control flow of the code:\nthey make it almost impossible to determine what code will be executed and when.\n\nAdopted from camelot's lint list.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
