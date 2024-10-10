@@ -1,4 +1,5 @@
-(** Aggregate all typed defined in a file. Not really a lint *)
+(** Aggregate all types defined in a file.
+    Not really a lint but a preparation for skipping false-positives *)
 
 [@@@ocaml.text "/*"]
 
@@ -50,7 +51,11 @@ let has_deriving_attribute (attrs : Typedtree.attributes) =
 let run _ fallback =
   let open Tast_iterator in
   { fallback with
-    type_declaration =
+    typ =
+      (fun self typ ->
+        Collected_lints.add_tdecl typ.ctyp_loc;
+        fallback.typ self typ)
+  ; type_declaration =
       (fun self tdecl ->
         (match tdecl.typ_kind, tdecl.Typedtree.typ_manifest with
          | Ttype_variant cds, _ when has_deriving_attribute tdecl.typ_attributes ->
