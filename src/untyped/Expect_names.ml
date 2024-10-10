@@ -16,16 +16,27 @@ let lint_id = "expect_tests_no_names"
 let lint_source = LINT.FPCourse
 let level = LINT.Warn
 
-let documentation = {|
+let documentation =
+  {|
 ### What it does
+Warns about expect tests without descriptions: `let%expect_test _ = ...`
 
-  |} |> Stdlib.String.trim
+### Why?
+For purposes of refactoring we want to know why certain test was writter. 
+It allows us to decide easily if this test is still needed.
+Better version is `let%expect_test "decent name" = ...`
+
+  |}
+  |> Stdlib.String.trim
+;;
 
 let describe_as_json () =
   describe_as_clippy_json lint_id ~group:LINT.Style ~impl:LINT.Untyped ~docs:documentation
 ;;
 
-let msg ppf () = fprintf ppf "A test without description"
+let msg ppf () =
+  fprintf ppf "A test without description. Try `let%%expect_test %S = ..." "name"
+;;
 
 let report ~loc ~filename info =
   let module M = struct
