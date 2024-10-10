@@ -10,6 +10,8 @@
 
 [@@@ocaml.text "/*"]
 
+(** {1 Collecting found lints} *)
+
 val clear : unit -> unit
 val add : loc:Warnings.loc -> (module LINT.REPORTER) -> unit
 
@@ -18,3 +20,12 @@ val add : loc:Warnings.loc -> (module LINT.REPORTER) -> unit
     - In RdJSONl format. Change {!Config.out_rdjsonl} to modify output file name
     - As plain text to stdout *)
 val report : unit -> unit
+
+(** {1 Collecting type declarations}
+
+    We use information about type declarations to skip reporting lints in
+    the code generated from a type declaration via `deriving`. *)
+
+val add_tdecl : Warnings.loc -> unit
+val has_tdecl_at : Warnings.loc -> bool
+val clear_tdecls : unit -> unit

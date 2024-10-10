@@ -2,6 +2,7 @@
  (name TypedLints)
  (libraries zanuda_core Tast_pattern Refactoring)
  (modules
+  Aggregate_defs
   Ambiguous_constructors
   Exc_try_with_wildcard
   Equality

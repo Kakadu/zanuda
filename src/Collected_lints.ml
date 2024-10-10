@@ -76,3 +76,8 @@ let report () =
       in
       List.iter f all_files)
 ;;
+
+let tdecls : (Location.t, unit) Hashtbl.t = Hashtbl.create 123
+let clear_tdecls () = Hashtbl.clear tdecls
+let add_tdecl key = Hashtbl.add tdecls key ()
+let has_tdecl_at key = Hashtbl.mem tdecls key

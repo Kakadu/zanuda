@@ -29,7 +29,8 @@ let untyped_linters =
 let typed_linters =
   let open TypedLints in
   [ (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
-    (module Ambiguous_constructors : LINT.TYPED)
+    (module Aggregate_defs : LINT.TYPED)
+  ; (module Ambiguous_constructors : LINT.TYPED)
   ; (module Exc_try_with_wildcard : LINT.TYPED)
   ; (module Failwith : LINT.TYPED)
   ; (module Equality : LINT.TYPED)
@@ -66,6 +67,7 @@ let () =
     if not (String.equal L.lint_id UntypedLints.Toplevel_eval.lint_id)
     then Hash_set.add enabled L.lint_id);
   List.iter typed_linters ~f:(fun (module L : LINT.TYPED) ->
+    (* Format.printf "   ENABLE %s\n%!" L.lint_id; *)
     Hash_set.add all L.lint_id;
     Hash_set.add enabled L.lint_id);
   List.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
@@ -125,7 +127,11 @@ let run_typed_lints entry info =
   build_iterator
     ~f:entry
     ~compose:(fun ((module L : LINT.TYPED) as lint) acc ->
-      if is_enabled (lint :> (module LINT.GENERAL)) then L.run info acc else acc)
+      if is_enabled (lint :> (module LINT.GENERAL))
+      then L.run info acc
+      else (
+        let __ () = Format.printf "%s is disabled\n%!" L.lint_id in
+        acc))
     ~init:Tast_iterator.default_iterator
     typed_linters
 ;;
