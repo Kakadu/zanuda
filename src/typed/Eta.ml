@@ -105,43 +105,44 @@ let run _ fallback =
   in
   let pat = of_func pat_func in
   let open Tast_iterator in
+  let check expr (ids, new_expr, args) () =
+    let open Typedtree in
+    let loc = expr.exp_loc in
+    let extract_ident = function
+      | Path.Pident id -> Some id
+      | _ -> None
+    in
+    (*              Format.printf "Expr: `%s`\nInner=`%s`\nFormal args=`%s`\nReal args=`%s`\nLengths: %d %d\n"
+                    (expr2string expr)
+                    (expr2string func)
+                    (String.concat ~sep:", " ids)
+                    (String.concat ~sep:", " (List.map ~f:ident2string args))
+                    (List.length ids)
+                    (List.length args); *)
+    let idents = List.filter_map extract_ident args in
+    let args_len = List.length args in
+    if args_len > 0
+       && args_len = List.length idents
+       && List.equal String.equal ids (List.map Ident.name idents)
+       && (not (Base.List.contains_dup ~compare:String.compare ids))
+       && List.for_all (no_ident new_expr) idents
+    then
+      if not (Collected_lints.has_tdecl_at loc)
+      then
+        Collected_lints.add
+          ~loc
+          (report loc.Location.loc_start.Lexing.pos_fname ~loc ~old_expr:expr new_expr)
+  in
   { fallback with
     expr =
       (fun self expr ->
         let open Typedtree in
-        let loc = expr.exp_loc in
-        let extract_ident = function
-          | Path.Pident id -> Some id
-          | _ -> None
-        in
         Tast_pattern.parse
           pat
-          loc
+          expr.exp_loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun (ids, new_expr, args) () ->
-            (*              Format.printf "Expr: `%s`\nInner=`%s`\nFormal args=`%s`\nReal args=`%s`\nLengths: %d %d\n"
-                            (expr2string expr)
-                            (expr2string func)
-                            (String.concat ~sep:", " ids)
-                            (String.concat ~sep:", " (List.map ~f:ident2string args))
-                            (List.length ids)
-                            (List.length args); *)
-            let idents = List.filter_map extract_ident args in
-            let args_len = List.length args in
-            if args_len > 0
-               && args_len = List.length idents
-               && List.equal String.equal ids (List.map Ident.name idents)
-               && (not (Base.List.contains_dup ~compare:String.compare ids))
-               && List.for_all (no_ident new_expr) idents
-            then
-              Collected_lints.add
-                ~loc
-                (report
-                   loc.Location.loc_start.Lexing.pos_fname
-                   ~loc
-                   ~old_expr:expr
-                   new_expr))
+          (check expr)
           ();
         fallback.expr self expr)
   }

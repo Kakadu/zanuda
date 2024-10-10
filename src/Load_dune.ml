@@ -142,6 +142,7 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
     (* Now analyze Typedtree extracted from cmt[i] *)
     let on_cmti source_file (_cmi_info, cmt_info) =
       Option.iter cmt_info ~f:(fun cmt ->
+        Collected_lints.clear_tdecls ();
         match cmt.Cmt_format.cmt_annots with
         | Cmt_format.Implementation stru -> analyze_cmt is_wrapped source_file stru
         | Interface sign -> analyze_cmti is_wrapped source_file sign

@@ -108,10 +108,13 @@ let recover_filepath filepath =
 let is_enabled () =
   let hash = enabled_lints () in
   fun (module M : LINT.GENERAL) ->
-    (* Format.printf "is_enabled of %s\n%!" M.lint_id; *)
-    match M.level with
-    | LINT.Allow when opts.skip_level_allow -> false
-    | _ -> Hash_set.mem hash M.lint_id
+    let ans =
+      match M.level with
+      | LINT.Allow when opts.skip_level_allow -> false
+      | _ -> Hash_set.mem hash M.lint_id
+    in
+    (* Format.printf "is_enabled of %s = %b\n%!" M.lint_id ans; *)
+    ans
 ;;
 
 let parse_args () =
