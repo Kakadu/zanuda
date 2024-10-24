@@ -22,6 +22,17 @@
     }
   },
   {
+    "id": "expect_tests_no_names",
+    "group": "style",
+    "level": "deny",
+    "impl": "untyped",
+    "docs": "### What it does\nWarns about expect tests without descriptions: `let%expect_test _ = ...`\n\n### Why?\nFor purposes of refactoring we want to know why a certain test was written.\nIt allows us to decide easily if this test is still needed.\nBetter version is `let%expect_test \"decent name\" = ...`",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "manual_fold",
     "group": "style",
     "level": "deny",
