@@ -79,4 +79,5 @@ TODO: Add custom configuration for this.
   |> Stdlib.String.trim
 ;;
 
-let describe_as_json () = Utils.describe_as_clippy_json "lint_filesystem" ~docs
+let lint_id = "lint_filesystem"
+let describe_as_json () = Utils.describe_as_clippy_json lint_id ~docs

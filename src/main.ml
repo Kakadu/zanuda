@@ -256,11 +256,13 @@ let () =
       let info =
         List.concat
           [ List.map untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
-              L.describe_as_json ())
+              L.lint_id, L.describe_as_json ())
           ; List.map typed_linters ~f:(fun (module L : LINT.TYPED) ->
-              L.describe_as_json ())
-          ; [ Lint_filesystem.describe_as_json () ]
+              L.lint_id, L.describe_as_json ())
+          ; [ Lint_filesystem.lint_id, Lint_filesystem.describe_as_json () ]
           ]
+        |> List.sort ~compare:(fun (a, _) (b, _) -> String.compare a b)
+        |> List.map ~f:snd
       in
       let ch = Caml.open_out filename in
       Exn.protect
