@@ -677,7 +677,13 @@ Otherwise, have a great day =^.^=
             } else {
                 enableHighlight = true;
                 // this makes sure that an unknown theme request gets set to a known one
-                theme = "light";
+
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    enableNight = true;
+                    theme = "navy"
+                } else {
+                    theme = "light";
+                }
             }
             document.getElementsByTagName("body")[0].className = theme;
 
