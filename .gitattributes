@@ -1,0 +1,6 @@
+*.ml*             text eol=lf linguist-language=OCaml
+*.t               text eol=lf -linguist-detectable
+dune              text eol=lf
+.gitignore        text eol=lf
+.gitattributes    text eol=lf
+
