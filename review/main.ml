@@ -141,7 +141,9 @@ let dismiss_review info =
        Format.printf "status: %d\n" x.Curly.Response.code;
        Format.printf "body: %s\n" x.Curly.Response.body
      | Error e -> Format.eprintf "Failed: %a" Curly.Error.pp e)
-  | _ -> Format.eprintf "Some argument was not initialized\n"
+  | _ ->
+    Format.eprintf "Some arguments were not initialized\n%!";
+    exit 1
 ;;
 
 let list_reviews info =
@@ -164,7 +166,9 @@ let list_reviews info =
        Format.printf "status: %d\n" x.Curly.Response.code;
        Format.printf "body: %s\n" x.Curly.Response.body
      | Error e -> Format.eprintf "Failed: %a" Curly.Error.pp e)
-  | _ -> Format.eprintf "Some argument was not initialized\n"
+  | _ ->
+    Format.eprintf "Some argument was not initialized\n%!";
+    exit 1
 ;;
 
 let submit_review info =
@@ -210,14 +214,20 @@ let () =
       , " Set input file in rdjsonl format" )
     ; "-token", Arg.String (fun s -> info.token <- Some s), " An access token"
       (* *** *** *** *** *** *** *** *** *)
-    ; "-review", Arg.Unit (fun () -> create_review info), " Create a review"
-    ; "-submit_review", Arg.Unit (fun () -> submit_review info), " "
+    ; ( "-review"
+      , (Arg.Unit (fun () -> create_review info) [@coverage off])
+      , " Create a review via Github API" )
+    ; ( "-submit_review"
+      , (Arg.Unit (fun () -> submit_review info) [@coverage off])
+      , " Submit review via Guthub API" )
       (* TODO(Kakadu): is submit_review required?? *)
     ; "-review_id", Arg.Int (fun s -> info.review_id <- Some s), " A review ID"
     ; ( "-disreview"
-      , Arg.Unit (fun () -> dismiss_review info)
+      , (Arg.Unit (fun () -> dismiss_review info) [@coverage off])
       , " Dismiss a review specified by -review_id" )
-    ; "-list_reviews", Arg.Unit (fun () -> list_reviews info), " "
+    ; ( "-list_reviews"
+      , (Arg.Unit (fun () -> list_reviews info) [@coverage off])
+      , " List reviews of PR via Guthub API" )
     ]
     (fun s ->
       Printf.eprintf "Anonymous arguments %S is not supported\n" s;

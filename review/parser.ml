@@ -52,9 +52,10 @@ let cfg = { from = None; file = None; line = None }
 
 let () =
   Arg.parse
-    [ "-", Arg.Unit (fun () -> cfg.from <- None), " use stdin"
-    ; "-f", Arg.String (fun s -> cfg.file <- Some s), " lookup for file"
-    ; "-l", Arg.Int (fun n -> cfg.line <- Some n), " lookup for line in a file"
+    [ "-", Arg.Unit (fun () -> cfg.from <- None), " Use stdin (default)"
+    ; "-diff", Arg.String (fun s -> cfg.from <- Some s), "[file] Use this .diff file"
+    ; "-f", Arg.String (fun s -> cfg.file <- Some s), "[file] Lookup for the file"
+    ; "-l", Arg.Int (fun n -> cfg.line <- Some n), "[NUMBER] Lookup for line in the file"
     ; ( "-vdp"
       , Arg.Unit (fun () -> Diff_parser.set_logging true)
       , " Enable logging in the diff parser" )
@@ -62,11 +63,15 @@ let () =
       , Arg.Unit (fun () -> Line_parser.set_logging true)
       , " Enable logging in the line parser" )
     ]
-    (fun _ -> assert false)
-    " "
+    (fun s ->
+      Format.eprintf "Anonymous arguments ('%s') are not supported\n" s;
+      exit 1)
+    "A diff parse tool designed to get a line number in the DIFF file with changes about \
+     specified source file and it's line"
 ;;
 
 (* A piece from stdio library *)
+(* TODO: Why we are not using In_channel module? *)
 let input_all t =
   let chunk_size = 10000 in
   let buffer = Buffer.create chunk_size in
@@ -112,7 +117,9 @@ let () =
              of file in diff\n"
             diff_pos
         | None -> Format.eprintf "Can't find '%s' line %d in the diff\n" file line)
-     | _ -> Format.eprintf "File or line was not initialized\n")
+     | _ ->
+       Format.eprintf "File or line was not initialized\n";
+       exit 1)
   | Error s ->
     Format.eprintf "Parsing failed: %s\n" s;
     exit 1
