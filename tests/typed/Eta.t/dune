@@ -3,6 +3,7 @@
  (wrapped false)
  (libraries base)
  (modules Eta deriv)
+ (modes byte)
  ; (flags
  ;  (:standard -dsource))
  (preprocess

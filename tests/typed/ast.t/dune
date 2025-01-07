@@ -2,6 +2,7 @@
  (name test_Parsetree)
  (wrapped false)
  (modules Parser Parsetree)
+ (modes byte)
  (modules_without_implementation Parsetree))
 
 (cram

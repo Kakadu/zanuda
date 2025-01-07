@@ -2,4 +2,5 @@
  (name test_hashtables)
  (wrapped false)
  (libraries base)
+ (modes byte)
  (modules Hashtables Counter Tast))

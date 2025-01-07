@@ -1,5 +1,6 @@
 (library
  (name test_string_concat)
+ (modes byte)
  (flags
   (:standard
    ;-dtypedtree

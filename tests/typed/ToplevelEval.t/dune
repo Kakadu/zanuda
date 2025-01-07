@@ -1,6 +1,7 @@
 (library
  (name test_toplevel_eval)
  (libraries base)
+ (modes byte)
  (preprocessor_deps anonymous.rb)
  (preprocess
   (pps ppx_blob ppx_optcomp))

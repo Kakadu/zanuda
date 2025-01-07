@@ -2,6 +2,7 @@
  (name test_license)
  (wrapped false)
  (libraries asdf)
+ (modes byte)
  (modules
   good
   bad
@@ -12,11 +13,12 @@
 
 (executable
  (name REPL)
+ (modes byte)
  (modules REPL))
 
 (alias
  (name default)
- (deps ./REPL.exe test_license.cmxa test_license_with_ppx.cmxa))
+ (deps ./REPL.bc test_license.cma test_license_with_ppx.cma))
 
 (library
  (name test_license_with_ppx)

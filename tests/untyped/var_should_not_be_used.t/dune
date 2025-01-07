@@ -1,6 +1,7 @@
 (library
  (name test_var_should_not_be_used)
  (wrapped false)
+ (modes byte)
  (modules lib)
  (instrumentation
   (backend bisect_ppx))

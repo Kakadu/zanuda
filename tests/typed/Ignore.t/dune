@@ -2,4 +2,5 @@
  (name test_Ignore)
  (wrapped false)
  (libraries base)
+ (modes byte)
  (modules Ignore))

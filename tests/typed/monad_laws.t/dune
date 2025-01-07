@@ -1,6 +1,7 @@
 (library
  (name test_laws)
  (wrapped false)
+ (modes byte)
  (modules laws))
 
 (cram

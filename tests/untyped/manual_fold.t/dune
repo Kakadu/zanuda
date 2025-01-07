@@ -1,6 +1,7 @@
 (library
  (name test_manual_fold)
  (wrapped false)
+ (modes byte)
  (modules manual_fold)
  (instrumentation
   (backend bisect_ppx))

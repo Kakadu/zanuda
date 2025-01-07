@@ -1,6 +1,7 @@
 (library
  (name test_dollar)
  (wrapped false)
+ (modes byte)
  (modules dollar)
  (instrumentation
   (backend bisect_ppx))

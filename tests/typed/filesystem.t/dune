@@ -1,4 +1,5 @@
 (library
  (name test_filesystem)
  (wrapped false)
+ (modes byte)
  (modules Ast Asdf no_iface))

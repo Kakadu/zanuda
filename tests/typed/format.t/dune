@@ -2,6 +2,7 @@
  (name test_Format)
  (wrapped false)
  (modules test_Format)
+ (modes byte)
  ; (flags
  ;  (:standard -dtypedtree))
  )

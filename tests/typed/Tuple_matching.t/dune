@@ -1,4 +1,5 @@
 (library
  (name test_tuple_matching)
  (wrapped false)
+ (modes byte)
  (modules Tuple_matching))

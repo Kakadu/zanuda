@@ -1,6 +1,7 @@
 (library
  (name test_Record1)
  (wrapped false)
+ (modes byte)
  (modules Record1 Record2))
 
 (cram

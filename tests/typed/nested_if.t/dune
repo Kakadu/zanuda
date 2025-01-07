@@ -1,13 +1,8 @@
 (library
  (name test_nested_if)
  (wrapped false)
- (modules nested_if)
- (flags
-  (:standard
-   ;-dsource
-   ;
-   ))
-)
+ (modes byte)
+ (modules nested_if))
 
 (cram
  (deps %{bin:zanuda.exe}))

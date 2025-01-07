@@ -2,6 +2,7 @@
  (name test_ifbool)
  (wrapped false)
  (modules ifBool)
+ (modes byte)
  (flags
   (:standard
    ;-dsource

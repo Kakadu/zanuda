@@ -2,6 +2,7 @@
  (name test_amb_cstrs)
  (wrapped false)
  (modules amb_cstrs)
+ (modes byte)
  (flags
   (:standard
    ;-dsource

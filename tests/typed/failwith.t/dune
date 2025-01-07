@@ -2,4 +2,5 @@
  (name test_failwith)
  (libraries base)
  (wrapped false)
+ (modes byte)
  (modules failwith))

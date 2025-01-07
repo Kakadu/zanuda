@@ -2,6 +2,7 @@
  (name test_Equality)
  (wrapped false)
  (modules Equality)
+ (modes byte)
  ;  (flags
  ;   (:standard -dtypedtree))
  (instrumentation

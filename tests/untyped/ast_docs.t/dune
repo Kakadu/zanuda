@@ -1,6 +1,7 @@
 (library
  (name test_dollar)
  (wrapped false)
+ (modes byte)
  ; (modules stuff)
  (modules_without_implementation ast)
  (instrumentation

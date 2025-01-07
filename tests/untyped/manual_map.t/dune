@@ -1,6 +1,7 @@
 (library
  (name test_manual_map)
  (wrapped false)
+ (modes byte)
  (modules manual_map)
  (instrumentation
   (backend bisect_ppx))

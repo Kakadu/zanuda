@@ -1,4 +1,4 @@
-  $ dune build @default ./REPL.exe
+  $ dune build @default @check ./REPL.bc
 
   $ ../zanuda.exe -no-check-filesystem -dir .  -ordjsonl /dev/null
   File "REPL.ml", line 1, characters 0-9:

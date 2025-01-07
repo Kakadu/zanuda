@@ -6,4 +6,5 @@
 (library
  (name test_mutually_rec_types)
  (wrapped false)
+ (modes byte)
  (modules Mutually_rec_types ast2))
