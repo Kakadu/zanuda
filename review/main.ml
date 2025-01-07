@@ -33,6 +33,8 @@ let info =
   }
 ;;
 
+[@@@coverage off]
+
 open Printf
 
 let github_patch_url ~owner ~repo ~pull_number =
@@ -192,6 +194,8 @@ let submit_review info =
      | Error e -> Format.eprintf "Failed: %a" Curly.Error.pp e)
   | _ -> Format.eprintf "Some argument was not initialized\n"
 ;;
+
+[@@@coverage on]
 
 let () =
   Arg.parse

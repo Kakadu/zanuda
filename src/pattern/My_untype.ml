@@ -9,6 +9,10 @@
 
 [@@@ocaml.text "/*"]
 
+[@@@coverage off]
+
+(* This are helper functions related to OCaml compiler. Doesn't make sense to seriously test them *)
+
 include Untypeast
 
 (** {2 New functions} *)

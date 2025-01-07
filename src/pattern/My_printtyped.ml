@@ -9,6 +9,10 @@
 
 [@@@ocaml.text "/*"]
 
+[@@@coverage off]
+
+(* This are helper functions related to OCaml compiler. Doesn't make sense to seriously test them *)
+
 include Printtyped
 
 [%%if ocaml_version < (4, 11, 0)]
