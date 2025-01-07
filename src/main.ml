@@ -257,7 +257,7 @@ let () =
         List.concat
           [ List.map untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
               L.lint_id, L.describe_as_json ())
-          ; List.map typed_linters ~f:(fun (module L : LINT.TYPED) ->
+          ; List.map (per_file_linters @ typed_linters) ~f:(fun (module L : LINT.TYPED) ->
               L.lint_id, L.describe_as_json ())
           ; [ Lint_filesystem.lint_id, Lint_filesystem.describe_as_json () ]
           ]

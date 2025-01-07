@@ -11,15 +11,8 @@
 
 (* TODO: support double licensing (AND keyword) *)
 
-(** NB: We can omit appearance of the license in the generated documentation.
-    We should write like this:
+(* TODO: Write down why this lint is implemented as typed and not as untyped *)
 
-    [@@@ocaml.text "/*"]
-    (** Copyright ... *)
-    (** SPDX-License-Identifier: ... *)
-    [@@@ocaml.text "/*"] *)
-
-open Stdlib.Format
 open Zanuda_core
 open Utils
 
@@ -80,11 +73,24 @@ let level = LINT.Warn
 let documentation =
   {|
 ### What it does
-Ensures that every files start from license and copyright information. The description is expected in SPDX format.
+Ensures that every files start from license and copyright information.
+The description is expected in [SPDX](https://spdx.org/licenses) format.
 
 ### Why is this bad?
-These annotation allow automatization tools to check code for license compliance.
-  |}
+These annotation allow automation tools to check code for license compliance.
+
+````
+[@@@ocaml.text "/*"]
+
+(** Copyright 2021-2024, Vasya Pupkin *)
+
+(** SPDX-License-Identifier: LGPL-3.0-only *)
+
+[@@@ocaml.text "/*"]
+````
+
+The `"/*"` decorations prevent ocamldoc/odoc from including comments with license into documentation.
+|}
   |> Stdlib.String.trim
 ;;
 
@@ -94,7 +100,7 @@ let describe_as_json () =
 
 type input = Tast_iterator.iterator
 
-let msg ppf s = fprintf ppf "%s" s
+let msg ppf s = Stdlib.Format.fprintf ppf "%s" s
 
 let report ~loc ~filename reason =
   let module M = struct
