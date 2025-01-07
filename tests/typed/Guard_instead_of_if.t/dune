@@ -1,0 +1,18 @@
+(library
+ (name test_If_guard)
+ (wrapped false)
+ (modules If_guard)
+ (modes byte)
+ (flags
+  (:standard
+   ;-dsource
+   ;
+   ))
+ ;  (preprocess
+ ;   (pps
+ ;    ;ppx_show
+ ;    ))
+ )
+
+(cram
+ (deps %{bin:zanuda.exe}))
