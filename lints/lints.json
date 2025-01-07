@@ -308,6 +308,17 @@
     }
   },
   {
+    "id": "top_file_license",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "untyped",
+    "docs": "### What it does\nEnsures that every files start from license and copyright information.\nThe description is expected in [SPDX](https://spdx.org/licenses) format.\n\n### Why is this bad?\nThese annotation allow automation tools to check code for license compliance.\n\n````\n[@@@ocaml.text \"/*\"]\n\n(** Copyright 2021-2024, Vasya Pupkin *)\n\n(** SPDX-License-Identifier: LGPL-3.0-only *)\n\n[@@@ocaml.text \"/*\"]\n````\n\nThe `\"/*\"` decorations prevent ocamldoc/odoc from including comments with license into documentation.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "tuple_matching",
     "group": "style",
     "level": "warn",
