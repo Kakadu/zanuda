@@ -21,6 +21,8 @@
   Unused_ML_logger
   Utils)
  (modules_without_implementation LINT)
+ (flags
+  (:standard -w -no-cmx-file))
  (libraries compiler-libs.common sexplib yojson dune-build-info Tast_pattern)
  (preprocess
   (pps
