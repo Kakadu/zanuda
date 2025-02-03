@@ -1,13 +1,11 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
-module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Format
@@ -32,6 +30,21 @@ If you do low level performance hacking, this lint could give false positives.
   |> Stdlib.String.trim
 ;;
 
+(* TODO(Kakadu): This is copy-paste from Hashtables.ml *)
+type config = { mutable files_to_skip : string list }
+
+let config = { files_to_skip = [] }
+
+let process_switches = function
+  | [ "ignore"; files ] ->
+    config.files_to_skip <- Stdlib.String.split_on_char ',' files @ config.files_to_skip
+  | other ->
+    Stdlib.Printf.eprintf
+      "Lint %s: Unsuported switches: %s\n"
+      lint_id
+      (String.concat " " other)
+;;
+
 let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 
 let msg ppf () =
@@ -42,15 +55,20 @@ let msg ppf () =
 
 let report filename ~loc =
   let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg ()
+    let txt ppf () =
+      if not (List.mem filename config.files_to_skip)
+      then Utils.Report.txt ~filename ~loc ppf msg ()
+    ;;
 
     let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        (fun _ _ -> ())
-        ()
+      if not (List.mem filename config.files_to_skip)
+      then
+        RDJsonl.pp
+          ppf
+          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
+          ~line:loc.loc_start.pos_lnum
+          (fun _ _ -> ())
+          ()
     ;;
   end
   in
