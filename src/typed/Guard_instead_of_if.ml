@@ -91,7 +91,7 @@ let run _ fallback =
     try
       Tast_pattern.parse
         pm
-        Location.none
+        case.Typedtree.c_rhs.exp_loc
         case.Typedtree.c_rhs
         ~on_error:(fun _ -> ())
         (fun { Location.loc } ->
