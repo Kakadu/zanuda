@@ -76,8 +76,20 @@ let report msg ~loc strct_items =
 module SCC = Strongly_connected_components.Make (Ident)
 
 let pp_graph ppf : Ident.Set.t Ident.Map.t -> unit =
-  Ident.Map.iter (fun key set ->
-    Format.fprintf ppf "%s ~~> %s\n%!" (Ident.name key) (Ident.Set.to_string set))
+  fun map ->
+  Format.fprintf ppf "digraph A {\n";
+  Ident.Map.iter
+    (fun key set ->
+      Ident.Set.iter
+        (fun id -> Format.fprintf ppf "  %s -> %s\n%!" (Ident.name key) (Ident.name id))
+        set)
+    (* Format.fprintf
+       ppf
+       "%s -> %s\n%!"
+       (Ident.name key)
+       (Ident.Set.fold (fun x acc -> Ident.name x ^ acc) set "")) *)
+    map;
+  Format.fprintf ppf "}\n%!"
 ;;
 
 let run _ fallback =
@@ -118,8 +130,21 @@ let run _ fallback =
             let extrnl_typs = Ident.Set.of_list @@ Queue.to_list extrnl_typs in
             Ident.Map.add decl.typ_id extrnl_typs acc)
         in
-        (* Format.printf "%a\n%!" pp_graph graph; *)
+        let __ () =
+          Out_channel.with_open_text "/tmp/graph.dot" (fun ch ->
+            Format.fprintf (Format.formatter_of_out_channel ch) "%a\n%!" pp_graph graph)
+        in
         let comps = SCC.connected_components_sorted_from_roots_to_leaf graph in
+        (* let comps =
+           Array.filter_map comps ~f:(function
+           | SCC.Has_loop _ as x -> Some x
+           | No_loop name as x ->
+           (match List.find_exn decls ~f:(fun dec -> Ident.same name dec.typ_id) with
+           | _ ->
+           Format.printf "found: %a\n%!" Ident.print name;
+           Some x
+           | (exception Not_found) | (exception Not_found_s _) -> None))
+           in *)
         if Array.length comps > 1
         then (
           let first_dec = List.hd_exn decls in
