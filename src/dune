@@ -23,13 +23,20 @@
  (modules_without_implementation LINT)
  (flags
   (:standard -w -no-cmx-file))
- (libraries compiler-libs.common sexplib yojson dune-build-info Tast_pattern)
+ (libraries
+  base
+  compiler-libs.common
+  sexplib
+  yojson
+  dune-build-info
+  Tast_pattern)
  (preprocess
   (pps
    ppx_optcomp
    ppx_sexp_conv
-   ;ppx_inline_test ; implies dependecy on base
-   ppx_expect))
+   ppx_expect_nobase
+   ;
+   ))
  (instrumentation
   (backend bisect_ppx))
  (inline_tests))
@@ -39,6 +46,7 @@
  (public_name zanuda)
  (modules main)
  (libraries
+  base
   yojson
   ppxlib
   compiler-libs.common
@@ -47,7 +55,7 @@
   TypedLints
   UntypedLints)
  (preprocess
-  (pps ppx_inline_test))
+  (pps ppx_inline_test_nobase))
  (instrumentation
   (backend bisect_ppx))
  (package zanuda))

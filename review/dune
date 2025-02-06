@@ -35,6 +35,6 @@
  (libraries diff_parser)
  (inline_tests)
  (preprocess
-  (pps ppx_inline_test ppx_expect))
+  (pps ppx_inline_test_nobase ppx_expect_nobase))
  (instrumentation
   (backend bisect_ppx)))

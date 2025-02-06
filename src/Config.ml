@@ -6,8 +6,7 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
-open Caml.Format
+open Stdlib.Format
 
 type mode =
   | Unspecified
@@ -30,8 +29,8 @@ type t =
   ; mutable extra_includes : string list
   ; mutable verbose : bool
   ; mutable gen_replacements : bool
-  ; enabled_lints : string Hash_set.t
-  ; all_lints : string Hash_set.t
+  ; enabled_lints : string Base.Hash_set.t
+  ; all_lints : string Base.Hash_set.t
   ; mutable skip_level_allow : bool
   ; mutable check_filesystem : bool
   }
@@ -46,8 +45,8 @@ let opts =
   ; extra_includes = []
   ; verbose = false
   ; gen_replacements = false
-  ; enabled_lints = Hash_set.create (module String)
-  ; all_lints = Hash_set.create (module String)
+  ; enabled_lints = Base.Hash_set.create (module Base.String)
+  ; all_lints = Base.Hash_set.create (module Base.String)
   ; skip_level_allow = true
   ; check_filesystem = true
   }
@@ -90,8 +89,8 @@ let set_skip_level_allow b = opts.skip_level_allow <- b
 let recover_filepath filepath =
   let filepath =
     match prefix_to_cut () with
-    | Some prefix when String.is_prefix filepath ~prefix ->
-      String.drop_prefix filepath (String.length prefix)
+    | Some prefix when String.starts_with filepath ~prefix ->
+      Base.String.drop_prefix filepath (String.length prefix)
     | Some prefix when verbose () ->
       Caml.Format.eprintf "Can't cut prefix '%s' from '%s'\n%!" prefix filepath;
       filepath
@@ -111,7 +110,7 @@ let is_enabled () =
     let ans =
       match M.level with
       | LINT.Allow when opts.skip_level_allow -> false
-      | _ -> Hash_set.mem hash M.lint_id
+      | _ -> Base.Hash_set.mem hash M.lint_id
     in
     (* Format.printf "is_enabled of %s = %b\n%!" M.lint_id ans; *)
     ans
@@ -157,7 +156,7 @@ let parse_args () =
     ]
   in
   let extra_args =
-    Hash_set.fold
+    Base.Hash_set.fold
       ~init:
         [ ( "-no-check-filesystem"
           , Arg.Unit unset_check_filesystem
@@ -166,10 +165,10 @@ let parse_args () =
       ~f:(fun acc x ->
         assert (x <> "");
         ( sprintf "-no-%s" x
-        , Arg.Unit (fun () -> Hash_set.remove opts.enabled_lints x)
+        , Arg.Unit (fun () -> Base.Hash_set.remove opts.enabled_lints x)
         , " Disable checking for this lint" )
         :: ( sprintf "-with-%s" x
-           , Arg.Unit (fun () -> Hash_set.add opts.enabled_lints x)
+           , Arg.Unit (fun () -> Base.Hash_set.add opts.enabled_lints x)
            , " Enable checking for this lint" )
         :: acc)
       opts.all_lints
