@@ -50,7 +50,10 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install autoconf -y
 
-      - run: opam update
+      - name: Update opam repo
+        run: |
+          opam remote -vvvv
+          opam update
 
       # checking out the code seems to be important because local switch is used
       - name: Installing dependencies
