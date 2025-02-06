@@ -28,8 +28,6 @@ module Ast_pattern0 = struct
 end
 
 open Location
-open Base
-module Format = Caml.Format
 open Format
 open Ast_pattern0
 
@@ -100,7 +98,7 @@ let drop : 'a 'b. ('a, 'b, 'b) t =
       k)
 ;;
 
-let cst ~to_string ?(equal = Poly.equal) v =
+let cst ~to_string ?(equal = Stdlib.( = )) v =
   T
     (fun ctx loc x k ->
       if equal x v
@@ -241,7 +239,7 @@ let map_result (T func) ~f = T (fun ctx loc x k -> f (func ctx loc x k))
 let alt_option some none = alt (map1 some ~f:(fun x -> Some x)) (map0 none ~f:None)
 
 let many (T f) =
-  T (fun ctx loc l k -> k (List.map l ~f:(fun x -> f ctx loc x (fun x -> x))))
+  T (fun ctx loc l k -> k (ListLabels.map l ~f:(fun x -> f ctx loc x (fun x -> x))))
 ;;
 
 let loc (T f) = T (fun ctx _loc (x : _ Ppxlib.Loc.t) k -> f ctx x.loc x.txt k)
@@ -299,7 +297,7 @@ let path xs =
       else fail loc "path"
     | Path.Pdot (next, id), id0 :: ids when cmp_names id id0 -> helper ids ctx loc next k
     | Path.Papply _, _ -> fail loc "path got Papply"
-    | _ -> fail loc (sprintf "path %s" (String.concat ~sep:"." xs))
+    | _ -> fail loc (sprintf "path %s" (String.concat "." xs))
   in
   T (helper (List.rev xs))
 ;;
@@ -307,7 +305,7 @@ let path xs =
 let path_of_list = function
   | [] -> failwith "Bad argument: path_of_list"
   | s :: tl ->
-    List.fold_left
+    ListLabels.fold_left
       tl
       ~init:(Path.Pident (Ident.create_local s))
       ~f:(fun acc x -> Path.Pdot (acc, x))
@@ -320,7 +318,7 @@ let%test_module " " =
     let%test_unit _ =
       let old = !Clflags.unique_ids in
       Clflags.unique_ids := false;
-      [%test_eq: string]
+      [%test_eq: Base.string]
         "Stdlib!.List.length"
         (asprintf "%a" Path.print (path_of_list names));
       Clflags.unique_ids := old
@@ -497,7 +495,7 @@ let texp_apply_nolabelled (T f0) (T args0) =
         let k = f0 ctx loc f k in
         (try
            let args =
-             List.map args ~f:(function
+             ListLabels.map args ~f:(function
                | _, None -> raise EarlyExit
                | _, Some x -> x)
            in
