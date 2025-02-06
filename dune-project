@@ -34,15 +34,17 @@
   ;   (>= 0.25.1)
   ;   (<= 0.28.0)))
   sexplib
-  ppx_inline_test ; implies dependecy on base
   ppx_assert
-  ppx_expect
   bisect_ppx
   stdune
   dune-build-info
   (angstrom
    (>= 0.15.0))
+  ppx_expect_nobase
   (base :with-test)
+  (ppx_assert :with-test)
+  (ppx_inline_test :with-test)
+  (ppx_expect :with-test)
   (ppx_fields_conv :with-test)
   (ppx_deriving :with-test)
   (ppx_blob :with-test) ; currently required for ToplevelEval test
