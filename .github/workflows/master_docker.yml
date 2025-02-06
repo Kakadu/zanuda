@@ -48,6 +48,7 @@ jobs:
           sudo apt-get install autoconf -y
 
       - run: opam update
+      - run: find / -iname 'opam*'
 
       # checking out the code seems to be important because local switch is used
       - name: Installing dependencies
