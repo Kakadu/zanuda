@@ -31,6 +31,13 @@ jobs:
       cancel-in-progress: true
 
     steps:
+      #- run: find / -iname 'opam*'
+      # - run: |
+      #     opam --version
+      #     /usr/bin/opam-2.2 --version
+      #     sudo mv /usr/bin/opam-2.2 /usr/bin/opam
+      #     opam --version
+
       # https://github.com/styfle/cancel-workflow-action
       # - name: Cancel Previous Runs
       #   uses: styfle/cancel-workflow-action@0.11.0
@@ -46,6 +53,11 @@ jobs:
       - run: |
           sudo apt-get update -y
           sudo apt-get install autoconf -y
+
+      - name: Update opam repo
+        run: |
+          opam remote -vvvv
+          opam update
 
       # checking out the code seems to be important because local switch is used
       - name: Installing dependencies
