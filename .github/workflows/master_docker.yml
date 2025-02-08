@@ -32,11 +32,11 @@ jobs:
 
     steps:
       #- run: find / -iname 'opam*'
-      - run: |
-          opam --version
-          /usr/bin/opam-2.2 --version
-          sudo mv /usr/bin/opam-2.2 /usr/bin/opam
-          opam --version
+      # - run: |
+      #     opam --version
+      #     /usr/bin/opam-2.2 --version
+      #     sudo mv /usr/bin/opam-2.2 /usr/bin/opam
+      #     opam --version
 
       # https://github.com/styfle/cancel-workflow-action
       # - name: Cancel Previous Runs
