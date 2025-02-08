@@ -13,7 +13,7 @@ env:
   OPAMROOT: /home/opam/.opam
   #OPAMYES: true
   OPAMCONFIRMLEVEL: unsafe-yes
-  OPAMIGNORECONSTRAINT: sexplib0
+  OPAMIGNORECONSTRAINTS: sexplib0
 jobs:
   build:
     strategy:
