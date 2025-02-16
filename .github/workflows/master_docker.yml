@@ -57,7 +57,7 @@ jobs:
       - name: Update opam repo
         run: |
           opam remote -vvvv
-          opam update
+          opam update default
 
       # checking out the code seems to be important because local switch is used
       - name: Installing dependencies
