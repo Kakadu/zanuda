@@ -26,11 +26,11 @@
 - #54: Detection of unused public declarations. (@Kakadu, initial implementation from @jegorpopow)
   At the moment support is kind of flaky: it could be broken by several things.
 
-    * Custom `public_name` for library my broke detection of `.cmt[i]` files.
+    * Custom `public_name` for library may broke detection of `.cmt[i]` files.
     * We [need to](https://github.com/ocaml/dune/issues/9724) do 'dune build @check' to generate all required `cmt` files.
 - #56: Simplify lint about license. We look for required doc-comments anywhere in the file,
   not only in the beginning.
-- #60: Skip mutability check for some source files (configured via '.zanuda').
+- #60: Skip some checks for some source files (configured via '.zanuda'). Currently this is mutability check and phys_equal check
 
 ### Changed
 
