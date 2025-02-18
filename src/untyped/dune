@@ -1,5 +1,6 @@
 (library
  (name UntypedLints)
+ (package zanuda)
  (libraries Tast_pattern zanuda_core)
  (modules
   Casing

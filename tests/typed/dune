@@ -3,10 +3,12 @@
  (modules exec1))
 
 (cram
- (deps ./zanuda.exe))
+ (deps ./zanuda.exe)
+ (package zanuda))
 
 (rule
  (deps %{project_root}/src/main.exe)
  (target zanuda.exe)
+ (package zanuda)
  (action
   (copy %{deps} %{target})))

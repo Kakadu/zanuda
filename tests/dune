@@ -1,6 +1,8 @@
 (cram
- (applies_to :whole_subtree))
+ (applies_to :whole_subtree)
+ (package zanuda))
 
 (cram
  (applies_to commandline)
- (deps untyped/zanuda.exe))
+ (deps untyped/zanuda.exe)
+ (package zanuda))
