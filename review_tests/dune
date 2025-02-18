@@ -1,4 +1,5 @@
 (cram
+ (package reviewer)
  (deps
   %{project_root}/review/parser.exe
   %{project_root}/review/main.exe
