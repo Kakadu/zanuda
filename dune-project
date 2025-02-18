@@ -41,6 +41,7 @@
   (angstrom
    (>= 0.15.0))
   ppx_expect_nobase
+  ppx_optcomp
   (base :with-test)
   (ppx_assert :with-test)
   (ppx_inline_test :with-test)
