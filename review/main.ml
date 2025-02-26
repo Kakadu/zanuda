@@ -228,6 +228,14 @@ let () =
     ; ( "-list_reviews"
       , (Arg.Unit (fun () -> list_reviews info) [@coverage off])
       , " List reviews of PR via Guthub API" )
+    ; ( "-version"
+      , Arg.Unit
+          (fun () ->
+            let open Build_info.V1 in
+            Printf.printf
+              "version: %s\n"
+              (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
+      , " Print version" )
     ]
     (fun s ->
       Printf.eprintf "Anonymous arguments %S is not supported\n" s;

@@ -148,7 +148,7 @@ let parse_args () =
             Printf.printf
               "version: %s\n"
               (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
-      , " print version" )
+      , " Print version" )
     ; ( "-diffs-with-fixes"
       , Arg.Unit (fun () -> opts.gen_replacements <- true)
       , " Do generate DIFFs with replacements" )

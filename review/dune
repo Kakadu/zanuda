@@ -8,7 +8,7 @@
  (name main)
  (public_name reviewer)
  (modules main)
- (libraries yojson diff_parser curly)
+ (libraries yojson diff_parser curly dune-build-info)
  (instrumentation
   (backend bisect_ppx)))
 

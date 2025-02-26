@@ -17,6 +17,7 @@
 
 (package
  (name zanuda)
+ (version 1.1.0)
  (synopsis "Linter for OCaml+dune projects")
  (description
   "Lints for OCaml projects. Primary usage is for teaching/education")
@@ -59,6 +60,7 @@
 
 (package
  (name reviewer)
+ (version 1.1.0)
  (synopsis "Creator of review for GitHub PR")
  (description
   "The tool for creating review in GitHub Pull Requests by zanuda's report")
