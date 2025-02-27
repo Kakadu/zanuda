@@ -115,7 +115,7 @@ let is_enabled () =
 ;;
 
 let parse_args () =
-  let open Caml in
+  let open Stdlib in
   let standard_args =
     [ "-o", Arg.String set_out_file, "[FILE] Set Markdown output file"
     ; "-dump", Arg.Unit set_dump_text, "Dump info about available lints to terminal"
@@ -143,7 +143,7 @@ let parse_args () =
       , Arg.Unit
           (fun () ->
             let open Build_info.V1 in
-            Printf.printf
+            Stdlib.Printf.printf
               "version: %s\n"
               (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
       , " Print version" )

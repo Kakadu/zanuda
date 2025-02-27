@@ -165,8 +165,9 @@ let no_ident ident =
         (fun (type a) self (c : a case) ->
           match c.c_lhs.pat_desc with
           | Tpat_value v ->
+            (* TODO: rewrite with FCPM *)
             (match (v :> pattern) with
-             | { pat_desc = Tpat_var (id, _) } ->
+             | { pat_desc = Tpat_var (id, _, _) } ->
                if Ident.equal ident id then () else default_iterator.case self c
              | _ -> default_iterator.case self c)
           | _ -> default_iterator.case self c)

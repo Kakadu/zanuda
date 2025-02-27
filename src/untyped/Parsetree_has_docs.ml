@@ -54,7 +54,8 @@ let report ~filename cname ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let run { Compile_common.source_file; _ } (fallback : Ast_iterator.iterator) =
+let run info fallback =
+  let source_file = Tast_pattern.source_of_info info in
   if Config.verbose () then printfn "Trying lint '%s' on file '%s'" lint_id source_file;
   if Base.String.is_suffix ~suffix:"arsetree.mli" source_file
      || Base.String.is_suffix ~suffix:"ast.mli" source_file

@@ -97,25 +97,47 @@ let is_name_suspicious txt =
   && not (String.is_prefix txt ~prefix:"_menhir_")
 ;;
 
-let run { Compile_common.source_file; _ } (fallback : Ast_iterator.iterator) =
+let run info fallback =
+  let source_file = Tast_pattern.source_of_info info in
+  let expr_pat e loc ~on_error sk =
+    Ppxlib.Ast_pattern.(
+      parse
+        (pexp_fun drop drop (ppat_var __') __
+         |> map2 ~f:(fun a b -> `Fun (a, b))
+         ||| (pexp_let
+                drop
+                (value_binding ~pat:(as__ (ppat_var __)) ~expr:drop ^:: nil)
+                __
+              |> map2 ~f:(fun a b -> a, b)
+              |> map2 ~f:(fun (pat, name) rhs -> `Let (pat, name, rhs)))))
+      e
+      loc
+      ~on_error
+      sk
+  in
   { fallback with
     expr =
       (fun self expr ->
         let () =
-          match expr.pexp_desc with
-          | Pexp_fun (_, _, ({ ppat_desc = Ppat_var { txt } } as pat), ebody)
-            when is_name_suspicious txt ->
-            (try check_occurances_exn txt ebody with
-             | Found ->
-               let loc = pat.ppat_loc in
-               Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
-          | Pexp_let (_, [ ({ pvb_pat = { ppat_desc = Ppat_var { txt } } } as vb) ], ebody)
-            when is_name_suspicious txt ->
-            (try check_occurances_exn txt ebody with
-             | Found ->
-               let loc = vb.pvb_pat.ppat_loc in
-               Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
-          | _ -> ()
+          expr_pat
+            expr.pexp_loc
+            expr
+            ~on_error:(fun _ -> ())
+            (function
+              | `Fun (txt, ebody) ->
+                if is_name_suspicious txt
+                then (
+                  try check_occurances_exn txt ebody with
+                  | Found ->
+                    let loc = pat.ppat_loc in
+                    CollectedLints.add ~loc (report ~loc ~filename:source_file txt))
+              | `Let (pat, name, rhs) ->
+                if is_name_suspicious txt
+                then (
+                  try check_occurances_exn txt ebody with
+                  | Found ->
+                    let loc = vb.pvb_pat.ppat_loc in
+                    CollectedLints.add ~loc (report ~loc ~filename:source_file txt)))
         in
         fallback.expr self expr)
   ; structure =

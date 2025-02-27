@@ -50,7 +50,8 @@ let report ~filename ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let run { Compile_common.source_file; _ } (fallback : Ast_iterator.iterator) =
+let run info (fallback : Ast_iterator.iterator) =
+  let source_file = Tast_pattern.source_of_info info in
   { fallback with
     structure_item =
       (fun self si ->

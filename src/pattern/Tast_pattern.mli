@@ -103,7 +103,6 @@ type comp_pat = computation pattern_desc pattern_data
 val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val labelled : (string, 'a, 'b) t -> (Asttypes.arg_label, 'a, 'b) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
-val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
 
 val tpat_constructor
   :  (Longident.t, 'a, 'b) t
@@ -152,7 +151,10 @@ val texp_apply_nolabelled
   -> (expression list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
-val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t
+val texp_function
+  :  (Ident.t list, 'a, 'b) t
+  -> (case_val list, 'b, 'c) t
+  -> (expression, 'a, 'c) t
 
 val texp_function_body
   :  ((Asttypes.arg_label * (Ident.t * Warnings.loc)) list, 'a, 'b) t
@@ -253,3 +255,5 @@ val pexp_function_cases
   :  (Parsetree.pattern list, 'a -> 'a, 'b) t
   -> (Parsetree.case list, 'c, 'd) t
   -> (Parsetree.expression, 'b -> 'c, 'd) t
+(* TODO: move to some other module *)
+val source_of_info : Compile_common.info -> string
