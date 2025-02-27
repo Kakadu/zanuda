@@ -287,7 +287,7 @@ let path xs =
       (* printf "\t\tCompare names %s and %s:  %b\n%!" l r ans; *)
       ans
     in
-    let __ _ = Format.printf "path = %a\n%!" Path.print x in
+    let __ _ = Format.printf "path = %a\n%!" (Format_doc.compat Path.print) x in
     match x, ps with
     | Path.Pident id, [ id0 ] ->
       if cmp_names (Ident.name id) id0
@@ -320,7 +320,7 @@ let%test_module " " =
       Clflags.unique_ids := false;
       [%test_eq: Base.string]
         "Stdlib!.List.length"
-        (asprintf "%a" Path.print (path_of_list names));
+        (asprintf "%a" (Format_doc.compat Path.print) (path_of_list names));
       Clflags.unique_ids := old
     ;;
 
@@ -376,8 +376,10 @@ let ebool =
       | Texp_construct ({ txt = Lident "false" }, _, []) ->
         ctx.matched <- ctx.matched + 1;
         k false
-      | _ -> fail loc (sprintf "ebool"))
+      | _ -> fail loc "ebool")
 ;;
+
+[%%if ocaml_version < (5, 0, 0)]
 
 let tpat_var (T fname) =
   T
@@ -388,6 +390,23 @@ let tpat_var (T fname) =
         k |> fname ctx loc txt
       | _ -> fail loc "tpat_var")
 ;;
+
+[%%else]
+
+let tpat_var (T fname) =
+  T
+    (fun (type kind) ctx loc (x : kind pattern_desc pattern_data) k ->
+      match x.pat_desc with
+      | Tpat_value v ->
+        (match (v :> pattern).pat_desc with
+         | Tpat_var (_, { txt }, _uid) ->
+           ctx.matched <- ctx.matched + 1;
+           k |> fname ctx loc txt
+         | _ -> fail loc "tpat_var")
+      | _ -> fail loc "tpat_var")
+;;
+
+[%%endif]
 
 let tpat_constructor (T fname) (T fargs) =
   T
@@ -462,15 +481,33 @@ let texp_ident_typ (T fpath) (T ftyp) =
       | _ -> fail loc "texp_ident_typ")
 ;;
 
+[%%if ocaml_version < (5, 0, 0)]
+
 let texp_assert (T fexp) =
   T
     (fun ctx loc x k ->
-      match x.exp_desc with
-      | Texp_assert e ->
-        ctx.matched <- ctx.matched + 1;
-        fexp ctx loc e k
-      | _ -> fail loc "texp_assert")
+       match x.exp_desc with
+       | Texp_assert e ->
+         ctx.matched <- ctx.matched + 1;
+         fexp ctx loc e k
+       | _ -> fail loc "texp_assert"
+     : context -> Warnings.loc -> expression -> 'a -> 'b)
 ;;
+
+[%%else]
+
+let texp_assert (T fexp) =
+  T
+    (fun ctx loc x k ->
+       match x.exp_desc with
+       | Texp_assert (e, _) ->
+         ctx.matched <- ctx.matched + 1;
+         fexp ctx loc e k
+       | _ -> fail loc "texp_assert"
+     : context -> Warnings.loc -> expression -> 'a -> 'b)
+;;
+
+[%%endif]
 
 let texp_apply (T f0) (T args0) =
   T
@@ -541,32 +578,39 @@ let labelled (T fstr) =
 let texp_apply1 f x = texp_apply f ((nolabel ** some x) ^:: nil)
 let texp_apply2 f x y = texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
 
-[%%if ocaml_version < (4, 11, 2)]
-
-(* 4.10 *)
-type case_val = Typedtree.case
-type case_comp = Typedtree.case
-type value_pat = pattern
-type comp_pat = pattern
-
-[%%else]
-
 type case_val = value case
 type case_comp = computation case
 type value_pat = value pattern_desc pattern_data
 type comp_pat = computation pattern_desc pattern_data
 
-[%%endif]
+(* [%%if ocaml_version < (5, 0, 0)] [%%else] [%%endif] *)
+[%%if ocaml_version < (5, 0, 0)]
 
-let texp_function (T fcases) =
+let texp_function (T fparam) (T fcases) =
   T
     (fun ctx loc e k ->
       match e.exp_desc with
-      | Texp_function { cases } ->
+      | Texp_function { param; cases } ->
         ctx.matched <- ctx.matched + 1;
-        k |> fcases ctx loc cases
+        k |> fparam ctx loc param |> fcases ctx loc cases
       | _ -> fail loc "texp_function")
 ;;
+
+[%%else]
+
+let texp_function (T fparam) (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_function (params, Tfunction_cases cases) ->
+        ctx.matched <- ctx.matched + 1;
+        k
+        |> fparam ctx loc (List.map ~f:(fun p -> p.fp_param) params)
+        |> fcases ctx loc cases.cases
+      | _ -> fail loc "texp_function")
+;;
+
+[%%endif]
 
 let case (T pat) (T guard) (T rhs) =
   T
@@ -580,6 +624,7 @@ let ccase (T pat) (T guard) (T rhs) =
       k |> pat ctx loc c_lhs |> guard ctx loc c_guard |> rhs ctx loc c_rhs)
 ;;
 
+[%%if ocaml_version < (5, 0, 0)]
 let texp_match (T fexpr) (T fcases) =
   T
     (fun ctx loc e k ->
@@ -589,6 +634,18 @@ let texp_match (T fexpr) (T fcases) =
         k |> fexpr ctx loc e |> fcases ctx loc cases
       | _ -> fail loc "texp_match")
 ;;
+[%%else]
+
+let texp_match (T fexpr) (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.Typedtree.exp_desc with
+      | Texp_match (e, cases, _) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fexpr ctx loc e |> fcases ctx loc cases
+      | _ -> fail loc "texp_match")
+;;
+[%%endif]
 
 let texp_ite (T pred) (T fthen) (T felse) =
   T
@@ -599,7 +656,7 @@ let texp_ite (T pred) (T fthen) (T felse) =
         k |> pred ctx loc p |> fthen ctx loc thenb |> felse ctx loc elseb
       | _ -> fail loc "texp_ite")
 ;;
-
+[%%if ocaml_version < (5, 0, 0)]
 let texp_try (T fexpr) (T fcases) =
   T
     (fun ctx loc e k ->
@@ -609,7 +666,9 @@ let texp_try (T fexpr) (T fcases) =
         k |> fexpr ctx loc e |> fcases ctx loc cases
       | _ -> fail loc "texp_try")
 ;;
+[%%else]
 
+[%%endif]
 let texp_record (T fext) (T ffields) =
   T
     (fun ctx loc e k ->
@@ -747,44 +806,45 @@ let attribute (T fname) (T fpayload) =
       k |> fname ctx loc attr.attr_name.txt |> fpayload ctx loc attr.attr_payload)
 ;;
 
-let tstr_docattr (T f) =
+[%%if ocaml_version < (5, 0, 0)]
+
+[%%else]
+let pconst_string (T fstring)  =
   T
-    (fun ctx loc subj k ->
-      let open Parsetree in
-      match subj.str_desc with
-      | Tstr_attribute
-          { attr_payload =
-              Parsetree.PStr
-                [ { pstr_desc =
-                      Pstr_eval
-                        ( { pexp_desc = Pexp_constant (Pconst_string (docstr, _, None)) }
-                        , _ )
-                  }
-                ]
-          } ->
-        ctx.matched <- ctx.matched + 1;
-        k |> f ctx loc docstr
-      | _ -> fail loc "tstr_docattr")
+    (fun ctx loc x k ->
+      match x.Parsetree.pconst_desc with
+      | Parsetree.Pconst_string (s, _,_) -> k |> fstring ctx loc s
+      | _ -> fail loc "pconst_string")
+;;
+let payload_stru (T fstru)  =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Parsetree.PStr stru -> k |> fstru ctx loc stru
+      | _ -> fail loc "payload_string")
+;;
+let pstr_eval (T f)  =
+  T
+    (fun ctx loc x k ->
+      match x.Parsetree.pstr_desc with
+      | Parsetree.Pstr_eval (e,_) -> k |> f ctx loc e
+      | _ -> fail loc "pstr_eval")
+;;
+let pexp_constant (T f)  =
+  T
+    (fun ctx loc e k ->
+      match e.Parsetree.pexp_desc with
+      | Parsetree.Pexp_constant e -> k |> f ctx loc e
+      | _ -> fail loc "pexp_constant")
+;;
+[%%endif]
+
+let tstr_docattr on_str =
+  tstr_attribute (attribute drop (payload_stru (pstr_eval (pexp_constant (pconst_string on_str)) ^:: nil)))
 ;;
 
-let tsig_docattr (T f) =
-  T
-    (fun ctx loc subj k ->
-      let open Parsetree in
-      match subj.sig_desc with
-      | Tsig_attribute
-          { attr_payload =
-              Parsetree.PStr
-                [ { pstr_desc =
-                      Pstr_eval
-                        ( { pexp_desc = Pexp_constant (Pconst_string (docstr, _, None)) }
-                        , _ )
-                  }
-                ]
-          } ->
-        ctx.matched <- ctx.matched + 1;
-        k |> f ctx loc docstr
-      | _ -> fail loc "tsig_docattr")
+let tsig_docattr on_str =
+  tsig_attribute (attribute drop (payload_stru (pstr_eval (pexp_constant (pconst_string on_str)) ^:: nil)))
 ;;
 
 type context = Ast_pattern0.context
@@ -792,3 +852,13 @@ type context = Ast_pattern0.context
 let of_func f = T f
 let to_func (T f) = f
 let fail = fail
+
+[%%if ocaml_version < (5, 0, 0)]
+
+let get_source_file info = info.Compile_common.source_file
+
+[%%else]
+
+let source_of_info info = Unit_info.source_file info.Compile_common.target
+
+[%%endif]

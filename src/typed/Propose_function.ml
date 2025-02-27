@@ -49,7 +49,7 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
-let msg ppf () = Caml.Format.fprintf ppf "Using `function` is recommended%!"
+let msg ppf () = Stdlib.Format.fprintf ppf "Using `function` is recommended%!"
 
 let report filename ~loc =
   let module M = struct
@@ -73,7 +73,7 @@ let no_ident ident c = Utils.no_ident ident (fun it -> it.case it c)
 let run _ fallback =
   let pat =
     let open Tast_pattern in
-    texp_function (case (tpat_var __) none (texp_match (texp_ident __) __) ^:: nil)
+    texp_function drop (case (tpat_var __) none (texp_match (texp_ident __) __) ^:: nil)
   in
   let open Tast_iterator in
   { fallback with
@@ -95,7 +95,7 @@ let run _ fallback =
                 Collected_lints.add
                   ~loc
                   (report loc.Location.loc_start.Lexing.pos_fname ~loc);
-                Refactoring.Propose_function.apply_fix expr.exp_desc)
+                Refactoring.ProposeFunction.apply_fix expr)
             | _ -> ())
           ();
         fallback.expr self expr)

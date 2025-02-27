@@ -92,7 +92,7 @@ let recover_filepath filepath =
     | Some prefix when String.starts_with filepath ~prefix ->
       Base.String.drop_prefix filepath (String.length prefix)
     | Some prefix when verbose () ->
-      Caml.Format.eprintf "Can't cut prefix '%s' from '%s'\n%!" prefix filepath;
+      Stdlib.Format.eprintf "Can't cut prefix '%s' from '%s'\n%!" prefix filepath;
       filepath
     | Some _ | None -> filepath
   in
@@ -117,7 +117,7 @@ let is_enabled () =
 ;;
 
 let parse_args () =
-  let open Caml in
+  let open Stdlib in
   let standard_args =
     [ "-o", Arg.String set_out_file, "[FILE] Set Markdown output file"
     ; "-dump", Arg.Unit set_dump_text, "Dump info about available lints to terminal"
@@ -145,7 +145,7 @@ let parse_args () =
       , Arg.Unit
           (fun () ->
             let open Build_info.V1 in
-            Printf.printf
+            Stdlib.Printf.printf
               "version: %s\n"
               (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
       , " Print version" )

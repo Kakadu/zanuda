@@ -7,7 +7,7 @@
 [@@@ocaml.text "/*"]
 
 open Base
-module Format = Caml.Format
+module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 
@@ -45,7 +45,7 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
-let msg ppf s = Caml.Format.fprintf ppf "%s\n%!" s
+let msg ppf s = Stdlib.Format.fprintf ppf "%s\n%!" s
 
 let report filename ~loc e =
   let module M = struct

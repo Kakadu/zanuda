@@ -33,7 +33,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf () =
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Using `failwith` (or `assert false`) usually is a clue that a corner case is not \
      being handled properly. To report errors we recommend using error monad instead. In \
