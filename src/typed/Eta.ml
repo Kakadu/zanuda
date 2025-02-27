@@ -52,7 +52,12 @@ let expr2string e0 =
 
 let msg ppf (old_expr, new_expr) =
   let open Parsetree in
-  Caml.Format.fprintf
+  let e = MyUntype.untype_expression e0 in
+  let si =
+    let open Ast_helper in
+    Format.asprintf "%a" Pprintast.expression e
+  in
+  Stdlib.Format.fprintf
     ppf
     "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
     Pprintast.expression

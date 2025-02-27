@@ -37,7 +37,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf () =
-  Caml.Format.fprintf
+  Stdlib.Format.fprintf
     ppf
     "Using nested if expressions more than three layers deep is a bad practice. Use let \
      statements or helper methods or rethinking logic.%!"

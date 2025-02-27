@@ -21,7 +21,7 @@ module _ = struct
   [@@deriving protocol ~driver:(module Xmlm)]
 
   open Base
-  open Caml.Format
+  open Stdlib.Format
 
   let () =
     printf
@@ -112,7 +112,7 @@ module _ = struct
   ;;
 
   open Base
-  module Format = Caml.Format
+  module Format = Stdlib.Format
   open Format
   open Sexplib.Sexp
 

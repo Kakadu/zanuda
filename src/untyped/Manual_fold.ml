@@ -7,7 +7,7 @@
 [@@@ocaml.text "/*"]
 
 open Base
-open Caml.Format
+open Stdlib.Format
 open Zanuda_core
 open Utils
 

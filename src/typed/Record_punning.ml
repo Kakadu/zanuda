@@ -7,7 +7,7 @@
 [@@@ocaml.text "/*"]
 
 open Base
-module Format = Caml.Format
+module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Tast_pattern
@@ -43,7 +43,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf expr =
-  Caml.Format.fprintf ppf "Rewrite record as '%a'%!" Pprintast.expression expr
+  Stdlib.Format.fprintf ppf "Rewrite record as '%a'%!" Pprintast.expression expr
 ;;
 
 let report filename ~loc expr =
