@@ -6,7 +6,6 @@
 
 [@@@ocaml.text "/*"]
 
-open Format
 open Zanuda_core
 open Utils
 open Parsetree
@@ -30,7 +29,7 @@ let describe_as_json () =
 ;;
 
 let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
-let msg ppf () = fprintf ppf "Toplevel eval not recommended"
+let msg ppf () = Format.fprintf ppf "Toplevel eval not recommended"
 
 let report ~filename ~loc =
   let module M = struct

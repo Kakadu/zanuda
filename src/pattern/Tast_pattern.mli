@@ -251,9 +251,10 @@ val of_func : (context -> Location.t -> 'a -> 'b -> 'c) -> ('a, 'b, 'c) t
 val to_func : ('a, 'b, 'c) t -> context -> Location.t -> 'a -> 'b -> 'c
 val fail : Warnings.loc -> string -> 'a
 
-val pexp_function_cases
-  :  (Parsetree.pattern list, 'a -> 'a, 'b) t
-  -> (Parsetree.case list, 'c, 'd) t
-  -> (Parsetree.expression, 'b -> 'c, 'd) t
+val pexp_function_cases:
+  (Parsetree.pattern list, 'a, 'b) t ->
+  (Parsetree.case list, 'b, 'c) t ->
+  (Parsetree.expression, Parsetree.expression -> 'a, 'c) t
+
 (* TODO: move to some other module *)
 val source_of_info : Compile_common.info -> string

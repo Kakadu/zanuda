@@ -669,6 +669,30 @@ let texp_function (T fparam) (T fcases) =
       | _ -> fail loc "texp_function")
 ;;
 
+let texp_function_cases (T fparam) (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_function (params, Tfunction_cases cases) ->
+        ctx.matched <- ctx.matched + 1;
+        k
+        |> fparam ctx loc (List.map (fun p -> (p.fp_arg_label,p.fp_param)) params)
+        |> fcases ctx loc cases.cases
+      | _ -> fail loc "texp_function")
+;;
+
+let texp_function_body (T fparam) (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Typedtree.Texp_function (params, Tfunction_body e) ->
+        ctx.matched <- ctx.matched + 1;
+        k
+        |> fparam ctx loc (List.map (fun p -> (p.fp_arg_label,(p.fp_param, p.fp_loc))) params)
+        |> fcases ctx loc e
+      | _ -> fail loc "texp_function")
+;;
+
 [%%endif]
 
 let case (T pat) (T guard) (T rhs) =
@@ -776,6 +800,15 @@ let texp_try (T fexpr) (T fcases) =
 ;;
 [%%else]
 
+let texp_try (T fexpr) (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Typedtree.Texp_try (e, cases, _) ->
+        (* TODO: support effects *)
+        ctx.matched <- ctx.matched + 1;
+        k |> fexpr ctx loc e |> fcases ctx loc cases
+      | _ -> fail loc "texp_try")
 [%%endif]
 let texp_record (T fext) (T ffields) =
   T
@@ -934,6 +967,23 @@ let pexp_function_cases (T fargs) (T fcases) =
 ;;
 
 [%%else]
+
+let pexp_function_cases (T fargs) (T fcases) =
+  let open Parsetree in
+  T (fun ctx loc x k ->
+    match x.pexp_desc with
+    | Pexp_function (params, _, Pfunction_cases (cases,_,_)) ->
+        let args = List.map (fun p ->
+          match p.pparam_desc with
+          | Pparam_val (Nolabel, _, pat) -> pat
+          | Pparam_newtype _
+          | _ -> fail loc "pexp_function_cases: params"
+          ) params
+        in
+        k x |> fargs ctx loc args |> fcases ctx loc cases
+    | _ -> fail loc "pexp_function_cases" )
+;;
+
 let pconst_string (T fstring)  =
   T
     (fun ctx loc x k ->
