@@ -1,6 +1,6 @@
 (** Detection of possible eta-conversion.
 
-    Initial implementation was contrivbuted by Github user jegorpopow *)
+    Initial implementation was contributed by Github user jegorpopow *)
 
 [@@@ocaml.text "/*"]
 

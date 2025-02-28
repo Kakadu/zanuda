@@ -135,7 +135,7 @@ module State = struct
       st_kept
       (pp_print_list
          ~pp_sep:(fun ppf () -> fprintf ppf " ")
-         (fun ppf (s, path) -> fprintf ppf "(%s,%a)" s Path.print path))
+         (fun ppf (s, path) -> fprintf ppf "(%s,%a)" s (Format_doc.compat Path.print) path))
       st_over_self
       (pp_print_list
          ~pp_sep:(fun ppf () -> fprintf ppf " ")

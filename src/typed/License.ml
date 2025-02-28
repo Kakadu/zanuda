@@ -166,13 +166,13 @@ let run info fallback =
     let pm = tsig_docattr __ in
     parse pm h1.sig_loc h1 ~on_error:(fun _ -> None) (fun s -> Some s)
   in
-  let filename = info.Compile_common.source_file in
+  let filename = Tast_pattern.source_of_info info in
   let iter_items extract get_loc items =
     let on_last_line () =
       let loc, loc2 =
         match items with
         | [] ->
-          let l = Location.in_file info.Compile_common.source_file in
+          let l = Location.in_file filename in
           l, l
         | h :: [] ->
           let l = get_loc h in
