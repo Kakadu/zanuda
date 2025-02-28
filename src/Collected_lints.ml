@@ -50,9 +50,9 @@ let report () =
     | Some s ->
       let (_ : int) = Sys.command (Format.asprintf "touch %s" s) in
       (* By some reason on CI Open_creat is not enough to create a file *)
-      let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
+      let ch = open_out_gen [ Open_append; Open_creat ] 0o666 s in
       [ ( (fun (module M : LINT.REPORTER) -> M.rdjsonl)
-        , Caml.Format.formatter_of_out_channel ch
+        , Format.formatter_of_out_channel ch
         , ch )
       ]
     | None -> []
@@ -72,7 +72,7 @@ let report () =
     ~finally:(fun () ->
       let f (_, ppf, ch) =
         Format.fprintf ppf "%!";
-        Caml.close_out ch
+        close_out ch
       in
       List.iter f all_files)
 ;;

@@ -6,7 +6,6 @@
 
 [@@@ocaml.text "/*"]
 
-module Format = Caml.Format
 open Zanuda_core
 open Zanuda_core.Utils
 
