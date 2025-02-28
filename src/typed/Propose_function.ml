@@ -95,7 +95,7 @@ let run _ fallback =
                 Collected_lints.add
                   ~loc
                   (report loc.Location.loc_start.Lexing.pos_fname ~loc);
-                Refactoring.ProposeFunction.apply_fix expr)
+                Refactoring.Propose_function.apply_fix expr)
             | _ -> ())
           ();
         fallback.expr self expr)
