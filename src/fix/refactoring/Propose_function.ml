@@ -17,7 +17,7 @@ let get_match_constr_payload ematch_case =
     let c = first_case ematch_case in
     c.c_rhs
   in
-  let pat = texp_match (texp_ident __) __ in
+  let pat = texp_match (texp_ident __) drop __ in
   parse
     pat
     e.exp_loc

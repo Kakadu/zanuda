@@ -1,6 +1,6 @@
 (** Detection of possible eta-conversion.
 
-    Initial implementation was contrivbuted by Github user jegorpopow *)
+    Initial implementation was contributed by Github user jegorpopow *)
 
 [@@@ocaml.text "/*"]
 
@@ -52,11 +52,11 @@ let expr2string e0 =
 
 let msg ppf (old_expr, new_expr) =
   let open Parsetree in
-  let e = MyUntype.untype_expression e0 in
+  (* let e = My_untype.untype_expression e0 in
   let si =
     let open Ast_helper in
     Format.asprintf "%a" Pprintast.expression e
-  in
+  in *)
   Stdlib.Format.fprintf
     ppf
     "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
