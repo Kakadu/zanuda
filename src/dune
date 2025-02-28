@@ -35,7 +35,7 @@
    ppx_optcomp
    ppx_sexp_conv
    ;ppx_inline_test ; implies dependecy on base
-   ppx_expect))
+   ppx_expect_nobase))
  (instrumentation
   (backend bisect_ppx))
  (inline_tests))
@@ -53,7 +53,7 @@
   TypedLints
   UntypedLints)
  (preprocess
-  (pps ppx_inline_test))
+  (pps ppx_inline_test_nobase))
  (instrumentation
   (backend bisect_ppx))
  (package zanuda))
