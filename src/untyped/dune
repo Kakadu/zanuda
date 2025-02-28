@@ -9,9 +9,9 @@
   Manual_fold
   Manual_map
   Parsetree_has_docs
-  ;Propose_function
+  Propose_function
   Toplevel_eval
-  Var_should_not_be_used
+  ; Var_should_not_be_used
   ;
   )
  (instrumentation
