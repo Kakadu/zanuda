@@ -638,13 +638,13 @@ let texp_match (T fexpr) (T fcases) =
 ;;
 [%%else]
 
-let texp_match (T fexpr) (T fcases) =
+let texp_match (T fexpr) (T fccases) (T fvcases) =
   T
     (fun ctx loc e k ->
       match e.Typedtree.exp_desc with
-      | Texp_match (e, cases, _) ->
+      | Texp_match (e, ccases, vcases, _) ->
         ctx.matched <- ctx.matched + 1;
-        k |> fexpr ctx loc e |> fcases ctx loc cases
+        k |> fexpr ctx loc e |> fccases ctx loc ccases |> fvcases ctx loc vcases
       | _ -> fail loc "texp_match")
 ;;
 [%%endif]
@@ -669,8 +669,16 @@ let texp_try (T fexpr) (T fcases) =
       | _ -> fail loc "texp_try")
 ;;
 [%%else]
-
+let texp_try (T fexpr) (T fcases) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_try (e, cases, _effects) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fexpr ctx loc e |> fcases ctx loc cases
+      | _ -> fail loc "texp_try")
 [%%endif]
+
 let texp_record (T fext) (T ffields) =
   T
     (fun ctx loc e k ->
@@ -767,6 +775,45 @@ let rec typ_arrow (T l) (T r) =
     | _ -> fail loc "typ_arrow"
   in
   T helper
+;;
+let typ_kind_abstract =
+  T (fun ctx loc x k ->
+    match x with
+    | Typedtree.Ttype_abstract ->
+      ctx.matched <- ctx.matched + 1;
+      k
+    | _ -> fail loc "typ_kind_abstract"
+  )
+;;
+
+let typ_kind_open =
+  T (fun ctx loc x k ->
+    match x with
+    | Typedtree.Ttype_open ->
+      ctx.matched <- ctx.matched + 1;
+      k
+    | _ -> fail loc "typ_kind_open"
+  )
+;;
+
+let typ_kind_variant =
+  T (fun ctx loc x k ->
+    match x with
+    | Typedtree.Ttype_variant _ ->
+      ctx.matched <- ctx.matched + 1;
+      k
+    | _ -> fail loc "typ_kind_variant"
+  )
+;;
+
+let typ_kind_record (T flabels) =
+  T (fun ctx loc x k ->
+    match x with
+    | Typedtree.Ttype_record labels  ->
+      ctx.matched <- ctx.matched + 1;
+      k |> flabels ctx loc labels
+    | _ -> fail loc "typ_kind_record"
+  )
 ;;
 
 (* Structure *)

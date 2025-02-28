@@ -72,8 +72,8 @@ module Report = struct
       ; loc_end = { loc.loc_end with pos_fname = !input_name }
       }
     in
-    let main = Location.mkloc (fun ppf -> msg ppf msg_arg) loc in
-    let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter" } in
+    let main = Location.mkloc (Format_doc.doc_printf "%s" (Format.asprintf "%a" msg msg_arg)) loc in
+    let r = Location.{ sub = []; main; kind = Report_alert "zanuda-linter"; footnote=None } in
     Location.print_report ppf r
   ;;
 

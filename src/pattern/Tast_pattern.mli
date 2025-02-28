@@ -175,7 +175,8 @@ val texp_construct
 val texp_match
   :  (expression, 'a, 'b) t
   -> (case_comp list, 'b, 'c) t
-  -> (expression, 'a, 'c) t
+  -> (case_val list, 'c, 'd) t
+  -> (expression, 'a, 'd) t
 
 val texp_ite
   :  (expression, 'a, 'b) t
@@ -216,6 +217,11 @@ val typ_arrow
   :  (Types.type_expr, 'a, 'b) t
   -> (Types.type_expr, 'b, 'c) t
   -> (Types.type_expr, 'a, 'c) t
+
+val typ_kind_abstract: (type_kind, 'c, 'c) t
+val typ_kind_open: (type_kind, 'c, 'c) t
+val typ_kind_variant: (type_kind, 'c, 'c) t
+val typ_kind_record: (label_declaration list, 'b, 'c) t -> (type_kind, 'b, 'c) t
 
 val core_typ : (Types.type_expr, 'a, 'b) t -> (core_type, 'a, 'b) t
 

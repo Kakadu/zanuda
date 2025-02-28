@@ -74,6 +74,7 @@ let run _ fallback =
     let open Tast_pattern in
     texp_match
       __
+      drop
       (ccase (tpat_constructor __ nil |> tpat_value) none __
        ^:: ccase (tpat_constructor __ nil |> tpat_value) none __
        ^:: nil)
