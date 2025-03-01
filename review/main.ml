@@ -38,7 +38,12 @@ let info =
 open Printf
 
 let github_patch_url ~owner ~repo ~pull_number =
-  Printf.sprintf "https://api.github.com/repos/%s/%s/pulls/%d" owner repo pull_number
+  Printf.sprintf
+    "https://%s/raw/%s/%s/pull/%d.diff"
+    "patch-diff.githubusercontent.com"
+    owner
+    repo
+    pull_number
 ;;
 
 let get_diff ~owner ~repo ~pull_number =
