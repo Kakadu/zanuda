@@ -181,6 +181,7 @@ let no_ident ident =
     | Found -> false
 ;;
 
+<<<<<<< HEAD
 [%%if ocaml_version < (5, 0, 0)]
 
 type intf_or_impl =
@@ -210,3 +211,10 @@ let with_info kind ~source_file =
 ;;
 
 [%%endif]
+=======
+let with_info ~source_file =
+  Compile_common.with_info ~native:false
+    ~tool_name:"asdf" (* TODO: pass right tool name *)
+    ~dump_ext:"asdf"
+    (Unit_info.make ~source_file Unit_info.Impl "")
+>>>>>>> d5d1f17 (Extract with_info)
