@@ -69,7 +69,7 @@ let report filename ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let no_ident ident c =
+let no_ ident ident c =
   let exception Found in
   let open Ast_iterator in
   let open Parsetree in

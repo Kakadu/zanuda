@@ -152,6 +152,11 @@ val texp_apply_nolabelled
 
 val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t
 
+val texp_function_body
+  :  ((Asttypes.arg_label * Ident.t) list, 'a, 'b) t
+  -> (expression, 'b, 'c) t
+  -> (expression, 'a, 'c) t
+
 val case
   :  (pattern, 'a, 'b) t
   -> (expression option, 'b, 'c) t

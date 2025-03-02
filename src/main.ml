@@ -21,7 +21,7 @@ let untyped_linters =
   ; (module Manual_map : LINT.UNTYPED)
   ; (module Parsetree_has_docs : LINT.UNTYPED)
   ; (module Toplevel_eval : LINT.UNTYPED)
-  ; (module UntypedLints.Propose_function : LINT.UNTYPED)
+    (* ; (module UntypedLints.Propose_function : LINT.UNTYPED) *)
   ; (module Var_should_not_be_used : LINT.UNTYPED)
   ]
 ;;
