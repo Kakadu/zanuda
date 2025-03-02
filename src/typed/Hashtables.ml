@@ -136,7 +136,7 @@ let run _ fallback =
           (* TODO(Kakadu): Algebraic constuctors could have mutable record arguments (issue #59) *)
         | `Check_labels labels ->
           ListLabels.iter labels ~f:(function
-          | { Types.ld_mutable = Mutable; ld_loc = loc; _ } ->
+          | { Typedtree.ld_mutable = Mutable; ld_loc = loc; _ } ->
             Collected_lints.add
               ~loc
               (report loc.Location.loc_start.Lexing.pos_fname ~loc ())

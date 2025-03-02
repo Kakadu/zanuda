@@ -45,7 +45,7 @@ let get_propose_function_payload ematch_case =
 let apply_fix expr =
   Tast_pattern.(
     parse
-      (texp_function drop __)
+      (texp_function_cases drop __)
       expr.exp_loc
       expr
       ~on_error:(fun _ -> failwith "invalid_arg")

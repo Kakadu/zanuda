@@ -11,7 +11,7 @@
   Eta
   Failwith
   Format
-  Guard_instead_of_if
+  ;Guard_instead_of_if
   Hashtables
   If_bool
   Ignore
@@ -19,14 +19,14 @@
   List_fusion
   List_length
   Match_Bool
-  Monad_laws
+  ;Monad_laws
   Mutually_rec_types
   Nested_if
-  Propose_function
+  ;Propose_function
   Record_punning
   String_concat
   String_concat_fold
-  Tuple_matching
+  ;Tuple_matching
   ;
   )
  (preprocess

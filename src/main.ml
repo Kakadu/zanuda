@@ -6,7 +6,6 @@
 
 [@@@ocaml.text "/*"]
 
-open Caml
 open Base
 open Zanuda_core
 open Utils
@@ -18,12 +17,12 @@ let untyped_linters =
   [ (module Casing : LINT.UNTYPED)
   ; (module UntypedLints.Dollar : LINT.UNTYPED)
   ; (module Expect_names : LINT.UNTYPED)
-  ; (module Manual_fold : LINT.UNTYPED)
-  ; (module Manual_map : LINT.UNTYPED)
-  ; (module Parsetree_has_docs : LINT.UNTYPED)
+  (* ; (module Manual_fold : LINT.UNTYPED) *)
+  (* ; (module Manual_map : LINT.UNTYPED) *)
+  (* ; (module Parsetree_has_docs : LINT.UNTYPED) *)
   ; (module Toplevel_eval : LINT.UNTYPED)
-  ; (module UntypedLints.Propose_function : LINT.UNTYPED)
-  ; (module Var_should_not_be_used : LINT.UNTYPED)
+  (* ; (module UntypedLints.Propose_function : LINT.UNTYPED) *)
+  (* ; (module Var_should_not_be_used : LINT.UNTYPED) *)
   ]
 ;;
 
@@ -38,21 +37,21 @@ let typed_linters =
   ; (module Equality_phys : LINT.TYPED)
   ; (module Eta : LINT.TYPED)
   ; (module Format : LINT.TYPED)
-  ; (module Guard_instead_of_if : LINT.TYPED)
+  (* ; (module Guard_instead_of_if : LINT.TYPED) *)
   ; (module Hashtables : LINT.TYPED)
   ; (module If_bool : LINT.TYPED)
   ; (module Ignore : LINT.TYPED)
   ; (module List_fusion : LINT.TYPED)
   ; (module List_length : LINT.TYPED)
-  ; (module Match_Bool : LINT.TYPED)
-  ; (module Monad_laws : LINT.TYPED)
+  (* ; (module Match_Bool : LINT.TYPED) *)
+  (* ; (module Monad_laws : LINT.TYPED) *)
   ; (module Mutually_rec_types : LINT.TYPED)
   ; (module Nested_if : LINT.TYPED)
-  ; (module Propose_function : LINT.TYPED)
+  (* ; (module Propose_function : LINT.TYPED) *)
   ; (module Record_punning : LINT.TYPED)
   ; (module String_concat : LINT.TYPED)
   ; (module String_concat_fold : LINT.TYPED)
-  ; (module Tuple_matching : LINT.TYPED)
+  (* ; (module Tuple_matching : LINT.TYPED) *)
     (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
   ]
 ;;
@@ -140,15 +139,7 @@ let run_typed_lints entry info =
 let typed_on_structure = run_typed_lints (fun o -> o.Tast_iterator.structure o)
 let typed_on_signature = run_typed_lints (fun o -> o.Tast_iterator.signature o)
 
-let with_info filename f =
-  Compile_common.with_info
-    ~native:false
-    ~source_file:filename
-    ~tool_name:"asdf" (* TODO: pass right tool name *)
-    ~output_prefix:"asdf"
-    ~dump_ext:"asdf"
-    f
-;;
+let with_info filename = Utils.with_info ~source_file:filename
 
 let process_cmt_typedtree _is_wrapped filename typedtree =
   if Config.verbose ()
@@ -180,20 +171,12 @@ let find_unused_in_cmt_typedtree is_wrapped filename typedtree =
 ;;
 
 let process_untyped filename =
-  if not (Caml.Sys.file_exists filename)
+  if not (Stdlib.Sys.file_exists filename)
   then Format.eprintf "Error: file %s doesn't exist. Continuing\n%!" filename
   else (
     Clflags.error_style := Some Misc.Error_style.Contextual;
     Clflags.include_dirs := Config.includes () @ Clflags.include_dirs.contents;
-    let with_info f =
-      Compile_common.with_info
-        ~native:false
-        ~source_file:filename
-        ~tool_name:"asdf" (* TODO: pass right tool name *)
-        ~output_prefix:"asdf"
-        ~dump_ext:"asdf"
-        f
-    in
+    let with_info = Utils.with_info ~source_file:filename in
     let process_structure info =
       let parsetree = Compile_common.parse_impl info in
       untyped_on_structure info parsetree
@@ -203,24 +186,24 @@ let process_untyped filename =
       untyped_on_signature info parsetree
     in
     with_info (fun info ->
-      if String.is_suffix info.source_file ~suffix:".ml"
+      if String.is_suffix filename ~suffix:".ml"
       then process_structure info
-      else if String.is_suffix info.source_file ~suffix:".mli"
+      else if String.is_suffix filename ~suffix:".mli"
       then process_signature info
       else (
         let () =
           Stdlib.Format.eprintf
             "Don't know to do with file '%s'\n%s %d\n%!"
-            info.source_file
-            Caml.__FILE__
-            Caml.__LINE__
+            filename
+            __FILE__
+            __LINE__
         in
-        Caml.exit 1)))
+        exit 1)))
 ;;
 
 let () =
   let config_filename = ".zanuda" in
-  if Caml.Sys.file_exists config_filename
+  if Stdlib.Sys.file_exists config_filename
   then (
     let s = In_channel.with_open_text config_filename In_channel.input_all in
     String.split s ~on:'\n'
@@ -267,11 +250,12 @@ let () =
         |> List.sort ~compare:(fun (a, _) (b, _) -> String.compare a b)
         |> List.map ~f:snd
       in
-      let ch = Caml.open_out filename in
+      let ch = Stdlib.open_out filename in
+      (* TODO: rewrite with Out_channel *)
       Exn.protect
         ~f:(fun () -> Yojson.Safe.pretty_to_channel ~std:true ch (`List info))
-        ~finally:(fun () -> Caml.close_out ch);
-      Caml.exit 0
+        ~finally:(fun () -> Stdlib.close_out ch);
+      Stdlib.exit 0
     | File file ->
       process_untyped file;
       Collected_lints.report ();
