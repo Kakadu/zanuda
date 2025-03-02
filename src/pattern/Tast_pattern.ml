@@ -598,7 +598,7 @@ let texp_function (T fparam) (T fcases) =
 
 [%%else]
 
-let texp_function (T fparam) (T fcases) =
+let texp_function_cases (T fparam) (T fcases) =
   T
     (fun ctx loc e k ->
       match e.exp_desc with
@@ -607,7 +607,18 @@ let texp_function (T fparam) (T fcases) =
         k
         |> fparam ctx loc (List.map ~f:(fun p -> p.fp_param) params)
         |> fcases ctx loc cases.cases
-      | _ -> fail loc "texp_function")
+      | _ -> fail loc "texp_function_body")
+;;
+let texp_function_body (T fparam) (T fexpr) =
+  T
+    (fun ctx loc e k ->
+      match e.exp_desc with
+      | Texp_function (params, Tfunction_body ebody) ->
+        ctx.matched <- ctx.matched + 1;
+        k
+        |> fparam ctx loc (List.map ~f:(fun p -> p.fp_param) params)
+        |> fexpr ctx loc ebody
+      | _ -> fail loc "texp_function_body")
 ;;
 
 [%%endif]
