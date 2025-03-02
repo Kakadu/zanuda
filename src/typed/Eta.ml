@@ -59,7 +59,7 @@ let msg ppf (old_expr, new_expr) =
   in *)
   Stdlib.Format.fprintf
     ppf
-    "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
+    "@[<v>@[Eta reduction proposed. It's recommended to rewrite @]@,@[@['%a'@] as @['%a'@]@]@]%!"
     Pprintast.expression
     (My_untype.expr old_expr)
     Pprintast.expression
@@ -95,7 +95,7 @@ let run _ fallback =
       Some path
     | _ -> None
   in
-  let rec pat_func ctx lc e k =
+  (* let rec pat_func ctx lc e k =
     let open Tast_pattern in
     match e.Typedtree.exp_desc with
     | Texp_function
@@ -108,10 +108,40 @@ let run _ fallback =
       else fail lc "eta-reduction FC pattern"
     | _ -> fail lc "eta-reduction FC pattern"
   in
-  let pat = of_func pat_func in
+  let pat = of_func pat_func in *)
+  let pat =
+    let open Tast_pattern in
+    let is_pat_var arg =
+      parse (tpat_var __) arg.Typedtree.pat_loc
+      ~on_error: (fun _ -> None)
+      arg
+      (fun s -> Some s)
+    in
+    let is_ident_expr arg =
+      parse (texp_ident __) arg.Typedtree.exp_loc
+      ~on_error: (fun _ -> None)
+      arg
+      (fun s -> Some s)
+    in
+    fun loca ->
+    texp_function_body  __ (texp_apply_nolabelled (as__ (texp_ident drop)) __)
+    |> map3 ~f:(fun formal_args fid real_args ->
+        let formal_len = List.length formal_args in
+        if formal_len <> List.length real_args
+        then fail loca "Not for eta-expansion"
+        else
+          let formal_pats = List.map Fun.id formal_args in
+          let formal_idents = List.filter_map is_ident_expr real_args in
+          let idents_len = List.length formal_idents in
+          if (List.length formal_pats = idents_len && idents_len = formal_len)
+          then (formal_args, fid, formal_idents)
+        else fail loca "Not for eta-expansion"
+      )
+  in
   let open Tast_iterator in
   let check expr (ids, new_expr, args) () =
     let open Typedtree in
+    let _ : Ident.t list = ids in
     let loc = expr.exp_loc in
     let extract_ident = function
       | Path.Pident id -> Some id
@@ -128,8 +158,8 @@ let run _ fallback =
     let args_len = List.length args in
     if args_len > 0
        && args_len = List.length idents
-       && List.equal String.equal ids (List.map Ident.name idents)
-       && (not (Base.List.contains_dup ~compare:String.compare ids))
+       && List.equal (fun a b -> String.equal (Ident.name a) (Ident.name b)) ids idents
+       && (not (Base.List.contains_dup ~compare:Ident.compare ids))
        && List.for_all (no_ident new_expr) idents
     then
       if not (Collected_lints.has_tdecl_at loc)
@@ -143,7 +173,7 @@ let run _ fallback =
       (fun self expr ->
         let open Typedtree in
         Tast_pattern.parse
-          pat
+          (pat expr.exp_loc)
           expr.exp_loc
           ~on_error:(fun _desc () -> ())
           expr

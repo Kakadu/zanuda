@@ -75,8 +75,8 @@ let run _ fallback =
     texp_match
       __
       drop
-      (ccase (tpat_constructor __ nil |> tpat_value) none __
-       ^:: ccase (tpat_constructor __ nil |> tpat_value) none __
+      (case (tpat_constructor __ nil) none __
+       ^:: case (tpat_constructor __ nil) none __
        ^:: nil)
   in
   let open Tast_iterator in
