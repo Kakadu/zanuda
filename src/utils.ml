@@ -137,16 +137,13 @@ let _ =
 
 let no_ident ident =
   let exception Found in
-  let pexpr loc expr ~on_error sk =
+  let pexpr =
     (let open Tast_pattern in
      parse
        (as__ (texp_ident __)
         |> map2 ~f:(fun _ x -> `Ident x)
-        ||| (texp_function __ __ |> map2 ~f:(fun ps _cases -> `Function ps))))
-      loc
-      expr
-      ~on_error
-      sk
+        ||| (texp_function_cases __ __ |> map2 ~f:(fun ps _cases -> `Function ps))))
+    (* TODO: what about texp_function_body *)
   in
   let open Tast_iterator in
   let open Typedtree in
@@ -184,3 +181,9 @@ let no_ident ident =
     with
     | Found -> false
 ;;
+
+let with_info ~source_file =
+  Compile_common.with_info ~native:false
+    ~tool_name:"asdf" (* TODO: pass right tool name *)
+    ~dump_ext:"asdf"
+    (Unit_info.make ~source_file Unit_info.Impl "")
