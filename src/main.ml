@@ -1,12 +1,11 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Caml
 open Base
 open Zanuda_core
 open Utils
@@ -140,28 +139,18 @@ let run_typed_lints entry info =
 let typed_on_structure = run_typed_lints (fun o -> o.Tast_iterator.structure o)
 let typed_on_signature = run_typed_lints (fun o -> o.Tast_iterator.signature o)
 
-let with_info filename f =
-  Compile_common.with_info
-    ~native:false
-    ~source_file:filename
-    ~tool_name:"asdf" (* TODO: pass right tool name *)
-    ~output_prefix:"asdf"
-    ~dump_ext:"asdf"
-    f
-;;
-
 let process_cmt_typedtree _is_wrapped filename typedtree =
   if Config.verbose ()
   then
     printfn "process_cmt_typedtree cmt: %s" filename
     (*Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree*);
-  with_info filename (fun info ->
+  Utils.(with_info Impl) filename (fun info ->
     process_per_file_linters_str info typedtree;
     typed_on_structure info typedtree)
 ;;
 
 let process_cmti_typedtree _is_wrapped filename typedtree =
-  with_info filename (fun info ->
+  Utils.(with_info Intf) filename (fun info ->
     process_per_file_linters_sig info typedtree;
     typed_on_signature info typedtree)
 ;;
@@ -180,20 +169,11 @@ let find_unused_in_cmt_typedtree is_wrapped filename typedtree =
 ;;
 
 let process_untyped filename =
-  if not (Caml.Sys.file_exists filename)
+  if not (Stdlib.Sys.file_exists filename)
   then Format.eprintf "Error: file %s doesn't exist. Continuing\n%!" filename
   else (
     Clflags.error_style := Some Misc.Error_style.Contextual;
     Clflags.include_dirs := Config.includes () @ Clflags.include_dirs.contents;
-    let with_info f =
-      Compile_common.with_info
-        ~native:false
-        ~source_file:filename
-        ~tool_name:"asdf" (* TODO: pass right tool name *)
-        ~output_prefix:"asdf"
-        ~dump_ext:"asdf"
-        f
-    in
     let process_structure info =
       let parsetree = Compile_common.parse_impl info in
       untyped_on_structure info parsetree
@@ -202,25 +182,24 @@ let process_untyped filename =
       let parsetree = Compile_common.parse_intf info in
       untyped_on_signature info parsetree
     in
-    with_info (fun info ->
-      if String.is_suffix info.source_file ~suffix:".ml"
-      then process_structure info
-      else if String.is_suffix info.source_file ~suffix:".mli"
-      then process_signature info
-      else (
-        let () =
-          Caml.Format.eprintf
-            "Don't know to do with file '%s'\n%s %d\n%!"
-            info.source_file
-            Caml.__FILE__
-            Caml.__LINE__
-        in
-        Caml.exit 1)))
+    if String.is_suffix filename ~suffix:".ml"
+    then Utils.(with_info Impl) filename (fun info -> process_structure info)
+    else if String.is_suffix filename ~suffix:".mli"
+    then Utils.(with_info Intf) filename (fun info -> process_signature info)
+    else (
+      let () =
+        Stdlib.Format.eprintf
+          "Don't know to do with file '%s'\n%s %d\n%!"
+          filename
+          __FILE__
+          __LINE__
+      in
+      exit 1))
 ;;
 
 let () =
   let config_filename = ".zanuda" in
-  if Caml.Sys.file_exists config_filename
+  if Stdlib.Sys.file_exists config_filename
   then (
     let s = In_channel.with_open_text config_filename In_channel.input_all in
     String.split s ~on:'\n'
@@ -267,11 +246,9 @@ let () =
         |> List.sort ~compare:(fun (a, _) (b, _) -> String.compare a b)
         |> List.map ~f:snd
       in
-      let ch = Caml.open_out filename in
-      Exn.protect
-        ~f:(fun () -> Yojson.Safe.pretty_to_channel ~std:true ch (`List info))
-        ~finally:(fun () -> Caml.close_out ch);
-      Caml.exit 0
+      Out_channel.with_open_text filename (fun ch ->
+        Yojson.Safe.pretty_to_channel ~std:true ch (`List info));
+      Stdlib.exit 0
     | File file ->
       process_untyped file;
       Collected_lints.report ();

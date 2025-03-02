@@ -161,3 +161,33 @@ let no_ident ident =
     with
     | Found -> false
 ;;
+
+[%%if ocaml_version < (5, 0, 0)]
+
+type intf_or_impl =
+  | Intf
+  | Impl
+
+let with_info _kind filename f =
+  Compile_common.with_info
+    ~native:false
+    ~source_file:filename
+    ~tool_name:"asdf" (* TODO: pass right tool name *)
+    ~output_prefix:"asdf"
+    ~dump_ext:"asdf"
+    f
+;;
+
+[%%else]
+
+type intf_or_impl = Unit_info.intf_or_impl
+
+let with_info kind ~source_file =
+  Compile_common.with_info
+    ~native:false
+    ~tool_name:"asdf" (* TODO: pass right tool name *)
+    ~dump_ext:"asdf"
+    (Unit_info.make ~source_file kind "")
+;;
+
+[%%endif]
