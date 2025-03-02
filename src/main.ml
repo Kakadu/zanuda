@@ -17,9 +17,9 @@ let untyped_linters =
   [ (module Casing : LINT.UNTYPED)
   ; (module UntypedLints.Dollar : LINT.UNTYPED)
   ; (module Expect_names : LINT.UNTYPED)
-  ; (module Manual_fold : LINT.UNTYPED)
-  ; (module Manual_map : LINT.UNTYPED)
-  ; (module Parsetree_has_docs : LINT.UNTYPED)
+  (* ; (module Manual_fold : LINT.UNTYPED) *)
+  (* ; (module Manual_map : LINT.UNTYPED) *)
+  (* ; (module Parsetree_has_docs : LINT.UNTYPED) *)
   ; (module Toplevel_eval : LINT.UNTYPED)
     (* ; (module UntypedLints.Propose_function : LINT.UNTYPED) *)
   ; (module Var_should_not_be_used : LINT.UNTYPED)
@@ -42,8 +42,8 @@ let typed_linters =
   ; (module Ignore : LINT.TYPED)
   ; (module List_fusion : LINT.TYPED)
   ; (module List_length : LINT.TYPED)
-  ; (module Match_Bool : LINT.TYPED)
-  ; (module Monad_laws : LINT.TYPED)
+  (* ; (module Match_Bool : LINT.TYPED) *)
+  (* ; (module Monad_laws : LINT.TYPED) *)
   ; (module Mutually_rec_types : LINT.TYPED)
   ; (module Nested_if : LINT.TYPED)
   ; (module Printf : LINT.TYPED)
@@ -51,7 +51,7 @@ let typed_linters =
   ; (module Record_punning : LINT.TYPED)
   ; (module String_concat : LINT.TYPED)
   ; (module String_concat_fold : LINT.TYPED)
-  ; (module Tuple_matching : LINT.TYPED)
+  (* ; (module Tuple_matching : LINT.TYPED) *)
     (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
   ]
 ;;
@@ -138,6 +138,8 @@ let run_typed_lints entry info =
 
 let typed_on_structure = run_typed_lints (fun o -> o.Tast_iterator.structure o)
 let typed_on_signature = run_typed_lints (fun o -> o.Tast_iterator.signature o)
+
+let with_info filename = Utils.with_info ~source_file:filename
 
 let process_cmt_typedtree _is_wrapped filename typedtree =
   if Config.verbose ()

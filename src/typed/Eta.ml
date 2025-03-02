@@ -53,7 +53,7 @@ let expr2string e0 =
 let msg ppf (old_expr, new_expr) =
   Format.fprintf
     ppf
-    "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
+    "@[<v>@[Eta reduction proposed. It's recommended to rewrite @]@,@[@['%a'@] as @['%a'@]@]@]%!"
     Pprintast.expression
     (My_untype.expr old_expr)
     Pprintast.expression
@@ -113,6 +113,7 @@ let run _ fallback =
   let open Tast_iterator in
   let check expr (ids, new_expr, args) () =
     let open Typedtree in
+    let _ : Ident.t list = ids in
     let loc = expr.exp_loc in
     let extract_ident = function
       | Path.Pident id -> Some id

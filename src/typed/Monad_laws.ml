@@ -62,6 +62,7 @@ let report filename ~loc kind =
 let run _ fallback =
   let pat =
     let open Tast_pattern in
+    (* __ >>= fun _ -> return __ *)
     texp_apply2 (texp_ident (pident (string ">>="))) drop
     @@ texp_function
          (case

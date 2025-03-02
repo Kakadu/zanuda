@@ -675,7 +675,7 @@ let texp_function_body (T fparam) (T fexpr) =
       | Texp_function (params, Tfunction_body ebody) ->
         ctx.matched <- ctx.matched + 1;
         k
-        |> fparam ctx loc (List.map ~f:(fun p -> p.fp_param) params)
+        |> fparam ctx loc (List.map (fun p -> p.fp_param) params)
         |> fexpr ctx loc ebody
       | _ -> fail loc "texp_function_body")
 ;;
