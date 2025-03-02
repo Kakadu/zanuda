@@ -166,6 +166,18 @@ let ( ^:: ) (T f0) (T f1) =
         fail loc "::")
 ;;
 
+(* let list_map (T farg) =
+   let rec helper acc ctx loc xs k =
+   match xs with
+   | [] -> k acc
+   | h :: tl ->
+   (match farg ctx loc h (fun x -> x) with
+   | exception Ast_pattern0.Expected _ -> fail loc "list_map"
+   | ans -> helper (ans :: acc) ctx loc tl k)
+   in
+   T (helper [])
+   ;; *)
+
 let none =
   T
     (fun ctx loc x k ->
@@ -566,6 +578,21 @@ let texp_function (T fcases) =
         ctx.matched <- ctx.matched + 1;
         k |> fcases ctx loc cases
       | _ -> fail loc "texp_function")
+;;
+
+let texp_function_body (T fargs) (T frhs) =
+  let rec helper acc ctx loc e k =
+    match e.exp_desc with
+    | Texp_function
+        { cases =
+            [ { c_lhs = { pat_desc = Tpat_var (pid, _); _ }; c_rhs; c_guard = None } ]
+        ; arg_label
+        ; partial = Total
+        } -> helper ((arg_label, pid) :: acc) ctx loc c_rhs k
+    | _ when [] = acc -> fail loc "texp_function_body"
+    | _ -> k |> fargs ctx loc (List.rev acc) |> frhs ctx loc e
+  in
+  T (helper [])
 ;;
 
 let case (T pat) (T guard) (T rhs) =

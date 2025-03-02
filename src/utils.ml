@@ -130,6 +130,7 @@ let describe_as_clippy_json
     ]
 ;;
 
+(* Checks that identifier is not used *)
 let no_ident ident =
   let exception Found in
   let open Tast_iterator in
@@ -138,11 +139,27 @@ let no_ident ident =
     { default_iterator with
       expr =
         (fun self e ->
-          (* TODO: rewrite with FCPM *)
-          match e.exp_desc with
-          | Texp_ident (Path.Pident id, _, _) when Ident.equal id ident -> raise Found
-          | Texp_function { param } when Ident.equal ident param -> ()
-          | _ -> default_iterator.expr self e)
+          let rec ident_in_list = function
+            | [] -> false
+            | (_, id) :: _ when Ident.equal id ident -> true
+            | _ :: tl -> ident_in_list tl
+          in
+          Tast_pattern.(
+            let p1 =
+              map2 (texp_function_body __ __) ~f:(fun args rhs -> `Function (args, rhs))
+            in
+            let p2 = map1 (texp_ident __) ~f:(fun x -> `Ident x) in
+            parse
+              (p1 ||| p2)
+              (* TODO: should we check other patterns? *)
+              e.exp_loc
+              e
+              ~on_error:(fun _ -> default_iterator.expr self e))
+            (function
+            | `Function (args, _rhs) when ident_in_list args -> ()
+            | `Function (_, rhs) -> self.expr default_iterator rhs
+            | `Ident (Pident id) when Ident.equal id ident -> raise_notrace Found
+            | _ -> default_iterator.expr self e))
     ; case =
         (fun (type a) self (c : a case) ->
           match c.c_lhs.pat_desc with
