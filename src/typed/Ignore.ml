@@ -1,13 +1,11 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
-module Format = Caml.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Tast_pattern
@@ -47,7 +45,7 @@ let msg ppf e0 =
       Pprintast.expression
       e
   in
-  Caml.Format.fprintf ppf "Unsafe ingore. It's recommended to rewrite it as '%s'%!" si
+  Format.fprintf ppf "Unsafe ingore. It's recommended to rewrite it as '%s'%!" si
 ;;
 
 let report filename ~loc e =

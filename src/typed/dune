@@ -10,7 +10,6 @@
   Equality_phys
   Eta
   Failwith
-  Format
   Guard_instead_of_if
   Hashtables
   If_bool
@@ -22,6 +21,7 @@
   Monad_laws
   Mutually_rec_types
   Nested_if
+  Printf
   Propose_function
   Record_punning
   String_concat

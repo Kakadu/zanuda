@@ -2,14 +2,13 @@
 
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
-open Caml.Format
+open Format
 
 let printfn fmt = kfprintf (fun ppf -> fprintf ppf "\n%!") std_formatter fmt
 
@@ -58,12 +57,14 @@ end
 
 let cut_build_dir s =
   let prefix = "_build/default/" in
-  if String.is_prefix ~prefix s then String.drop_prefix s (String.length prefix) else s
+  if String.starts_with ~prefix s
+  then Base.String.drop_prefix s (String.length prefix)
+  else s
 ;;
 
 module Report = struct
   let txt ~loc ~filename ppf msg msg_arg =
-    Option.iter !Location.input_lexbuf ~f:Lexing.flush_input;
+    Option.iter Lexing.flush_input !Location.input_lexbuf;
     Location.input_name := cut_build_dir filename;
     let loc =
       let open Location in

@@ -7,7 +7,7 @@
 [@@@ocaml.text "/*"]
 
 open Base
-module Format = Caml.Format
+module Format = Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Tast_pattern
@@ -42,9 +42,7 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group:LINT.Style ~level ~docs:documentation
 ;;
 
-let msg ppf expr =
-  Caml.Format.fprintf ppf "Rewrite record as '%a'%!" Pprintast.expression expr
-;;
+let msg ppf expr = Format.fprintf ppf "Rewrite record as '%a'%!" Pprintast.expression expr
 
 let report filename ~loc expr =
   let module M = struct
