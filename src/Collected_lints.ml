@@ -6,7 +6,6 @@
 
 [@@@ocaml.text "/*"]
 
-module Format = Stdlib.Format
 open Utils
 
 include struct
@@ -18,44 +17,16 @@ include struct
   let iter_lints f = Queue.iter f found_Lints
 end
 
-let __report () =
-  Config.out_rdjsonl ()
-  |> Option.iter (fun filename ->
-    let (_ : int) = Sys.command (Format.asprintf "touch %s" filename) in
-    (* Out_channel.with_open_text filename (fun ch -> *)
-    let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 filename in
-    let ppf = Format.formatter_of_out_channel ch in
-    iter_lints (fun (_loc, (module M : LINT.REPORTER)) ->
-      M.txt Format.std_formatter ();
-      M.rdjsonl ppf ());
-    Format.fprintf ppf "%!";
-    Caml.close_out ch)
-;;
-
-(* ) *)
-
 let report () =
   iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.txt Format.std_formatter ());
   Format.pp_print_flush Format.std_formatter ();
-  match Config.out_rdjsonl () with
-  | Some s ->
-    let (_ : int) = Sys.command (Format.asprintf "touch %s" s) in
-    (* By some reason on CI Open_creat is not enough to create a file *)
-    let ch = Caml.open_out_gen [ Caml.Open_append; Open_creat ] 0o666 s in
-    let ppf = Caml.Format.formatter_of_out_channel ch in
-    let all_files = [ (fun (module M : LINT.REPORTER) -> M.rdjsonl), ch ] in
-    Base.Exn.protect
-      ~f:(fun () ->
-        iter_lints (fun (_loc, (module M : LINT.REPORTER)) ->
-          M.txt Format.std_formatter ();
-          M.rdjsonl ppf ()))
-      ~finally:(fun () ->
-        let f (_, ch) =
-          Format.fprintf ppf "%!";
-          Caml.close_out ch
-        in
-        List.iter f all_files)
-  | None -> ()
+  Config.out_rdjsonl ()
+  |> Option.iter (fun filename ->
+    let (_ : int) = Sys.command (Format.asprintf "touch %s" filename) in
+    Out_channel.with_open_text filename (fun ch ->
+      let ppf = Format.formatter_of_out_channel ch in
+      iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.rdjsonl ppf ());
+      Format.fprintf ppf "%!"))
 ;;
 
 let tdecls : (Location.t, unit) Hashtbl.t = Hashtbl.create 123
