@@ -1,12 +1,11 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
 open Zanuda_core
 open Zanuda_core.Utils
 
@@ -25,7 +24,7 @@ The usage of 'Stdlib.failwith' in production code could be error-prone. The cons
 
 Constructions `failwith "should not happen"` smells. Maybe techniques from https://doi.org/10.1145/3299711.3242755 could help.
 |}
-  |> Stdlib.String.trim
+  |> String.trim
 ;;
 
 let describe_as_json () =
@@ -33,7 +32,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf () =
-  Caml.Format.fprintf
+  Format.fprintf
     ppf
     "Using `failwith` (or `assert false`) usually is a clue that a corner case is not \
      being handled properly. To report errors we recommend using error monad instead. In \

@@ -21,7 +21,7 @@ module _ = struct
   [@@deriving protocol ~driver:(module Xmlm)]
 
   open Base
-  open Caml.Format
+  open Format
 
   let () =
     printf
@@ -112,7 +112,7 @@ module _ = struct
   ;;
 
   open Base
-  module Format = Caml.Format
+  module Format = Format
   open Format
   open Sexplib.Sexp
 
@@ -134,7 +134,7 @@ module _ = struct
       let l, c = Xmlm.pos i in
       invalid_arg (sprintf "parse error: %d %d" l c)
     in
-    let accept s i = if Caml.(Xmlm.input i = s) then () else error () in
+    let accept s i = if (Xmlm.input i = s) then () else error () in
     let rec i_seq el acc i =
       match Xmlm.peek i with
       | `El_start _ -> i_seq el (el i :: acc) i

@@ -1,12 +1,10 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
-
-open Stdlib.Format
 
 type mode =
   | Unspecified
@@ -92,13 +90,13 @@ let recover_filepath filepath =
     | Some prefix when String.starts_with filepath ~prefix ->
       Base.String.drop_prefix filepath (String.length prefix)
     | Some prefix when verbose () ->
-      Caml.Format.eprintf "Can't cut prefix '%s' from '%s'\n%!" prefix filepath;
+      Format.eprintf "Can't cut prefix '%s' from '%s'\n%!" prefix filepath;
       filepath
     | Some _ | None -> filepath
   in
   let filepath =
     match prefix_to_add () with
-    | Some s -> sprintf "%s%s" s filepath
+    | Some s -> Printf.sprintf "%s%s" s filepath
     | None -> filepath
   in
   filepath
@@ -164,10 +162,10 @@ let parse_args () =
         ]
       ~f:(fun acc x ->
         assert (x <> "");
-        ( sprintf "-no-%s" x
+        ( Printf.sprintf "-no-%s" x
         , Arg.Unit (fun () -> Base.Hash_set.remove opts.enabled_lints x)
         , " Disable checking for this lint" )
-        :: ( sprintf "-with-%s" x
+        :: ( Printf.sprintf "-with-%s" x
            , Arg.Unit (fun () -> Base.Hash_set.add opts.enabled_lints x)
            , " Enable checking for this lint" )
         :: acc)

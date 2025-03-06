@@ -31,7 +31,7 @@ Let's look at the expression 'let f x = g x'.
 It may be simply replaced with an expression, `let f = g` which has the same semantics.
 In general, wrappers like this may be confusing, so it is recommended to get rid of them.
 |}
-  |> Stdlib.String.trim
+  |> String.trim
 ;;
 
 let describe_as_json () =
@@ -51,8 +51,7 @@ let expr2string e0 =
 ;;
 
 let msg ppf (old_expr, new_expr) =
-  let open Parsetree in
-  Caml.Format.fprintf
+  Format.fprintf
     ppf
     "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
     Pprintast.expression

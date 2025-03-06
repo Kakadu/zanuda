@@ -6,7 +6,7 @@
 
 [@@@ocaml.text "/*"]
 
-module Format = Caml.Format
+module Format = Format
 open Zanuda_core
 open Zanuda_core.Utils
 
@@ -40,7 +40,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf () =
-  Caml.Format.fprintf
+  Format.fprintf
     ppf
     "Concatenating a container of strings via fold-like iteration may lead to \
      performance issues."

@@ -39,10 +39,7 @@ let msg ppf e0 =
     let open Ast_helper in
     Format.asprintf "%a" Pprintast.expression e
   in
-  Caml.Format.fprintf
-    ppf
-    "Match is redundant. It's recommended to rewrite it as '%s'%!"
-    si
+  Format.fprintf ppf "Match is redundant. It's recommended to rewrite it as '%s'%!" si
 ;;
 
 let report filename ~loc e =

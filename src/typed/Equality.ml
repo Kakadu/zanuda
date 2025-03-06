@@ -6,8 +6,6 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
-module Format = Caml.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Format
@@ -43,7 +41,7 @@ let pp_kind ppf = function
 ;;
 
 let msg ppf kind =
-  Caml.Format.fprintf
+  Format.fprintf
     ppf
     "Using generic equality for type %a and other algebraic data types is not \
      recommended. Use pattern matching%!"

@@ -33,12 +33,12 @@ let describe_as_json () =
 ;;
 
 let msg ppf () =
-  Caml.Format.fprintf ppf "Bad measurement of a list (with non-negative size)\n%!"
+  Format.fprintf ppf "Bad measurement of a list (with non-negative size)\n%!"
 ;;
 
 let msg_long ppf (l, r) =
   msg ppf ();
-  Caml.Format.fprintf
+  Format.fprintf
     ppf
     "Between '%a' and '%a'.%!"
     Pprintast.expression

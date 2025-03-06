@@ -49,7 +49,7 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
-let msg ppf () = Caml.Format.fprintf ppf "Using `function` is recommended%!"
+let msg ppf () = Format.fprintf ppf "Using `function` is recommended%!"
 
 let report filename ~loc =
   let module M = struct

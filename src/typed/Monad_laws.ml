@@ -7,7 +7,7 @@
 [@@@ocaml.text "/*"]
 
 open Base
-module Format = Caml.Format
+module Format = Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Format
@@ -37,7 +37,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf () =
-  Caml.Format.fprintf
+  Format.fprintf
     ppf
     "Applying monad laws allows to write monadic code in more compact way.%!"
 ;;
