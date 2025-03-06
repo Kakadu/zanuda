@@ -508,7 +508,8 @@ let texp_apply_nolabelled (T f0) (T args0) =
         (try
            let args =
              ListLabels.map args ~f:(function
-               | _, None -> raise EarlyExit
+               | Asttypes.Labelled _, _ | Asttypes.Optional _, _ | _, None ->
+                 raise EarlyExit
                | _, Some x -> x)
            in
            args0 ctx loc args k
