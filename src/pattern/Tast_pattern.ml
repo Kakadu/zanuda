@@ -775,6 +775,20 @@ let attribute (T fname) (T fpayload) =
       k |> fname ctx loc attr.attr_name.txt |> fpayload ctx loc attr.attr_payload)
 ;;
 
+let pexp_function_cases (T fargs) (T fcases) =
+  let open Parsetree in
+  let rec helper acc ctx loc x k =
+    match x.pexp_desc with
+    | Pexp_fun (Asttypes.Nolabel, None, pat, rhs) -> helper (pat :: acc) ctx loc rhs k
+    | Pexp_function cases ->
+      (match fargs ctx loc (List.rev acc) Fun.id with
+       | exception (Ast_pattern0.Expected _ as exc) -> raise exc
+       | x -> k x |> fcases ctx loc cases)
+    | _ -> fail loc "pexp_function_cases"
+  in
+  T (helper [])
+;;
+
 let tstr_docattr (T f) =
   T
     (fun ctx loc subj k ->
