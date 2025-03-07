@@ -240,3 +240,8 @@ type context
 val of_func : (context -> Location.t -> 'a -> 'b -> 'c) -> ('a, 'b, 'c) t
 val to_func : ('a, 'b, 'c) t -> context -> Location.t -> 'a -> 'b -> 'c
 val fail : Warnings.loc -> string -> 'a
+
+val pexp_function_cases
+  :  (Parsetree.pattern list, 'a -> 'a, 'b) t
+  -> (Parsetree.case list, 'c, 'd) t
+  -> (Parsetree.expression, 'b -> 'c, 'd) t
