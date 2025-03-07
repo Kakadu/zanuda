@@ -104,11 +104,13 @@ let run _ fallback =
     expr =
       (fun self e ->
         let () =
-          match e.exp_desc with
-          | Texp_function { cases = _ :: _ :: _ as cases } ->
-            (* When we have a single case, we probably don't have a pattern matching *)
-            List.iter oncase cases
-          | _ -> ()
+          Tast_pattern.(
+            parse
+              (texp_function_cases nil __)
+              ~on_error:(fun _ -> ())
+              e.Typedtree.exp_loc
+              e
+              (List.iter oncase))
         in
         fallback.expr self e)
   }

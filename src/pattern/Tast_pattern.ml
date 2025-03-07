@@ -596,6 +596,23 @@ let texp_function_body (T fargs) (T frhs) =
   T (helper [])
 ;;
 
+let texp_function_cases (T fargs) (T frhs) =
+  let rec helper acc ctx loc e k =
+    match e.exp_desc with
+    | Typedtree.Texp_function
+        { cases =
+            [ { c_lhs = { pat_desc = Tpat_var (pid, _); _ }; c_rhs; c_guard = None } ]
+        ; arg_label
+        ; partial = Total
+        } -> helper ((arg_label, pid) :: acc) ctx loc c_rhs k
+    (* | _ when [] = acc -> fail loc "texp_function_cases" *)
+    | Texp_function { cases = _ :: _ :: _ as cases; _ } ->
+      k |> fargs ctx loc (List.rev acc) |> frhs ctx loc cases
+    | _ -> fail loc "texp_function_cases"
+  in
+  T (helper [])
+;;
+
 let case (T pat) (T guard) (T rhs) =
   T
     (fun ctx loc { c_lhs; c_rhs; c_guard } k ->
