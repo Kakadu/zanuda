@@ -157,6 +157,11 @@ val texp_function_body
   -> (expression, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
+val texp_function_cases
+  :  ((Asttypes.arg_label * Ident.t) list, 'a, 'b) t
+  -> (value case list, 'b, 'c) t
+  -> (expression, 'a, 'c) t
+
 val case
   :  (pattern, 'a, 'b) t
   -> (expression option, 'b, 'c) t
