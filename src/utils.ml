@@ -159,7 +159,7 @@ let no_ident ident =
             (function
             | `Function (args, _rhs) when ident_in_list args -> ()
             | `Function (_, rhs) -> self.expr default_iterator rhs
-            | `Ident (Pident id) when Ident.equal id ident -> raise_notrace Found
+            | `Ident (Pident id) when Ident.same id ident -> raise_notrace Found
             | _ -> default_iterator.expr self e))
     ; case =
         (fun (type a) self (c : a case) ->

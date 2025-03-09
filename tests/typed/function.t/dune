@@ -7,6 +7,9 @@
   (:standard
    ;-dtypedtree
    ;
-   ))
+   -warn-error
+   -11
+   -w
+   -11))
  (preprocess
   (pps ppx_deriving.show)))

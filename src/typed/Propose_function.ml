@@ -72,8 +72,9 @@ let no_ident ident c = Utils.no_ident ident (fun it -> it.case it c)
 
 let pat () =
   let open Tast_pattern in
-  texp_function
-    (case (as__ (tpat_var __)) none (as__ (texp_match (texp_ident __) __)) ^:: nil)
+  texp_function_body
+    ((nolabel ** __) ^:: nil)
+    (as__ (texp_match (texp_ident_loc __) drop __))
 ;;
 
 let run _ fallback =
@@ -88,19 +89,18 @@ let run _ fallback =
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun scru_pat argname match_expr ident cases () ->
-            match ident with
+          (fun (scru_ident, scru_loc) match_expr _scru_loc scru_pat cases () ->
+            match scru_pat with
             | Path.Pident id ->
-              if String.equal argname (Ident.name id)
-                 && List.for_all cases ~f:(no_ident id)
+              if String.equal (Ident.name scru_ident) (Ident.name id)
+                 && List.for_all cases ~f:(no_ident scru_ident)
               then (
                 Collected_lints.add
                   ~loc
                   (report loc.Location.loc_start.Lexing.pos_fname ~loc);
                 Refactoring.Propose_function.register_fix
                   ~loc:match_expr.exp_loc
-                  scru_pat
-                  expr
+                  scru_loc
                   cases)
             | _ -> ())
           ();

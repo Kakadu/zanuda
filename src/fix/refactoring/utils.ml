@@ -25,6 +25,7 @@ let position { loc; pos } =
   | End -> loc.loc_end
 ;;
 
+let make_point loc pos = { loc; pos }
 let pat_point p point = { loc = p.pat_loc; pos = point }
 let exp_point e point = { loc = e.exp_loc; pos = point }
 let exp_start e = exp_point e Start
