@@ -465,6 +465,7 @@ let texp_ident_loc (T fpath) =
       | _ -> fail loc "texp_ident")
 ;;
 
+(* TODO(Kakadu): accept and Ident, and not a string *)
 let pident (T fstr) =
   T
     (fun ctx loc x k ->
