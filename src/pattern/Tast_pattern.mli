@@ -122,6 +122,8 @@ val pident : (string, 'a, 'b) t -> (Path.t, 'a, 'b) t
     texp_ident (path [ "Stdlib"; "&&" ])  (* CORRECT *) *)
 val texp_ident : (Path.t, 'a, 'b) t -> (expression, 'a, 'b) t
 
+val texp_ident_loc : (Path.t, 'a, 'b) t -> (expression, Warnings.loc -> 'a, 'b) t
+
 val texp_ident_typ
   :  (Path.t, 'a, 'b) t
   -> (Types.type_expr, 'b, 'c) t
@@ -153,7 +155,7 @@ val texp_apply_nolabelled
 val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t
 
 val texp_function_body
-  :  ((Asttypes.arg_label * Ident.t) list, 'a, 'b) t
+  :  ((Asttypes.arg_label * (Ident.t * Warnings.loc)) list, 'a, 'b) t
   -> (expression, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
@@ -183,7 +185,8 @@ val texp_construct
 val texp_match
   :  (expression, 'a, 'b) t
   -> (case_comp list, 'b, 'c) t
-  -> (expression, 'a, 'c) t
+  -> (case_val list, 'c, 'd) t
+  -> (expression, 'a, 'd) t
 
 val texp_ite
   :  (expression, 'a, 'b) t

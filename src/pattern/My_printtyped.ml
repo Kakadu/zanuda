@@ -57,6 +57,38 @@ let me ppf me =
     }
 ;;
 
+let pattern ppf pat =
+  let open Typedtree in
+  let dummy_expr =
+    { exp_desc = Texp_variant ("Dummy", None)
+    ; exp_loc = Location.none
+    ; exp_env = pat.pat_env
+    ; exp_type = pat.pat_type
+    ; exp_extra = []
+    ; exp_attributes = []
+    }
+  in
+  implementation
+    ppf
+    { str_items =
+        [ { str_desc =
+              Tstr_value
+                ( Nonrecursive
+                , [ { vb_pat = pat
+                    ; vb_loc = Location.none
+                    ; vb_attributes = []
+                    ; vb_expr = dummy_expr
+                    }
+                  ] )
+          ; str_loc = pat.pat_loc
+          ; str_env = pat.pat_env
+          }
+        ]
+    ; str_final_env = pat.pat_env
+    ; str_type = []
+    }
+;;
+
 let attrs ppf attrs =
   Pprintast.expression ppf (Ast_helper.Exp.constant (Pconst_integer ("1", None)) ~attrs)
 ;;

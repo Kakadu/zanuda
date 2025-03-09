@@ -455,6 +455,16 @@ let texp_ident (T fpath) =
       | _ -> fail loc "texp_ident")
 ;;
 
+let texp_ident_loc (T fpath) =
+  T
+    (fun ctx loc x k ->
+      match x.exp_desc with
+      | Texp_ident (path, _, _) ->
+        ctx.matched <- ctx.matched + 1;
+        k x.exp_loc |> fpath ctx loc path
+      | _ -> fail loc "texp_ident")
+;;
+
 let pident (T fstr) =
   T
     (fun ctx loc x k ->
@@ -570,6 +580,7 @@ type value_pat = value pattern_desc pattern_data
 type comp_pat = computation pattern_desc pattern_data
 
 [%%endif]
+[%%if ocaml_version < (5, 0, 0)]
 
 let texp_function (T fcases) =
   T
@@ -586,10 +597,14 @@ let texp_function_body (T fargs) (T frhs) =
     match e.exp_desc with
     | Texp_function
         { cases =
-            [ { c_lhs = { pat_desc = Tpat_var (pid, _); _ }; c_rhs; c_guard = None } ]
+            [ { c_lhs = { pat_desc = Tpat_var (pid, _); pat_loc; _ }
+              ; c_rhs
+              ; c_guard = None
+              }
+            ]
         ; arg_label
         ; partial = Total
-        } -> helper ((arg_label, pid) :: acc) ctx loc c_rhs k
+        } -> helper ((arg_label, (pid, pat_loc)) :: acc) ctx loc c_rhs k
     | _ when [] = acc -> fail loc "texp_function_body"
     | _ -> k |> fargs ctx loc (List.rev acc) |> frhs ctx loc e
   in
@@ -600,8 +615,7 @@ let texp_function_cases (T fargs) (T frhs) =
   let rec helper acc ctx loc e k =
     match e.exp_desc with
     | Typedtree.Texp_function
-        { cases =
-            [ { c_lhs = { pat_desc = Tpat_var (pid, _); _ }; c_rhs; c_guard = None } ]
+        { cases = [ { c_lhs = { pat_desc = Tpat_var (pid, _); _ }; c_rhs; c_guard = _ } ]
         ; arg_label
         ; partial = Total
         } -> helper ((arg_label, pid) :: acc) ctx loc c_rhs k
@@ -612,6 +626,9 @@ let texp_function_cases (T fargs) (T frhs) =
   in
   T (helper [])
 ;;
+
+[%%else]
+[%%endif]
 
 let case (T pat) (T guard) (T rhs) =
   T
@@ -625,13 +642,62 @@ let ccase (T pat) (T guard) (T rhs) =
       k |> pat ctx loc c_lhs |> guard ctx loc c_guard |> rhs ctx loc c_rhs)
 ;;
 
-let texp_match (T fexpr) (T fcases) =
+let texp_match (T fexpr) (T fcomp_cases) (T fval_cases) =
+  let rec split (type _a) (comps, vals) (cases : _ case list) =
+    let _ : case_comp list = comps in
+    let _ : case_val list = vals in
+    let wrap (type a) comps vals : a case -> case_comp list * case_val list =
+      let _ : case_comp list = comps in
+      let _ : case_val list = vals in
+      fun case ->
+        match case with
+        | { c_lhs = { pat_desc = Tpat_value p }; _ } ->
+          ( comps
+          , { c_lhs = (p :> pattern); c_rhs = case.c_rhs; c_guard = case.c_guard } :: vals
+          )
+        | { c_lhs = { pat_desc = Tpat_any }; _ } -> comps, (case :> case_val) :: vals
+        | { c_lhs = { pat_desc = Tpat_var _ }; _ } -> comps, (case :> case_val) :: vals
+        | { c_lhs = { pat_desc = Tpat_alias _ }; _ } -> comps, (case :> case_val) :: vals
+        | { c_lhs = { pat_desc = Tpat_constant _ }; _ } ->
+          comps, (case :> case_val) :: vals
+        | { c_lhs = { pat_desc = Tpat_construct _ }; _ } ->
+          comps, (case :> case_val) :: vals
+        | { c_lhs = { pat_desc = Tpat_variant _ }; _ } ->
+          comps, (case :> case_val) :: vals
+        | { c_lhs = { pat_desc = Tpat_record _ }; _ } -> comps, (case :> case_val) :: vals
+        | { c_lhs = { pat_desc = Tpat_array _ }; _ } -> comps, (case :> case_val) :: vals
+        | { c_lhs = { pat_desc = Tpat_lazy _ }; _ } -> comps, (case :> case_val) :: vals
+        (* | { c_lhs = { pat_desc = Tpat_value _ }; _ } -> (case :> case_comp) :: comps, vals *)
+        | { c_lhs = { pat_desc = Tpat_exception _ }; _ } ->
+          (case :> case_comp) :: comps, vals
+        | { c_lhs = { pat_desc = Tpat_or _ }; _ } ->
+          failwith "Or-patterns are not yet implemented"
+        | { c_lhs; _ } ->
+          (* Format.eprintf "%a\n%!" My_printtyped.pattern c_lhs; *)
+          Format.eprintf
+            "Unsupported pattern: tag = %d, is_block = %b\n"
+            Obj.(tag @@ repr c_lhs)
+            Obj.(is_block @@ repr c_lhs);
+          assert false
+    in
+    match cases with
+    | h :: tl -> split (wrap comps vals h) tl
+    | [] -> List.rev comps, List.rev vals
+  in
   T
     (fun ctx loc e k ->
       match e.exp_desc with
       | Texp_match (e, cases, _) ->
         ctx.matched <- ctx.matched + 1;
-        k |> fexpr ctx loc e |> fcases ctx loc cases
+        let comp_cases, val_cases = split ([], []) cases in
+        (* log
+           "There are %d comp cases and %d val cases"
+           (List.length comp_cases)
+           (List.length val_cases); *)
+        k
+        |> fexpr ctx loc e
+        |> fcomp_cases ctx loc comp_cases
+        |> fval_cases ctx loc val_cases
       | _ -> fail loc "texp_match")
 ;;
 
