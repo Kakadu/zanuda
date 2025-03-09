@@ -70,11 +70,13 @@ let report filename ~loc =
 
 let no_ident ident c = Utils.no_ident ident (fun it -> it.case it c)
 
+let pat () =
+  let open Tast_pattern in
+  texp_function
+    (case (as__ (tpat_var __)) none (as__ (texp_match (texp_ident __) __)) ^:: nil)
+;;
+
 let run _ fallback =
-  let pat =
-    let open Tast_pattern in
-    texp_function (case (as__ (tpat_var __)) none (texp_match (texp_ident __) __) ^:: nil)
-  in
   let open Tast_iterator in
   { fallback with
     expr =
@@ -82,11 +84,11 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         Tast_pattern.parse
-          pat
+          (pat ())
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun scru_pat argname ident cases () ->
+          (fun scru_pat argname match_expr ident cases () ->
             match ident with
             | Path.Pident id ->
               if String.equal argname (Ident.name id)
@@ -95,7 +97,11 @@ let run _ fallback =
                 Collected_lints.add
                   ~loc
                   (report loc.Location.loc_start.Lexing.pos_fname ~loc);
-                Refactoring.Propose_function.register_fix ~loc scru_pat expr cases)
+                Refactoring.Propose_function.register_fix
+                  ~loc:match_expr.exp_loc
+                  scru_pat
+                  expr
+                  cases)
             | _ -> ())
           ();
         fallback.expr self expr)
