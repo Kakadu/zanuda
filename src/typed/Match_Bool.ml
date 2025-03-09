@@ -71,8 +71,9 @@ let run _ fallback =
     let open Tast_pattern in
     texp_match
       __
-      (ccase (tpat_constructor __ nil |> tpat_value) none __
-       ^:: ccase (tpat_constructor __ nil |> tpat_value) none __
+      __
+      (case (tpat_constructor __ nil) none __
+       ^:: case (tpat_constructor __ nil) none __
        ^:: nil)
   in
   let open Tast_iterator in
@@ -86,7 +87,7 @@ let run _ fallback =
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun scru id1 rhs1 id2 rhs2 () ->
+          (fun scru _ id1 rhs1 id2 rhs2 () ->
             (*            Format.printf "%a -> %s\n%a -> %s\n"
                           Pprintast.longident
                           id1

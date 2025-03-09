@@ -142,7 +142,7 @@ let no_ident ident =
         (fun self e ->
           let rec ident_in_list = function
             | [] -> false
-            | (_, id) :: _ when Ident.equal id ident -> true
+            | (_, (id, _)) :: _ when Ident.equal id ident -> true
             | _ :: tl -> ident_in_list tl
           in
           Tast_pattern.(

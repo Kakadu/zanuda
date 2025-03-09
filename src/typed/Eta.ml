@@ -100,7 +100,7 @@ let run _ fallback =
           let formal_pats =
             List.map
               (function
-                | Asttypes.Nolabel, id -> id
+                | Asttypes.Nolabel, (id, _) -> id
                 | _ -> fail loca "labels")
               formal_args
           in
