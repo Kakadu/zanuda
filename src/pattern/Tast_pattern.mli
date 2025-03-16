@@ -67,6 +67,11 @@ val map5
   -> f:('b -> 'c -> 'd -> 'e -> 'f -> 'i)
   -> ('a, 'i -> 'g, 'h) t
 
+val map6
+  :  ('a, 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h, 'i) t
+  -> f:('b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'j)
+  -> ('a, 'j -> 'h, 'i) t
+
 val map_result : ('a, 'b, 'c) t -> f:('c -> 'd) -> ('a, 'b, 'd) t
 
 open Typedtree
@@ -103,7 +108,11 @@ type comp_pat = computation pattern_desc pattern_data
 val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val labelled : (string, 'a, 'b) t -> (Asttypes.arg_label, 'a, 'b) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
-val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
+val tpat_id : (Ident.t, 'a, 'b) t -> (pattern, 'a, 'b) t
+
+val tpat_tuple
+  :  (value general_pattern list, 'a, 'b) t
+  -> (value pattern_desc pattern_data, 'a, 'b) t
 
 val tpat_constructor
   :  (Longident.t, 'a, 'b) t
@@ -217,6 +226,11 @@ val rld_overriden
   :  (Longident.t, 'a, 'b) t
   -> (expression, 'b, 'c) t
   -> (record_label_definition, 'a, 'c) t
+
+val value_binding
+  :  (pattern, 'a, 'b) t
+  -> (expression, 'b, 'c) t
+  -> (value_binding, 'a, 'c) t
 
 val typ_constr
   :  (Path.t, 'a, 'b) t

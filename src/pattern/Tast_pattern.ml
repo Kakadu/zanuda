@@ -244,6 +244,10 @@ let map5 (T func) ~f =
   T (fun ctx loc x k -> func ctx loc x (fun a b c d e -> k (f a b c d e)))
 ;;
 
+let map6 (T func) ~f:fmap =
+  T (fun ctx loc x k -> func ctx loc x (fun a b c d e f -> k (fmap a b c d e f)))
+;;
+
 let map0' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (k (f loc)))
 let map1' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a -> k (f loc a)))
 let map2' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a b -> k (f loc a b)))
@@ -401,6 +405,16 @@ let tpat_var (T fname) =
       | _ -> fail loc "tpat_var")
 ;;
 
+let tpat_id (T fname) =
+  T
+    (fun ctx loc x k ->
+      match x.pat_desc with
+      | Tpat_var (id, _) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fname ctx loc id
+      | _ -> fail loc "tpat_var_id")
+;;
+
 let tpat_constructor (T fname) (T fargs) =
   T
     (fun ctx loc x k ->
@@ -409,6 +423,16 @@ let tpat_constructor (T fname) (T fargs) =
         ctx.matched <- ctx.matched + 1;
         k |> fname ctx loc txt |> fargs ctx loc args
       | _ -> fail loc "tpat_constructor")
+;;
+
+let tpat_tuple (T fargs) =
+  T
+    (fun ctx loc x k ->
+      match x.pat_desc with
+      | Tpat_tuple pats ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fargs ctx loc pats
+      | _ -> fail loc "tpat_tuple")
 ;;
 
 let tpat_value (T fpat) =
@@ -769,6 +793,13 @@ let rld_overriden (T flident) (T fexpr) =
         ctx.matched <- ctx.matched + 1;
         k |> flident ctx loc lident |> fexpr ctx loc e
       | _ -> fail loc "rld_overriden")
+;;
+
+let value_binding (T fpat) (T fexpr) =
+  T
+    (fun ctx loc { vb_pat; vb_expr } k ->
+      ctx.matched <- ctx.matched + 1;
+      k |> fpat ctx loc vb_pat |> fexpr ctx loc vb_expr)
 ;;
 
 (*   let hack0 (T path0) =
