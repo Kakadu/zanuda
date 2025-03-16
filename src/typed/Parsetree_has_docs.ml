@@ -1,17 +1,16 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Format
 open Zanuda_core
 open Utils
 open Parsetree
 
-type input = Ast_iterator.iterator
+type input = Tast_iterator.iterator
 
 let lint_id = "no_docs_parsetree"
 let lint_source = LINT.FPCourse
@@ -26,7 +25,7 @@ In this case it's recommended to annotate every constructor with a documentation
 
 As example of this kind of documentation you can consult [OCaml 4.14.2 parse tree](https://github.com/ocaml/ocaml/blob/4.14.2/parsing/parsetree.mli#L286)
   |}
-  |> Stdlib.String.trim
+  |> String.trim
 ;;
 
 let describe_as_json () =
@@ -34,7 +33,7 @@ let describe_as_json () =
 ;;
 
 let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
-let msg ppf name = fprintf ppf "Constructor '%s' has no documentation attribute" name
+let msg ppf = Format.fprintf ppf "Constructor '%s' has no documentation attribute"
 
 let report ~filename cname ~loc =
   let module M = struct
@@ -54,19 +53,27 @@ let report ~filename cname ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let run { Compile_common.source_file; _ } (fallback : Ast_iterator.iterator) =
+open Typedtree
+
+let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
   if Config.verbose () then printfn "Trying lint '%s' on file '%s'" lint_id source_file;
-  if Base.String.is_suffix ~suffix:"arsetree.mli" source_file
-     || Base.String.is_suffix ~suffix:"ast.mli" source_file
+  if String.ends_with ~suffix:"arsetree.mli" source_file
+     || String.ends_with ~suffix:"ast.mli" source_file
   then
     { fallback with
-      constructor_declaration =
+      type_kind =
         (fun self cd ->
-          let loc = cd.pcd_loc in
-          let filename = loc.Location.loc_start.Lexing.pos_fname in
-          if not (ListLabels.exists cd.pcd_attributes ~f:is_doc_attribute)
-          then Collected_lints.add ~loc (report ~filename cd.pcd_name.txt ~loc);
-          fallback.constructor_declaration self cd)
+          fallback.type_kind self cd;
+          match cd with
+          | Ttype_variant cds ->
+            List.iter
+              (fun cd ->
+                let loc = cd.Typedtree.cd_loc in
+                let filename = loc.Location.loc_start.Lexing.pos_fname in
+                if not (List.exists is_doc_attribute cd.cd_attributes)
+                then Collected_lints.add ~loc (report ~filename cd.cd_name.txt ~loc))
+              cds
+          | _ -> ())
     }
   else fallback
 ;;

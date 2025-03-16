@@ -21,6 +21,7 @@
   Monad_laws
   Mutually_rec_types
   Nested_if
+  Parsetree_has_docs
   Printf
   Propose_function
   Record_punning

@@ -1,6 +1,5 @@
-  $ dune build
+  $ dune build @all @check
   $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
-  File '_build/default/.test_dollar.objs/byte/ast.cmti' doesn't exist. Maybe some of source files are not compiled?
   File "ast.mli", lines 1-4, characters 0-17:
   1 | type exprA =
   2 |   | App of exprA * exprA
