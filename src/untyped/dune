@@ -6,7 +6,6 @@
   Casing
   Dollar
   Expect_names
-  Manual_fold
   ;Propose_function
   Toplevel_eval
   Var_should_not_be_used
