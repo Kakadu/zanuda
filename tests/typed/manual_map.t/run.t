@@ -10,13 +10,8 @@
   8 |   | x :: xs -> f x :: map2 f xs
   9 |   | [] -> []
   Alert zanuda-linter: Consider using `List.map` instead of `map2`
-  File "manual_map.ml", lines 12-14, characters 0-31:
-  12 | let rec map3 = function 
-  13 |   | [] -> []
-  14 |   | h :: tl -> h + 1 :: map3 tl
-  Alert zanuda-linter: Consider using `List.map` instead of `map3`
-  File "manual_map.ml", lines 27-29, characters 2-14:
-  27 | ..let rec map = function
-  28 |     | x :: xs -> Int.to_string x :: map xs
-  29 |     | [] -> []
-  Alert zanuda-linter: Consider using `List.map` instead of `map`
+  File "manual_map.ml", lines 16-18, characters 0-31:
+  16 | let rec map4 f l = match l with
+  17 |   | [] -> []
+  18 |   | x :: xs -> f x :: map4 f xs
+  Alert zanuda-linter: Consider using `List.map` instead of `map4`
