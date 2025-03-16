@@ -1,17 +1,16 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
 open Format
 open Zanuda_core
 open Utils
 
-type input = Ast_iterator.iterator
+type input = Tast_iterator.iterator
 
 let lint_id = "manual_fold"
 let lint_source = LINT.Camelot
@@ -75,7 +74,7 @@ let report ~loc ~filename k n =
 
 let has_arg x args =
   List.exists
-    ~f:(fun (_, arg) ->
+    (fun (_, arg) ->
       match arg.pexp_desc with
       | Pexp_ident { txt = Lident a; _ } -> String.equal a x
       | _ -> false)
@@ -86,7 +85,7 @@ let is_fold fun_name tail f args =
   if String.equal fun_name f && has_arg tail args
   then Some Fold_left
   else if List.exists
-            ~f:(fun (_, arg) ->
+            (fun (_, arg) ->
               match arg.pexp_desc with
               | Pexp_apply (exp, args) ->
                 (match exp.pexp_desc with
@@ -107,35 +106,35 @@ let rec fun_body expr =
 ;;
 
 let run _ (fallback : Ast_iterator.iterator) =
-  let open Ppxlib.Ast_pattern in
-  let cases =
-    let empty_case () =
-      case
-        ~lhs:(ppat_construct (lident (string "[]")) drop)
-        ~guard:none
-        ~rhs:(pexp_ident (lident drop))
+  let pat_main, pat_exp =
+    let open Tast_pattern in
+    let cases =
+      let empty_case () =
+        case
+          (tpat_constructor (lident (string "[]")) drop)
+          none
+          (texp_ident (pident drop))
+      in
+      let cons_case () =
+        case
+          (tpat_constructor (lident (string "::")) (drop ^:: tpat_var __ ^:: nil))
+          none
+          (texp_apply (texp_ident (pident __)) __)
+      in
+      cons_case () ^:: empty_case () ^:: nil ||| empty_case () ^:: cons_case () ^:: nil
     in
-    let cons_case () =
-      case
-        ~lhs:
-          (ppat_construct
-             (lident (string "::"))
-             (some (drop ** ppat_tuple (drop ^:: ppat_var __ ^:: nil))))
-        ~guard:none
-        ~rhs:(pexp_apply (pexp_ident (lident __)) __)
-    in
-    cons_case () ^:: empty_case () ^:: nil ||| empty_case () ^:: cons_case () ^:: nil
+    ( (fun () ->
+        value_binding (tpat_var __) (texp_function_cases (drop ^:: drop ^:: nil) __))
+    , fun () -> texp_match drop drop cases ||| texp_function_cases nil cases )
   in
-  let pat_main = value_binding ~pat:(ppat_var __) ~expr:(pexp_fun drop drop drop __) in
-  let pat_exp = pexp_match drop cases ||| pexp_function cases in
   let parse vb =
     (* We hide attributes. Don't know why it is really needed.
        TODO: Rewrite to typed tree and see what will happen.
     *)
-    let vb = { vb with pvb_attributes = [] } in
-    let loc = vb.pvb_loc in
-    Ppxlib.Ast_pattern.parse
-      pat_main
+    let vb = { vb with Typedtree.vb_attributes = [] } in
+    let loc = vb.Typedtree.vb_loc in
+    Tast_pattern.parse
+      (pat_main ())
       loc
       ~on_error:(fun _desc () -> ())
       vb
@@ -165,13 +164,13 @@ let run _ (fallback : Ast_iterator.iterator) =
       (fun self si ->
         fallback.structure_item self si;
         match si.pstr_desc with
-        | Pstr_value (Asttypes.Recursive, vbl) -> List.iter vbl ~f:parse
+        | Pstr_value (Asttypes.Recursive, vbl) -> List.iter parse vbl
         | _ -> ())
   ; expr =
       (fun self e ->
         fallback.expr self e;
         match e.pexp_desc with
-        | Pexp_let (Asttypes.Recursive, vbl, _) -> List.iter vbl ~f:parse
+        | Pexp_let (Asttypes.Recursive, vbl, _) -> List.iter parse vbl
         | _ -> ())
   }
 ;;
