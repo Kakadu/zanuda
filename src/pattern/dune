@@ -21,4 +21,4 @@
  (inline_tests)
  (libraries Tast_pattern compiler-libs compiler-libs.common)
  (preprocess
-  (pps ppx_expect_nobase)))
+  (pps ppx_optcomp ppx_expect_nobase)))
