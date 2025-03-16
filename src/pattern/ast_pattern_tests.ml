@@ -1,16 +1,21 @@
 open Compenv
 
 [%%if ocaml_version < (5, 0, 0)]
+
 let type_implementation source_file =
   let outputprefix = output_prefix source_file in
   let modulename = "Module1" in
   Env.set_unit_name modulename;
-  Typemod.type_implementation filename outputprefix modulename
+  Typemod.type_implementation source_file outputprefix modulename
+;;
+
 [%%else]
+
 let type_implementation file =
   Typemod.type_implementation Unit_info.(make ~source_file:file Impl "")
-[%%endif]
+;;
 
+[%%endif]
 
 let translate filename =
   Compmisc.init_path ();
@@ -60,7 +65,7 @@ let run_string_typed code line pat sk =
   Tast_pattern.parse pat Location.none expr sk ~on_error:(Printf.printf "ERROR: %s\n")
 ;;
 
-let default_sk _ pats _cases =
+let default_sk pats _cases =
   Format.printf
     "patterns: @[%a@]\n%!"
     (Format.pp_print_list
