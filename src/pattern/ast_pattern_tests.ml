@@ -1,15 +1,24 @@
 open Compenv
 
+[%%if ocaml_version < (5, 0, 0)]
+let type_implementation source_file =
+  let outputprefix = output_prefix source_file in
+  let modulename = "Module1" in
+  Env.set_unit_name modulename;
+  Typemod.type_implementation filename outputprefix modulename
+[%%else]
+let type_implementation file =
+  Typemod.type_implementation Unit_info.(make ~source_file:file Impl "")
+[%%endif]
+
+
 let translate filename =
   Compmisc.init_path ();
-  let outputprefix = output_prefix filename in
-  let modulename = module_of_filename filename outputprefix in
-  Env.set_unit_name modulename;
   let env = Compmisc.initial_env () in
   try
     let parsetree = Pparse.parse_implementation ~tool_name:"xxx" filename in
     let { Typedtree.structure = typedtree; _ } =
-      Typemod.type_implementation filename outputprefix modulename env parsetree
+      type_implementation filename env parsetree
     in
     parsetree, typedtree
   with
@@ -51,7 +60,7 @@ let run_string_typed code line pat sk =
   Tast_pattern.parse pat Location.none expr sk ~on_error:(Printf.printf "ERROR: %s\n")
 ;;
 
-let default_sk pats _cases =
+let default_sk _ pats _cases =
   Format.printf
     "patterns: @[%a@]\n%!"
     (Format.pp_print_list
