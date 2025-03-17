@@ -30,6 +30,7 @@
   String_concat
   String_concat_fold
   Tuple_matching
+  Var_should_not_be_used
   ;
   )
  (preprocess

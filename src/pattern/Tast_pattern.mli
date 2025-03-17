@@ -146,6 +146,11 @@ val texp_ident_typ
 
 val texp_assert : (expression, 'a, 'b) t -> (expression, 'a, 'b) t
 
+val texp_let
+  :  (value_binding list, 'a, 'b) t
+  -> (expression, 'b, 'c) t
+  -> (expression, 'a, 'c) t
+
 val texp_apply
   :  (expression, 'a, 'b) t
   -> ((Asttypes.arg_label * expression option) list, 'b, 'c) t
