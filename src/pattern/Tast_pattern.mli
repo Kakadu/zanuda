@@ -72,6 +72,11 @@ val map6
   -> f:('b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'j)
   -> ('a, 'j -> 'h, 'i) t
 
+val map7
+  :  ('a, 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h -> 'i, 'j) t
+  -> f:('b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h -> 'k)
+  -> ('a, 'k -> 'i, 'j) t
+
 val map_result : ('a, 'b, 'c) t -> f:('c -> 'd) -> ('a, 'b, 'd) t
 
 open Typedtree
@@ -130,6 +135,7 @@ val pident : (string, 'a, 'b) t -> (Path.t, 'a, 'b) t
     texp_ident (path [ "&&" ])  (* WRONG *)
     texp_ident (path [ "Stdlib"; "&&" ])  (* CORRECT *) *)
 val texp_ident : (Path.t, 'a, 'b) t -> (expression, 'a, 'b) t
+(* TODO: Implement pattern for solo variable *)
 
 val texp_ident_loc : (Path.t, 'a, 'b) t -> (expression, Warnings.loc -> 'a, 'b) t
 
@@ -163,6 +169,7 @@ val texp_apply_nolabelled
 
 val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t
 
+(* TODO: Hardcoded triple is awful *)
 val texp_function_body
   :  ((Asttypes.arg_label * (Ident.t * Warnings.loc)) list, 'a, 'b) t
   -> (expression, 'b, 'c) t
