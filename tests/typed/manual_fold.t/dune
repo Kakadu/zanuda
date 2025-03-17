@@ -7,6 +7,10 @@
   (backend bisect_ppx))
  (flags
   (:standard
+   -warn-error
+   -32
+   -w
+   -32
    ;
    )))
 

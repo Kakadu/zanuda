@@ -248,6 +248,10 @@ let map6 (T func) ~f:fmap =
   T (fun ctx loc x k -> func ctx loc x (fun a b c d e f -> k (fmap a b c d e f)))
 ;;
 
+let map7 (T func) ~f:fmap =
+  T (fun ctx loc x k -> func ctx loc x (fun a b c d e f g -> k (fmap a b c d e f g)))
+;;
+
 let map0' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (k (f loc)))
 let map1' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a -> k (f loc a)))
 let map2' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (fun a b -> k (f loc a b)))

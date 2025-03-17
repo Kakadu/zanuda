@@ -6,7 +6,6 @@
 
 [@@@ocaml.text "/*"]
 
-open Format
 open Zanuda_core
 open Utils
 
@@ -105,57 +104,107 @@ let rec fun_body expr =
   | _ -> result
 ;;
 
-let run _ (fallback : Ast_iterator.iterator) =
-  let pat_main, pat_exp =
-    let open Tast_pattern in
-    let cases =
-      let empty_case () =
-        case
-          (tpat_constructor (lident (string "[]")) drop)
-          none
-          (texp_ident (pident drop))
-      in
-      let cons_case () =
-        case
-          (tpat_constructor (lident (string "::")) (drop ^:: tpat_var __ ^:: nil))
-          none
-          (texp_apply (texp_ident (pident __)) __)
-      in
-      cons_case () ^:: empty_case () ^:: nil ||| empty_case () ^:: cons_case () ^:: nil
-    in
-    ( (fun () ->
-        value_binding (tpat_var __) (texp_function_cases (drop ^:: drop ^:: nil) __))
-    , fun () -> texp_match drop drop cases ||| texp_function_cases nil cases )
+let vb_pattern () =
+  let open Tast_pattern in
+  let empty_case () =
+    case (tpat_constructor (lident (string "[]")) drop) none (texp_ident (pident drop))
   in
+  let cons_case () =
+    case
+      (tpat_constructor (lident (string "::")) (drop ^:: tpat_id __ ^:: nil))
+      none
+      (as__ (texp_apply_nolabelled drop drop))
+    (* |> map3 ~f:(fun tlpat rec_ident last_arg ->
+       match last_arg with
+       | Path.Pident tl2 when Ident.same tlpat tl2 -> rec_ident
+       | _ -> fail Location.none "cons_case") *)
+  in
+  value_binding
+    (tpat_var __)
+    (texp_function_cases
+       (__ ^:: __ ^:: nil)
+       (empty_case () ^:: cons_case () ^:: nil ||| cons_case () ^:: empty_case () ^:: nil))
+  |> map5 ~f:(fun fold_ (_, f_) (_, init_) _ long_expr -> fold_, f_, init_, long_expr)
+  ||| (value_binding
+         (tpat_var __)
+         (texp_function_body
+            (__ ^:: __ ^:: __ ^:: nil)
+            (texp_match
+               (texp_ident __)
+               drop
+               (empty_case () ^:: cons_case () ^:: nil
+                ||| cons_case () ^:: empty_case () ^:: nil)))
+       |> map7
+            ~f:
+              (fun
+                fold_
+                (_, (f_, _))
+                (_, (init_, _))
+                (_, (list_path, _))
+                list_scru
+                _
+                long_expr
+              ->
+              match list_path, list_scru with
+              | list_path, Path.Pident list_scru when Ident.same list_path list_scru ->
+                fold_, f_, init_, long_expr
+              | _ -> fail Location.none "Something "))
+;;
+
+let rhs_parser pseudo_fold pseudo_f _pseudo_init =
+  let open Tast_pattern in
+  (* fold f (f acc _) tl *)
+  texp_apply_nolabelled
+    (texp_ident __)
+    (texp_ident __ ^:: texp_apply2 (texp_ident __) __ drop ^:: __ ^:: nil)
+  |> map5 ~f:(fun fold f f2 _init _ ->
+    match fold, f, f2 with
+    | Path.Pident fold, Path.Pident f, Path.Pident f2
+      when Ident.name fold = pseudo_fold && Ident.same f pseudo_f && Ident.same f f2 ->
+      Fold_left
+    | _ -> fail Location.none "Not the right rhs for fold_left")
+  ||| (* f _ (fold f acc tl) *)
+  (texp_apply_nolabelled
+     (texp_ident __)
+     (drop
+      ^:: texp_apply_nolabelled (texp_ident __) (texp_ident __ ^:: __ ^:: __ ^:: nil)
+      ^:: nil)
+   |> map5 ~f:(fun f2 fold f _init _ ->
+     match fold, f, f2 with
+     | Path.Pident fold, Path.Pident f, Path.Pident f2
+       when Ident.name fold = pseudo_fold && Ident.same f pseudo_f && Ident.same f f2 ->
+       Fold_right
+     | _ -> fail Location.none "Not the right rhs for fold_left"))
+;;
+
+let run _ (fallback : Tast_iterator.iterator) =
   let parse vb =
-    (* We hide attributes. Don't know why it is really needed.
-       TODO: Rewrite to typed tree and see what will happen.
-    *)
     let vb = { vb with Typedtree.vb_attributes = [] } in
     let loc = vb.Typedtree.vb_loc in
     Tast_pattern.parse
-      (pat_main ())
+      (vb_pattern ())
       loc
       ~on_error:(fun _desc () -> ())
       vb
-      (fun fun_name expr () ->
-        let body = fun_body expr in
-        Ppxlib.Ast_pattern.parse
-          pat_exp
-          body.pexp_loc
-          ~on_error:(fun _desc () -> ())
-          body
-          (fun tail f args () ->
-            match is_fold fun_name tail f args with
-            | Some kind ->
-              Collected_lints.add
-                ~loc
-                (report
-                   ~filename:loc.Location.loc_start.Lexing.pos_fname
-                   ~loc
-                   kind
-                   fun_name)
-            | None -> ())
+      (fun (fun_name, _f, _init, long_expr) () ->
+        (* Format.printf
+           "Got %s and '%a'\n%!"
+           fun_name
+           Pprintast.expression
+           (My_untype.expr long_expr); *)
+        Tast_pattern.parse
+          (rhs_parser fun_name _f _init)
+          long_expr.Typedtree.exp_loc
+          long_expr
+          ~on_error:(fun _ () -> ())
+          (fun kind () ->
+            Collected_lints.add
+              ~loc
+              (report
+                 ~filename:loc.Location.loc_start.Lexing.pos_fname
+                 ~loc
+                 kind
+                 fun_name))
           ())
       ()
   in
@@ -163,14 +212,14 @@ let run _ (fallback : Ast_iterator.iterator) =
     structure_item =
       (fun self si ->
         fallback.structure_item self si;
-        match si.pstr_desc with
-        | Pstr_value (Asttypes.Recursive, vbl) -> List.iter parse vbl
+        match si.Typedtree.str_desc with
+        | Tstr_value (Asttypes.Recursive, vbl) -> List.iter parse vbl
         | _ -> ())
   ; expr =
       (fun self e ->
         fallback.expr self e;
-        match e.pexp_desc with
-        | Pexp_let (Asttypes.Recursive, vbl, _) -> List.iter parse vbl
+        match e.exp_desc with
+        | Texp_let (Asttypes.Recursive, vbl, _) -> List.iter parse vbl
         | _ -> ())
   }
 ;;
