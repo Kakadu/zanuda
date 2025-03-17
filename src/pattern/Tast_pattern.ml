@@ -570,6 +570,16 @@ let texp_construct (T fpath) (T fcd) (T fargs) =
 
 let texp_assert_false () = texp_assert (texp_construct (lident (string "false")) drop nil)
 
+let texp_let (T fvbs) (T fexpr) =
+  T
+    (fun ctx loc x k ->
+      match x.exp_desc with
+      | Texp_let (_flg, vbs, expr) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fvbs ctx loc vbs |> fexpr ctx loc expr
+      | _ -> fail loc (sprintf "texp_let"))
+;;
+
 let nolabel =
   T
     (fun ctx loc x k ->

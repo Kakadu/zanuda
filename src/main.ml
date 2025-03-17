@@ -19,7 +19,6 @@ let untyped_linters =
   ; (module Expect_names : LINT.UNTYPED)
   ; (module Toplevel_eval : LINT.UNTYPED)
     (* ; (module UntypedLints.Propose_function : LINT.UNTYPED) *)
-  ; (module Var_should_not_be_used : LINT.UNTYPED)
   ]
 ;;
 
@@ -52,6 +51,7 @@ let typed_linters =
   ; (module String_concat : LINT.TYPED)
   ; (module String_concat_fold : LINT.TYPED)
   ; (module Tuple_matching : LINT.TYPED)
+  ; (module Var_should_not_be_used : LINT.TYPED)
     (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
   ]
 ;;
