@@ -127,3 +127,26 @@ let backslash = fun ch ->
 ;;
 
 let () = ()
+
+let%expect_test _ =
+  let code = {| let f x y = function true -> 1 | false -> 0 |} in
+  run_string code __LINE__ Tast_pattern.(pexp_function_cases (list2 __) __) default_sk;
+  [%expect {|
+
+    patterns: x y
+    success|}];
+  let code = {| let f x y = x+y |} in
+  run_string
+    code
+    __LINE__
+    Tast_pattern.(pexp_function_body drop (pexp_apply drop (list2 (drop ** __))))
+    (fun args ->
+      List.iter (fun e -> Format.printf "%a\n%!" (Printast.expression 0) e) args);
+  [%expect {|
+
+    expression (tmp141.ml[1,0+13]..[1,0+14])
+      Pexp_ident "x" (tmp141.ml[1,0+13]..[1,0+14])
+
+    expression (tmp141.ml[1,0+15]..[1,0+16])
+      Pexp_ident "y" (tmp141.ml[1,0+15]..[1,0+16])|}]
+;;
