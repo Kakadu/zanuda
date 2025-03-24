@@ -124,7 +124,8 @@ let vb_pattern () =
     (texp_function_cases
        (__ ^:: __ ^:: nil)
        (empty_case () ^:: cons_case () ^:: nil ||| cons_case () ^:: empty_case () ^:: nil))
-  |> map5 ~f:(fun fold_ (_, f_) (_, init_) _ long_expr -> fold_, f_, init_, long_expr)
+  |> map5 ~f:(fun fold_ (_, (f_, _)) (_, (init_, _)) _ long_expr ->
+    fold_, f_, init_, long_expr)
   ||| (value_binding
          (tpat_var __)
          (texp_function_body

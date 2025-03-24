@@ -131,53 +131,54 @@ let describe_as_clippy_json
     ]
 ;;
 
-(* Checks that identifier is not used *)
-let no_ident ident =
-  let exception Found in
+exception Ident_is_found
+
+let no_ident_iterator ident =
   let open Tast_iterator in
   let open Typedtree in
-  let it =
-    { default_iterator with
-      expr =
-        (fun self e ->
-          let rec ident_in_list = function
-            | [] -> false
-            | (_, (id, _)) :: _ when Ident.equal id ident -> true
-            | _ :: tl -> ident_in_list tl
+  { default_iterator with
+    expr =
+      (fun self e ->
+        let rec ident_in_list = function
+          | [] -> false
+          | (_, (id, _)) :: _ when Ident.equal id ident -> true
+          | _ :: tl -> ident_in_list tl
+        in
+        Tast_pattern.(
+          let p1 =
+            map2 (texp_function_body __ __) ~f:(fun args rhs -> `Function (args, rhs))
           in
-          Tast_pattern.(
-            let p1 =
-              map2 (texp_function_body __ __) ~f:(fun args rhs -> `Function (args, rhs))
-            in
-            let p2 = map1 (texp_ident __) ~f:(fun x -> `Ident x) in
-            parse
-              (p1 ||| p2)
-              (* TODO: should we check other patterns? *)
-              e.exp_loc
-              e
-              ~on_error:(fun _ -> default_iterator.expr self e))
-            (function
-            | `Function (args, _rhs) when ident_in_list args -> ()
-            | `Function (_, rhs) -> self.expr default_iterator rhs
-            | `Ident (Pident id) when Ident.same id ident -> raise_notrace Found
-            | _ -> default_iterator.expr self e))
-    ; case =
-        (fun (type a) self (c : a case) ->
-          match c.c_lhs.pat_desc with
-          | Tpat_value v ->
-            (match (v :> pattern) with
-             | { pat_desc = Tpat_var (id, _) } ->
-               if Ident.equal ident id then () else default_iterator.case self c
-             | _ -> default_iterator.case self c)
-          | _ -> default_iterator.case self c)
-    }
-  in
-  fun f ->
-    try
-      f it;
-      true
-    with
-    | Found -> false
+          let p2 = map1 (texp_ident __) ~f:(fun x -> `Ident x) in
+          parse
+            (p1 ||| p2)
+            (* TODO: should we check other patterns? *)
+            e.exp_loc
+            e
+            ~on_error:(fun _ -> default_iterator.expr self e))
+          (function
+          | `Function (args, _rhs) when ident_in_list args -> ()
+          | `Function (_, rhs) -> self.expr self rhs
+          | `Ident (Pident id) when Ident.same id ident -> raise_notrace Ident_is_found
+          | _ -> default_iterator.expr self e))
+  ; case =
+      (fun (type a) self (c : a case) ->
+        match c.c_lhs.pat_desc with
+        | Tpat_value v ->
+          (match (v :> pattern) with
+           | { pat_desc = Tpat_var (id, _) } ->
+             if Ident.equal ident id then () else default_iterator.case self c
+           | _ -> default_iterator.case self c)
+        | _ -> default_iterator.case self c)
+  }
+;;
+
+(* Checks that identifier is not used *)
+let no_ident ident f =
+  try
+    f (no_ident_iterator ident);
+    true
+  with
+  | Ident_is_found -> false
 ;;
 
 [%%if ocaml_version < (5, 0, 0)]

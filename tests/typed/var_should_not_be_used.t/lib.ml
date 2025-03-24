@@ -17,11 +17,13 @@ let f1 () =
   let _menhir_action_05 = 1 in
   _menhir_action_05
 
+let _fcases _x = function true -> 1 | false ->  2+_x
+let _fbody _x = 2+_x
+
 (** Should not give a warning *)
+
 let __ () = ()
 
-(* let f2 () = __ () *)
-let __ () = ()
 
 let _menhir_action_1 () = ()
 include struct
