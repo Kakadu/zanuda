@@ -87,8 +87,7 @@ let occurs_check name =
 ;;
 
 let check_occurances_exn txt e =
-  let it = occurs_check txt in
-  it.expr it e
+  if Utils.no_ident txt (fun it -> it.expr it e) then () else raise Found
 ;;
 
 let is_name_suspicious txt =
@@ -99,6 +98,7 @@ let is_name_suspicious txt =
   && (not (String.equal txt "_2"))
   && (not (String.equal txt "_tok"))
   && (not (String.equal txt "_v"))
+  && (not (String.starts_with txt ~prefix:"___bisect"))
   && (not (String.starts_with txt ~prefix:"__ocaml_lex"))
   && not (String.starts_with txt ~prefix:"_menhir_")
 ;;
@@ -132,15 +132,13 @@ let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
                 args
             | `Fcases (args, cases) ->
               List.iter
-                (fun (_, txt) ->
+                (fun (_, (txt, { Location.loc })) ->
                   if is_name_suspicious (Ident.name txt)
                   then
                     List.iter
                       (fun case ->
                         try check_occurances_exn txt case.Typedtree.c_rhs with
                         | Found ->
-                          let loc = expr.exp_loc in
-                          (* TODO: use right location *)
                           Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
                       cases)
                 args
@@ -150,36 +148,19 @@ let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
                  let loc = argid.loc in
                  Collected_lints.add ~loc (report ~loc ~filename:source_file argid.txt))
             | _ -> ())
-          ()
-        (*
-           match expr.exp_desc with
-          | Pexp_fun (_, _, ({ ppat_desc = Ppat_var { txt } } as pat), ebody)
-            when is_name_suspicious txt ->
-            (try check_occurances_exn txt ebody with
-             | Found ->
-               let loc = pat.ppat_loc in
-               Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
-          | Pexp_let (_, [ ({ pvb_pat = { ppat_desc = Ppat_var { txt } } } as vb) ], ebody)
-            when is_name_suspicious txt ->
-            (try check_occurances_exn txt ebody with
-             | Found ->
-               let loc = vb.pvb_pat.ppat_loc in
-               Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
-          | _ -> ()
-        in *))
+          ())
   ; structure =
       (fun self x ->
-        let open Parsetree in
         let loop_vb wher vb =
           match vb.Typedtree.vb_pat.pat_desc with
           | Tpat_var (id, _) when is_name_suspicious (Ident.name id) ->
             (try
-               let it = occurs_check id in
+               let it = Utils.no_ident_iterator id in
                it.expr it vb.vb_expr;
                List.iter (it.structure_item it) wher
              with
-             | Found ->
-               let loc = vb.vb_loc in
+             | Utils.Ident_is_found ->
+               let loc = vb.Typedtree.vb_pat.pat_loc in
                Collected_lints.add ~loc (report ~loc ~filename:source_file id))
           | _ ->
             (* TODO: support Ppat_as ... *)

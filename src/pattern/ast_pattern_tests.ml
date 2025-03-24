@@ -130,7 +130,7 @@ let () = ()
 
 let%expect_test _ =
   let code = {| let f x y = function true -> 1 | false -> 0 |} in
-  run_string code __LINE__ Tast_pattern.(pexp_function_cases (list2 __) __) default_sk;
+  run_string code __LINE__ Tast_pattern.(pexp_function_cases (list __) __) default_sk;
   [%expect {|
 
     patterns: x y
@@ -139,10 +139,11 @@ let%expect_test _ =
   run_string
     code
     __LINE__
-    Tast_pattern.(pexp_function_body drop (pexp_apply drop (list2 (drop ** __))))
+    Tast_pattern.(pexp_function_body drop (pexp_apply drop (list (drop ** __))))
     (fun args ->
       List.iter (fun e -> Format.printf "%a\n%!" (Printast.expression 0) e) args);
-  [%expect {|
+  [%expect
+    {|
 
     expression (tmp141.ml[1,0+13]..[1,0+14])
       Pexp_ident "x" (tmp141.ml[1,0+13]..[1,0+14])
