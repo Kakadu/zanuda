@@ -10,7 +10,13 @@
  (wrapped false)
  (libraries ppxlib)
  (preprocess
-  (pps ppx_optcomp ppx_assert ppx_inline_test_nobase))
+  (pps
+   ppx_optcomp
+   ppx_assert
+   ;ppx_inline_test
+   ppx_inline_test_nobase
+   ;
+   ))
  (instrumentation
   (backend bisect_ppx))
  (inline_tests))
@@ -21,4 +27,7 @@
  (inline_tests)
  (libraries Tast_pattern compiler-libs compiler-libs.common)
  (preprocess
-  (pps ppx_optcomp ppx_expect_nobase)))
+  (pps
+   ppx_optcomp
+   ;ppx_expect
+   ppx_expect_nobase)))

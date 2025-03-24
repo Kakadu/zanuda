@@ -44,6 +44,7 @@ val ( ** ) : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
 val ( ||| ) : ('a, 'b, 'c) t -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
 val loc : ('a, 'b, 'c) t -> ('a Location.loc, 'b, 'c) t
 val ( >>| ) : ('a, 'b, 'c) t -> ('d -> 'b) -> ('a, 'd, 'c) t
+val list : ('a, 'b -> 'b, 'c) t -> ('a list, 'c list -> 'd, 'd) t
 
 (** Mapping results of applying pattern-combinator *)
 
@@ -181,7 +182,7 @@ val texp_function_body
   -> (expression, 'a, 'c) t
 
 val texp_function_cases
-  :  ((Asttypes.arg_label * Ident.t) list, 'a, 'b) t
+  :  ((Asttypes.arg_label * (Ident.t * string Location.loc)) list, 'a, 'b) t
   -> (value case list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
@@ -275,7 +276,17 @@ val of_func : (context -> Location.t -> 'a -> 'b -> 'c) -> ('a, 'b, 'c) t
 val to_func : ('a, 'b, 'c) t -> context -> Location.t -> 'a -> 'b -> 'c
 val fail : Warnings.loc -> string -> 'a
 
+val pexp_function_body
+  :  (Parsetree.pattern list, 'a, 'b) t
+  -> (Parsetree.expression, 'b, 'c) t
+  -> (Parsetree.expression, 'a, 'c) t
+
 val pexp_function_cases
   :  (Parsetree.pattern list, 'a, 'b) t
   -> (Parsetree.case list, 'b, 'c) t
+  -> (Parsetree.expression, 'a, 'c) t
+
+val pexp_apply
+  :  (Parsetree.expression, 'a, 'b) t
+  -> ((Asttypes.arg_label * Parsetree.expression) list, 'b, 'c) t
   -> (Parsetree.expression, 'a, 'c) t

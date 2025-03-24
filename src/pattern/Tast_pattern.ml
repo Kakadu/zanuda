@@ -166,17 +166,16 @@ let ( ^:: ) (T f0) (T f1) =
         fail loc "::")
 ;;
 
-(* let list_map (T farg) =
-   let rec helper acc ctx loc xs k =
-   match xs with
-   | [] -> k acc
-   | h :: tl ->
-   (match farg ctx loc h (fun x -> x) with
-   | exception Ast_pattern0.Expected _ -> fail loc "list_map"
-   | ans -> helper (ans :: acc) ctx loc tl k)
-   in
-   T (helper [])
-   ;; *)
+let list (T fel) =
+  let rec helper acc ctx loc xs k =
+    match xs with
+    | [] -> k (List.rev acc)
+    | h :: tl ->
+      (match fel ctx loc h Fun.id with
+       | x -> helper (x :: acc) ctx loc tl k)
+  in
+  T (fun ctx loc xs k -> helper [] ctx loc xs k)
+;;
 
 let none =
   T
@@ -413,7 +412,7 @@ let tpat_id (T fname) =
   T
     (fun ctx loc x k ->
       match x.pat_desc with
-      | Tpat_var (id, _) ->
+      | Tpat_var (id, { loc }) ->
         ctx.matched <- ctx.matched + 1;
         k |> fname ctx loc id
       | _ -> fail loc "tpat_var_id")
@@ -654,10 +653,11 @@ let texp_function_cases (T fargs) (T frhs) =
   let rec helper acc ctx loc e k =
     match e.exp_desc with
     | Typedtree.Texp_function
-        { cases = [ { c_lhs = { pat_desc = Tpat_var (pid, _); _ }; c_rhs; c_guard = _ } ]
+        { cases =
+            [ { c_lhs = { pat_desc = Tpat_var (pid, tag); _ }; c_rhs; c_guard = _ } ]
         ; arg_label
         ; partial = Total
-        } -> helper ((arg_label, pid) :: acc) ctx loc c_rhs k
+        } -> helper ((arg_label, (pid, tag)) :: acc) ctx loc c_rhs k
     (* | _ when [] = acc -> fail loc "texp_function_cases" *)
     | Texp_function { cases = _ :: _ :: _ as cases; _ } ->
       k |> fargs ctx loc (List.rev acc) |> frhs ctx loc cases
@@ -913,6 +913,26 @@ let pexp_function_cases (T fargs) (T fcases) =
     | _ -> fail loc "pexp_function_cases"
   in
   T (helper [])
+;;
+
+let pexp_function_body (T fargs) (T fcases) =
+  let open Parsetree in
+  let rec helper acc ctx loc x k =
+    match x.pexp_desc with
+    | Pexp_fun (Asttypes.Nolabel, None, pat, rhs) -> helper (pat :: acc) ctx loc rhs k
+    | _ -> k |> fargs ctx loc (List.rev acc) |> fcases ctx loc x
+  in
+  T (helper [])
+;;
+
+let pexp_apply (T f) (T fargs) =
+  let open Parsetree in
+  let helper ctx loc x k =
+    match x.pexp_desc with
+    | Pexp_apply (efun, eargs) -> k |> f ctx loc efun |> fargs ctx loc eargs
+    | _ -> fail loc "pexp_apply"
+  in
+  T helper
 ;;
 
 let tstr_docattr (T f) =
