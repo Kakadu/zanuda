@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -12,7 +12,6 @@ open Utils
 
 type input = Ast_iterator.iterator
 
-(* let is_camel_case s = String.(lowercase s <> s) *)
 let lint_id = "camel_extra_dollar"
 let lint_source = LINT.FPCourse
 let level = LINT.Warn
