@@ -12,7 +12,7 @@ open Utils
 
 type input = Ast_iterator.iterator
 
-let is_camel_case s = String.(lowercase s <> s)
+let is_camel_case s = String.(lowercase_ascii s <> s)
 
 let is_good_name s =
   String.starts_with s ~prefix:"_menhir_cell1_" || not (is_camel_case s)
