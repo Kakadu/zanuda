@@ -306,7 +306,7 @@ let path xs =
       (* printf "\t\tCompare names %s and %s:  %b\n%!" l r ans; *)
       ans
     in
-    let __ _ = Format.printf "path = %a\n%!" Path.print x in
+    let __ _ = Format.printf "path = %a\n%!" (Format_doc.compat Path.print) x in
     match x, ps with
     | Path.Pident id, [ id0 ] ->
       if cmp_names (Ident.name id) id0
@@ -339,7 +339,7 @@ let%test_module " " =
       Clflags.unique_ids := false;
       [%test_eq: Base.string]
         "Stdlib!.List.length"
-        (asprintf "%a" Path.print (path_of_list names));
+        (asprintf "%a" (Format_doc.compat Path.print) (path_of_list names));
       Clflags.unique_ids := old
     ;;
 
