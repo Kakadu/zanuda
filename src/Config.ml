@@ -115,7 +115,6 @@ let is_enabled () =
 ;;
 
 let parse_args () =
-  let open Caml in
   let standard_args =
     [ "-o", Arg.String set_out_file, "[FILE] Set Markdown output file"
     ; "-dump", Arg.Unit set_dump_text, "Dump info about available lints to terminal"
