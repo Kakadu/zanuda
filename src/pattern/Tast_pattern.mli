@@ -294,3 +294,6 @@ val pexp_apply
   :  (Parsetree.expression, 'a, 'b) t
   -> ((Asttypes.arg_label * Parsetree.expression) list, 'b, 'c) t
   -> (Parsetree.expression, 'a, 'c) t
+
+(* TODO: move to some other module *)
+val source_of_info : Compile_common.info -> string
