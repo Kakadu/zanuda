@@ -165,9 +165,14 @@ let no_ident_iterator ident =
         match c.c_lhs.pat_desc with
         | Tpat_value v ->
           (match (v :> pattern) with
-           | { pat_desc = Tpat_var (id, _) } ->
-             if Ident.equal ident id then () else default_iterator.case self c
-           | _ -> default_iterator.case self c)
+          | p ->
+            Tast_pattern.(parse
+              (tpat_id  __)
+              Location.none
+              p
+              ~on_error:(fun _ -> default_iterator.case self c)
+              (fun id -> if Ident.equal ident id then () else default_iterator.case self c)
+              ))
         | _ -> default_iterator.case self c)
   }
 ;;
