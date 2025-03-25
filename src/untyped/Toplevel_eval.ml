@@ -50,7 +50,7 @@ let report ~filename ~loc =
   (module M : LINT.REPORTER)
 ;;
 
-let run { Compile_common.source_file; _ } (fallback : Ast_iterator.iterator) =
+let run info (fallback : Ast_iterator.iterator) =
   { fallback with
     structure_item =
       (fun self si ->
@@ -59,7 +59,7 @@ let run { Compile_common.source_file; _ } (fallback : Ast_iterator.iterator) =
         match si.pstr_desc with
         | Pstr_eval (_, _) ->
           let loc = si.pstr_loc in
-          Collected_lints.add ~loc (report ~filename:source_file ~loc)
+          Collected_lints.add ~loc (report ~filename:(Tast_pattern.source_of_info info) ~loc)
         | _ -> ())
   ; expr =
       (fun self e ->

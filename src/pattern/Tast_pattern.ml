@@ -1019,3 +1019,13 @@ type context = Ast_pattern0.context
 let of_func f = T f
 let to_func (T f) = f
 let fail = fail
+
+[%%if ocaml_version < (5, 0, 0)]
+
+let get_source_file info = info.Compile_common.source_file
+
+[%%else]
+
+let source_of_info info = Unit_info.source_file info.Compile_common.target
+
+[%%endif]
