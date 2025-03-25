@@ -173,7 +173,7 @@ val texp_apply_nolabelled
   -> (expression list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
-val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t
+(* val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t *)
 
 (* TODO: Hardcoded triple is awful *)
 val texp_function_body
@@ -182,7 +182,7 @@ val texp_function_body
   -> (expression, 'a, 'c) t
 
 val texp_function_cases
-  :  ((Asttypes.arg_label * (Ident.t * string Location.loc)) list, 'a, 'b) t
+  :  ((Asttypes.arg_label * (Ident.t * Warnings.loc)) list, 'a, 'b) t
   -> (value case list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
