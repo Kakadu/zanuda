@@ -29,6 +29,7 @@
   sexplib
   yojson
   dune-build-info
+  unix
   Tast_pattern)
  (preprocess
   (pps
