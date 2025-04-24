@@ -1,6 +1,8 @@
 (library
  (name test_laws)
  (wrapped false)
+ ; (flags
+ ;  (:standard -dtypedtree))
  (modes byte)
  (modules laws))
 
