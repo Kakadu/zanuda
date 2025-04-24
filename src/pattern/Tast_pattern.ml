@@ -426,6 +426,9 @@ let tpat_var (T fname) =
   T
     (fun (type kind) ctx loc (x : kind pattern_desc pattern_data) k ->
       match x.pat_desc with
+      | Tpat_var (_, { txt }, _uid) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fname ctx loc txt
       | Tpat_value v ->
         (match (v :> pattern).pat_desc with
          | Tpat_var (_, { txt }, _uid) ->
@@ -439,13 +442,16 @@ let tpat_id (T fname) =
   T
     (fun (type kind) ctx loc (x : kind pattern_desc pattern_data) k ->
       match x.pat_desc with
-      | Tpat_value v ->
+      | Typedtree.Tpat_value v ->
         (match (v :> pattern).pat_desc with
         | Tpat_var (id, { loc }, _uid) ->
           ctx.matched <- ctx.matched + 1;
           k |> fname ctx loc id
          | _ -> fail loc "tpat_id")
-      | _ -> fail loc "tpat_id")
+      | Tpat_var (id, { loc }, _uid) ->
+          ctx.matched <- ctx.matched + 1;
+          k |> fname ctx loc id
+      | _ -> fail loc "tpat_id 2")
 ;;
 
 [%%endif]
