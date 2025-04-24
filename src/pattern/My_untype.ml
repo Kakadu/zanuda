@@ -33,3 +33,5 @@ let untype_stru_item si =
   | [ si ] -> si
   | _ -> failwith "A bug"
 ;;
+
+let value_binding  = default_mapper.value_binding default_mapper
