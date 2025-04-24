@@ -823,6 +823,17 @@ let texp_match (T fexpr)  (T fcomp_cases) (T fval_cases) =
     (fun ctx loc e k ->
       match e.Typedtree.exp_desc with
       | Texp_match (e, ccases, vcases, _) ->
+        let ccases, vcases = 
+          List.fold_left 
+          (fun (cacc,vacc) c -> 
+            match c.c_lhs.pat_desc with 
+            | Tpat_value v -> (cacc, {c with c_lhs = (v :> value general_pattern) }::vacc)
+            | _ -> (cacc,vacc)
+            )
+            ([],vcases)
+            ccases 
+          in 
+
         ctx.matched <- ctx.matched + 1;
         k |> fexpr ctx loc e |> fcomp_cases ctx loc ccases |> fval_cases ctx loc vcases
       | _ -> fail loc "texp_match")

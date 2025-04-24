@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, .... *)
+(** Copyright 2021-2025, .... *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -66,15 +66,25 @@ let expr2string e0 =
   Format.asprintf "let (_: %a) = %a" Printtyp.type_expr e0.exp_type Pprintast.expression e
 ;;
 
+type if_cases_info = True_false | False_true | Other 
+
 let run _ fallback =
-  let pat =
+  let pat () =
     let open Tast_pattern in
-    texp_match
+    let cases_pat () =
+      case (tpat_constructor __ nil) none __
+      ^:: case (tpat_constructor __ nil) none __
+      ^:: nil
+      |> map4 ~f:(fun a b c d  -> ((a,b),(c,d)))
+    in
+    texp_function_cases (__ ^:: nil)  (cases_pat ())
+    |> map2 ~f:(fun arg cases -> (`Function arg, cases))
+    |||
+    (texp_match
       __
-      __
-      (case (tpat_constructor __ nil) none __
-       ^:: case (tpat_constructor __ nil) none __
-       ^:: nil)
+      drop
+      (cases_pat())
+      |> map2 ~f:(fun scru cases -> (`Match scru, cases)))
   in
   let open Tast_iterator in
   { fallback with
@@ -83,34 +93,38 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         Tast_pattern.parse
-          pat
+          (pat())
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun scru _ id1 rhs1 id2 rhs2 () ->
-            (*            Format.printf "%a -> %s\n%a -> %s\n"
-                          Pprintast.longident
-                          id1
-                          (expr2string rhs1)
-                          Pprintast.longident
-                          id2
-                          (expr2string rhs2); *)
-            match Longident.flatten id1, Longident.flatten id2 with
-            | [ "true" ], [ "false" ] ->
+          (fun (info, ((id1, rhs1 ),(id2, rhs2))) () ->
+            let cases_shape k = 
+              match Longident.flatten id1, Longident.flatten id2 with
+              | [ "true" ], [ "false" ] ->
+                k True_false
+                  (fun scru -> { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) })
+              | [ "false" ], [ "true" ] ->
+                k False_true
+                  (fun scru -> { expr with exp_desc = Texp_ifthenelse (scru, rhs2, Some rhs1) })
+              | _ -> ()
+            in        
+            cases_shape (fun _shape make_expr ->
+              match info with 
+            | `Match scru -> 
+                Collected_lints.add
+                  ~loc
+                  (report
+                    loc.Location.loc_start.Lexing.pos_fname
+                    ~loc
+                    (make_expr scru))
+            | `Function _arg1 ->
+              (* TODO: construct right expression *)
               Collected_lints.add
-                ~loc
-                (report
-                   loc.Location.loc_start.Lexing.pos_fname
-                   ~loc
-                   { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) })
-            | [ "false" ], [ "true" ] ->
-              Collected_lints.add
-                ~loc
-                (report
-                   loc.Location.loc_start.Lexing.pos_fname
-                   ~loc
-                   { expr with exp_desc = Texp_ifthenelse (scru, rhs2, Some rhs1) })
-            | _ -> ())
+                  ~loc
+                  (report
+                    loc.Location.loc_start.Lexing.pos_fname
+                    ~loc
+                    expr)))
           ();
         fallback.expr self expr)
   }
