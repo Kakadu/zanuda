@@ -6,10 +6,12 @@
   3 |   | Abs of string * exprA
   4 |   | Var of string
   Alert zanuda-linter: Type name `exprA` should be in snake case
+  
   File "ast.mli", line 2, characters 2-24:
   2 |   | App of exprA * exprA
         ^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Constructor 'App' has no documentation attribute
+  
   File "ast.mli", line 3, characters 2-25:
   3 |   | Abs of string * exprA
         ^^^^^^^^^^^^^^^^^^^^^^^

@@ -4,6 +4,7 @@
   2 | let%expect_test _ = ()
       ^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: A test without description. Try `let%expect_test "name" = ...
+  
   File "expect_names.ml", line 4, characters 0-22:
   4 | let%expect_test _ = ()
       ^^^^^^^^^^^^^^^^^^^^^^
