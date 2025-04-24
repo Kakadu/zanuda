@@ -865,6 +865,46 @@ let rec typ_arrow (T l) (T r) =
   T helper
 ;;
 
+let typ_kind_abstract =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Typedtree.Ttype_abstract ->
+        ctx.matched <- ctx.matched + 1;
+        k
+      | _ -> fail loc "typ_kind_abstract")
+;;
+
+let typ_kind_open =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Typedtree.Ttype_open ->
+        ctx.matched <- ctx.matched + 1;
+        k
+      | _ -> fail loc "typ_kind_open")
+;;
+
+let typ_kind_variant =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Typedtree.Ttype_variant _ ->
+        ctx.matched <- ctx.matched + 1;
+        k
+      | _ -> fail loc "typ_kind_variant")
+;;
+
+let typ_kind_record (T flabels) =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Typedtree.Ttype_record labels ->
+        ctx.matched <- ctx.matched + 1;
+        k |> flabels ctx loc labels
+      | _ -> fail loc "typ_kind_record")
+;;
+
 (* Structure *)
 
 let tstr_attribute (T fattr) =
