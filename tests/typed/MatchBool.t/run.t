@@ -5,7 +5,6 @@
   2 |   | true -> 1
   3 |   | false -> 2
   Alert zanuda-linter: Match is redundant. It's recommended to rewrite it as 'if a then 1 else 2'
-  
   File "MatchBool.ml", lines 6-10, characters 20-13:
    6 | ....................match a with
    7 |   | false -> (

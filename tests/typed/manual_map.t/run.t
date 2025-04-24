@@ -5,13 +5,11 @@
   3 |   | [] -> []
   4 |   | h :: tl -> f h :: map1 f tl
   Alert zanuda-linter: Consider using `List.map` instead of `map1`
-  
   File "manual_map.ml", lines 7-9, characters 0-12:
   7 | let rec map2 f = function 
   8 |   | x :: xs -> f x :: map2 f xs
   9 |   | [] -> []
   Alert zanuda-linter: Consider using `List.map` instead of `map2`
-  
   File "manual_map.ml", lines 16-18, characters 0-31:
   16 | let rec map4 f l = match l with
   17 |   | [] -> []
