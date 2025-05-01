@@ -144,13 +144,13 @@ let process_cmt_typedtree _is_wrapped filename typedtree =
   then
     printfn "process_cmt_typedtree cmt: %s" filename
     (*Format.printf "Typedtree ML:\n%a\n%!" Printtyped.implementation typedtree*);
-  Utils.(with_info Impl) filename (fun info ->
+  Utils.(with_info Impl) ~source_file:filename (fun info ->
     process_per_file_linters_str info typedtree;
     typed_on_structure info typedtree)
 ;;
 
-let process_cmti_typedtree _is_wrapped filename typedtree =
-  Utils.(with_info Intf) filename (fun info ->
+let process_cmti_typedtree _is_wrapped source_file typedtree =
+  Utils.(with_info Intf) ~source_file (fun info ->
     process_per_file_linters_sig info typedtree;
     typed_on_signature info typedtree)
 ;;
@@ -183,9 +183,9 @@ let process_untyped filename =
       untyped_on_signature info parsetree
     in
     if String.is_suffix filename ~suffix:".ml"
-    then Utils.(with_info Impl) filename (fun info -> process_structure info)
+    then Utils.(with_info Impl) ~source_file:filename (fun info -> process_structure info)
     else if String.is_suffix filename ~suffix:".mli"
-    then Utils.(with_info Intf) filename (fun info -> process_signature info)
+    then Utils.(with_info Intf) ~source_file:filename (fun info -> process_signature info)
     else (
       let () =
         Stdlib.Format.eprintf
