@@ -80,9 +80,15 @@ let occurs_check name =
         | _ -> ())
   ; value_binding =
       (fun self vb ->
-        match vb.vb_pat.pat_desc with
+        Tast_pattern.(parse (tpat_id __))
+          vb.Typedtree.vb_pat.pat_loc
+          vb.Typedtree.vb_pat
+          ~on_error:(fun _ -> ())
+          (fun id -> if Ident.same id name then () else fallback.value_binding self vb)
+        (* match vb.vb_pat.pat_desc with
         | Tpat_var (id, _) when Ident.same id name -> ()
-        | _ -> fallback.value_binding self vb)
+        | _ -> fallback.value_binding self vb *)
+        )
   }
 ;;
 
@@ -103,7 +109,8 @@ let is_name_suspicious txt =
   && not (String.starts_with txt ~prefix:"_menhir_")
 ;;
 
-let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
+let run info (fallback : Tast_iterator.iterator) =
+  let source_file = Tast_pattern.source_of_info info in
   { fallback with
     expr =
       (fun self expr ->
@@ -132,7 +139,7 @@ let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
                 args
             | `Fcases (args, cases) ->
               List.iter
-                (fun (_, (txt, { Location.loc })) ->
+                (fun (_, (txt, loc)) ->
                   if is_name_suspicious (Ident.name txt)
                   then
                     List.iter
@@ -152,7 +159,21 @@ let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
   ; structure =
       (fun self x ->
         let loop_vb wher vb =
-          match vb.Typedtree.vb_pat.pat_desc with
+          Tast_pattern.(parse (tpat_id __))
+            vb.Typedtree.vb_pat.pat_loc
+            vb.Typedtree.vb_pat
+            ~on_error:(fun _ -> ())
+            (fun id ->
+              if is_name_suspicious (Ident.name id) then
+              (try
+                let it = Utils.no_ident_iterator id in
+                it.expr it vb.vb_expr;
+                List.iter (it.structure_item it) wher
+              with
+              | Utils.Ident_is_found ->
+                let loc = vb.Typedtree.vb_pat.pat_loc in
+                Collected_lints.add ~loc (report ~loc ~filename:source_file id)));
+          (* match vb.Typedtree.vb_pat.pat_desc with
           | Tpat_var (id, _) when is_name_suspicious (Ident.name id) ->
             (try
                let it = Utils.no_ident_iterator id in
@@ -164,7 +185,7 @@ let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
                Collected_lints.add ~loc (report ~loc ~filename:source_file id))
           | _ ->
             (* TODO: support Ppat_as ... *)
-            ()
+            () *)
         in
         let rec loop_str = function
           | [] -> ()
