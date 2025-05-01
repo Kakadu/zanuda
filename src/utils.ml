@@ -216,3 +216,9 @@ let with_info kind ~source_file =
 ;;
 
 [%%endif]
+
+[%%if ocaml_version < (5, 0, 0)]
+let pp_path = Path.print
+[%%else]
+let pp_path = Format_doc.compat Path.print
+[%%endif]
