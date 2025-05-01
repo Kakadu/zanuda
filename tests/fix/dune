@@ -1,2 +1,6 @@
 (cram
  (deps %{bin:zanuda}))
+
+(cram
+ (applies_to FalseProposeFunction)
+ (enabled_if false))
