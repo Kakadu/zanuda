@@ -3,6 +3,7 @@
 [![Lints docs](https://img.shields.io/badge/Implemented-lints-yellowgreen)](https://kakadu.github.io/zanuda/lints/index.html)
 [![API docs](https://img.shields.io/badge/Documentation-API-yellowgreen)](https://kakadu.github.io/zanuda/api/index.html)
 [![Coverage Status](https://coveralls.io/repos/github/Kakadu/zanuda/badge.svg?branch=master)](https://coveralls.io/github/Kakadu/zanuda?branch=master)
+[![opam package status](https://badgen.net/opam/v/zanuda)](https://opam.ocaml.org/packages/zanuda)
 
 [![](http://github-actions.40ants.com/Kakadu/zanuda/matrix.svg)](https://github.com/Kakadu/zanuda)
 
