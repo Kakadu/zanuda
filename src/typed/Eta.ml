@@ -54,9 +54,9 @@ let msg ppf (old_expr, new_expr) =
   Format.fprintf
     ppf
     "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
-    Pprintast.expression
+    My_pprintast.expression
     (My_untype.expr old_expr)
-    Pprintast.expression
+    My_pprintast.expression
     (My_untype.expr new_expr)
 ;;
 
