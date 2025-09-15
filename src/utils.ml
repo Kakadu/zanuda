@@ -62,7 +62,6 @@ let cut_build_dir s =
   else s
 ;;
 
-
 include (
 struct
   open Location
@@ -223,7 +222,31 @@ struct
   (* module Fmt = Format_doc *)
   module Fmt = Format
 
-  let pp_two_columns = Misc.pp_two_columns
+  let pp_two_columns ?(sep = "|") ?max_lines ppf (lines : (string * string) list) =
+    let left_column_size =
+      List.fold_left (fun acc (s, _) -> Int.max acc (String.length s)) 0 lines
+    in
+    let lines_nb = List.length lines in
+    let ellipsed_first, ellipsed_last =
+      match max_lines with
+      | Some max_lines when lines_nb > max_lines ->
+        let printed_lines = max_lines - 1 in
+        (* the ellipsis uses one line *)
+        let lines_before = (printed_lines / 2) + (printed_lines mod 2) in
+        let lines_after = printed_lines / 2 in
+        lines_before, lines_nb - lines_after - 1
+      | _ -> -1, -1
+    in
+    Format.fprintf ppf "@[<v>";
+    List.iteri
+      (fun k (line_l, line_r) ->
+        if k = ellipsed_first then Format.fprintf ppf "...@,";
+        if ellipsed_first <= k && k <= ellipsed_last
+        then ()
+        else Format.fprintf ppf "%*s %s %s@," left_column_size line_l sep line_r)
+      lines;
+    Format.fprintf ppf "@]"
+  ;;
 
   (* [get_lines] must return the lines to highlight, given starting and ending
    positions.
