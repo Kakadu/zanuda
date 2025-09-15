@@ -1,5 +1,5 @@
   $ dune build
-  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
   File "Counter.ml", line 3, characters 18-22:
   3 |   (fun () -> incr last; !last)
                         ^^^^

@@ -1,6 +1,6 @@
   $ dune build @default @check ./REPL.bc
 
-  $ ../zanuda.exe -no-check-filesystem -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
   File "REPL.ml", line 1, characters 0-9:
   1 | open List
       ^^^^^^^^^

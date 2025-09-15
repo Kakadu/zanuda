@@ -1,5 +1,5 @@
   $ dune build
-  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
   File "Record1.ml", line 4, characters 11-34:
   4 | let f2 r = { x=r.x; y=r.y; z=r.z }
                  ^^^^^^^^^^^^^^^^^^^^^^^

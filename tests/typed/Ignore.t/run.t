@@ -1,5 +1,5 @@
   $ dune build
-  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir . -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
   File "Ignore.ml", line 2, characters 2-29:
   2 |   ignore (List.map ((+)1) xs);
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^

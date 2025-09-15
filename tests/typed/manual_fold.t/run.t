@@ -1,5 +1,5 @@
   $ dune build @check
-  $ ../zanuda.exe -no-check-filesystem -no-eta_reduction -no-top_file_license -no-propose_function -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-eta_reduction -no-top_file_license -no-propose_function -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
   File "manual_fold.ml", lines 3-6, characters 0-39:
   3 | let rec fold_left f acc l =
   4 |   match l with

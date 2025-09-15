@@ -1,5 +1,5 @@
   $ dune build
-  $ ../zanuda.exe  -no-check-filesystem -no-top_file_license -no-mutability_check -dir . -ordjsonl /dev/null
+  $ ../zanuda.exe  -no-check-filesystem -no-top_file_license -no-mutability_check -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
   File "Eta.ml", line 3, characters 12-23:
   3 | let wrapper x = my_id x
                   ^^^^^^^^^^^

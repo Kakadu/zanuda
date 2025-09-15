@@ -1,5 +1,5 @@
   $ dune build
-  $ ../zanuda.exe -no-check-filesystem -no-eta_reduction -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-eta_reduction -no-top_file_license -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
   File "laws.ml", line 5, characters 12-35:
   5 | let foo x = x >>= fun y -> return y
                   ^^^^^^^^^^^^^^^^^^^^^^^
