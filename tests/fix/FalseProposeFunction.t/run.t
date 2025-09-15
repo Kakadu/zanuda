@@ -1,7 +1,5 @@
-  $ dune build
+  $ dune build @all @check
   $ zanuda -no-top_file_license -dir . -diffs-with-fixes
-  File '_build/default/FalseProposeFunction.ml' doesn't have corresponding .mli interface
-  
   File "FalseProposeFunction.ml", lines 2-5, characters 0-43:
   2 | type private_flag =
   3 |   | Private
@@ -41,3 +39,4 @@
   ---
   > function closed_flag =
   
+

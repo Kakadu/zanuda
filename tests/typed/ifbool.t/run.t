@@ -25,12 +25,12 @@
                 ^^^^^^^^^^^^
   Alert zanuda-linter: Conjunction with boolean smells bad
   
-  File "IfBool.ml", line 13, characters 4-8:
-  13 |   { name : int
-           ^^^^
-  Alert zanuda-linter: Identifier `_r__` used somewhere else but supposed to be unused.
   File "IfBool.ml", line 12, characters 5-14:
   12 | type substring =
             ^^^^^^^^^
   Alert zanuda-linter: Identifier `_record__` used somewhere else but supposed to be unused.
+  File "IfBool.ml", line 13, characters 4-8:
+  13 |   { name : int
+           ^^^^
+  Alert zanuda-linter: Identifier `_r__` used somewhere else but supposed to be unused.
 
