@@ -1,4 +1,6 @@
-  $ dune build
+  $ dune build @all @check
+$ dune show pp IfBool.ml
+$ which zanuda
   $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
   File "IfBool.ml", line 2, characters 2-23:
   2 |   if true then 1 else 2

@@ -62,6 +62,7 @@ let report filename ~loc e =
   (module M : LINT.REPORTER)
 ;;
 
+(* TODO(Kakadu): This simple hack is not enough. See #71 for details. *)
 let do_check = ref true
 
 let run _ fallback =
