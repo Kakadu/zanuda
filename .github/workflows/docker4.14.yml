@@ -1,49 +1,31 @@
-name: Build Master in docker
+name: Build Master in docker 4.14
 
 on:
   pull_request:
     branches:
       - 'master'
   push:
+    paths-ignore:
+      - '*.md'
     branches:
       - 'master'
-      - 'ppx_nobase'
+      - 'ocaml53-2'
 
 env:
   OPAMROOT: /home/opam/.opam
-  #OPAMYES: true
   OPAMCONFIRMLEVEL: unsafe-yes
+
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     container:
-      image: ocaml/opam:ubuntu-lts-ocaml-4.14
-      options: --user root               # dirty hack
+      image: kakadu18/ocaml:zanuda414
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
 
     steps:
-      #- run: find / -iname 'opam*'
-      # - run: |
-      #     opam --version
-      #     /usr/bin/opam-2.2 --version
-      #     sudo mv /usr/bin/opam-2.2 /usr/bin/opam
-      #     opam --version
-
-      # https://github.com/styfle/cancel-workflow-action
-      # - name: Cancel Previous Runs
-      #   uses: styfle/cancel-workflow-action@0.11.0
-      #   with:
-      #     access_token: ${{ github.token }}
-
       - name: Checkout code
         uses: actions/checkout@v4
         with:

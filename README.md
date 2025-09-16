@@ -1,4 +1,5 @@
-[![Build Master](https://github.com/Kakadu/zanuda/actions/workflows/master_docker.yml/badge.svg?branch=master)](https://github.com/Kakadu/zanuda/actions/workflows/master_docker.yml)
+[![Build Master 4.14](https://github.com/Kakadu/zanuda/actions/workflows/docker4.14.yml/badge.svg?branch=master)](https://github.com/Kakadu/zanuda/actions/workflows/docker4.14.yml)
+[![Build Master 5.3](https://github.com/Kakadu/zanuda/actions/workflows/docker5.3.yml/badge.svg?branch=master)](https://github.com/Kakadu/zanuda/actions/workflows/docker5.3.yml)
 [![License](https://img.shields.io/badge/license-LGPL-blue)](https://github.com/JetBrains-Research/spla/blob/master/LICENSE.md)
 [![Lints docs](https://img.shields.io/badge/Implemented-lints-yellowgreen)](https://kakadu.github.io/zanuda/lints/index.html)
 [![API docs](https://img.shields.io/badge/Documentation-API-yellowgreen)](https://kakadu.github.io/zanuda/api/index.html)

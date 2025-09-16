@@ -1,0 +1,64 @@
+name: Build Master in docker 5.3
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+  push:
+    paths-ignore:
+      - '*.md'
+    branches:
+      - 'master'
+      - 'ocaml53-2'
+
+env:
+  OPAMROOT: /home/opam/.opam
+  OPAMCONFIRMLEVEL: unsafe-yes
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
+    container:
+      image: kakadu18/ocaml:zanuda53
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      # By some reason depext doesn't install it for conf-autoconf
+      - run: |
+          sudo apt-get update -y
+          sudo apt-get install autoconf -y
+
+      - name: Update opam repo
+        run: |
+          opam remote -vvvv
+          opam update default
+
+      # checking out the code seems to be important because local switch is used
+      - name: Installing dependencies
+        run: |
+          opam pin add ./ -n
+          opam install . --deps-only --with-test --with-doc
+        #opam depext zanuda reviewer -y
+
+      - name: Building...
+        run: opam exec -- dune build --profile=release
+
+      - run: opam exec -- dune build @install --profile=release
+
+      - name: Running tests in release...
+        run: |
+          opam exec -- dune test --profile=release
