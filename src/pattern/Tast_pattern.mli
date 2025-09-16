@@ -173,16 +173,14 @@ val texp_apply_nolabelled
   -> (expression list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
-(* val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t *)
-
-(* TODO: Hardcoded triple is awful *)
+(* TODO(Kakadu): Hardcoded triple is awful *)
 val texp_function_body
-  :  ((Asttypes.arg_label * (Ident.t * Warnings.loc)) list, 'a, 'b) t
+  :  ((Asttypes.arg_label * (Ident.t * Location.t)) list, 'a, 'b) t
   -> (expression, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
 val texp_function_cases
-  :  ((Asttypes.arg_label * (Ident.t * Warnings.loc)) list, 'a, 'b) t
+  :  ((Asttypes.arg_label * (Ident.t * Location.t)) list, 'a, 'b) t
   -> (value case list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 

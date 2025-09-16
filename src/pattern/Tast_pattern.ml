@@ -306,7 +306,6 @@ let path xs =
       (* printf "\t\tCompare names %s and %s:  %b\n%!" l r ans; *)
       ans
     in
-    let __ _ = Format.printf "path = %a\n%!" (Format_doc.compat Path.print) x in
     match x, ps with
     | Path.Pident id, [ id0 ] ->
       if cmp_names (Ident.name id) id0
@@ -334,12 +333,22 @@ let%test_module " " =
   (module struct
     let names = [ "Stdlib!"; "List"; "length" ]
 
+    [%%if ocaml_version < (5, 0, 0)]
+
+    let pp_path = Path.print
+
+    [%%else]
+
+    let pp_path = Format_doc.compat Path.print
+
+    [%%endif]
+
     let%test_unit _ =
       let old = !Clflags.unique_ids in
       Clflags.unique_ids := false;
       [%test_eq: Base.string]
         "Stdlib!.List.length"
-        (asprintf "%a" (Format_doc.compat Path.print) (path_of_list names));
+        (asprintf "%a" pp_path (path_of_list names));
       Clflags.unique_ids := old
     ;;
 
@@ -444,19 +453,17 @@ let tpat_id (T fname) =
       match x.pat_desc with
       | Typedtree.Tpat_value v ->
         (match (v :> pattern).pat_desc with
-        | Tpat_var (id, { loc }, _uid) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fname ctx loc id
+         | Tpat_var (id, { loc }, _uid) ->
+           ctx.matched <- ctx.matched + 1;
+           k |> fname ctx loc id
          | _ -> fail loc "tpat_id")
       | Tpat_var (id, { loc }, _uid) ->
-          ctx.matched <- ctx.matched + 1;
-          k |> fname ctx loc id
+        ctx.matched <- ctx.matched + 1;
+        k |> fname ctx loc id
       | _ -> fail loc "tpat_id 2")
 ;;
 
 [%%endif]
-
-
 
 let tpat_constructor (T fname) (T fargs) =
   T
@@ -552,7 +559,6 @@ let texp_ident_typ (T fpath) (T ftyp) =
       | _ -> fail loc "texp_ident_typ")
 ;;
 
-
 [%%if ocaml_version < (5, 0, 0)]
 
 let texp_assert (T fexp) =
@@ -564,6 +570,7 @@ let texp_assert (T fexp) =
         fexp ctx loc e k
       | _ -> fail loc "texp_assert")
 ;;
+
 [%%else]
 
 let texp_assert (T fexp) =
@@ -675,7 +682,6 @@ type value_pat = value pattern_desc pattern_data
 type comp_pat = computation pattern_desc pattern_data
 
 [%%endif]
-
 [%%if ocaml_version < (5, 0, 0)]
 
 let texp_function (T fcases) =
@@ -707,7 +713,11 @@ let texp_function_body (T fargs) (T frhs) =
   T (helper [])
 ;;
 
-let texp_function_cases (T fargs) (T frhs) =
+let texp_function_cases
+  :  ((Asttypes.arg_label * (Ident.t * Location.t)) list, 'a, 'b) t
+  -> (value case list, 'b, 'c) t -> (expression, 'a, 'c) t
+  =
+  fun (T fargs) (T frhs) ->
   let rec helper acc ctx loc e k =
     match e.exp_desc with
     | Typedtree.Texp_function
@@ -715,7 +725,7 @@ let texp_function_cases (T fargs) (T frhs) =
             [ { c_lhs = { pat_desc = Tpat_var (pid, tag); _ }; c_rhs; c_guard = _ } ]
         ; arg_label
         ; partial = Total
-        } -> helper ((arg_label, (pid, tag)) :: acc) ctx loc c_rhs k
+        } -> helper ((arg_label, (pid, tag.loc)) :: acc) ctx loc c_rhs k
     | Texp_function { cases = _ :: _ :: _ as cases; _ } ->
       k |> fargs ctx loc (List.rev acc) |> frhs ctx loc cases
     | _ -> fail loc "texp_function_cases"
@@ -732,7 +742,10 @@ let texp_function_cases (T fparam) (T fcases) =
       | Texp_function (params, Tfunction_cases cases) ->
         ctx.matched <- ctx.matched + 1;
         k
-        |> fparam ctx loc (List.map (fun p -> (p.Typedtree.fp_arg_label, (p.fp_param, p.fp_loc))) params)
+        |> fparam
+             ctx
+             loc
+             (List.map (fun p -> p.Typedtree.fp_arg_label, (p.fp_param, p.fp_loc)) params)
         |> fcases ctx loc cases.cases
       | _ -> fail loc "texp_function")
 ;;
@@ -744,7 +757,10 @@ let texp_function_body (T fparam) (T fcases) =
       | Typedtree.Texp_function (params, Tfunction_body e) ->
         ctx.matched <- ctx.matched + 1;
         k
-        |> fparam ctx loc (List.map (fun p -> (p.fp_arg_label,(p.fp_param, p.fp_loc))) params)
+        |> fparam
+             ctx
+             loc
+             (List.map (fun p -> p.fp_arg_label, (p.fp_param, p.fp_loc)) params)
         |> fcases ctx loc e
       | _ -> fail loc "texp_function")
 ;;
@@ -764,6 +780,7 @@ let ccase (T pat) (T guard) (T rhs) =
 ;;
 
 [%%if ocaml_version < (5, 0, 0)]
+
 let texp_match (T fexpr) (T fcomp_cases) (T fval_cases) =
   let rec split (type _a) (comps, vals) (cases : _ case list) =
     let _ : case_comp list = comps in
@@ -822,28 +839,29 @@ let texp_match (T fexpr) (T fcomp_cases) (T fval_cases) =
         |> fval_cases ctx loc val_cases
       | _ -> fail loc "texp_match")
 ;;
+
 [%%else]
 
-let texp_match (T fexpr)  (T fcomp_cases) (T fval_cases) =
+let texp_match (T fexpr) (T fcomp_cases) (T fval_cases) =
   T
     (fun ctx loc e k ->
       match e.Typedtree.exp_desc with
       | Texp_match (e, ccases, vcases, _) ->
-        let ccases, vcases = 
-          List.fold_left 
-          (fun (cacc,vacc) c -> 
-            match c.c_lhs.pat_desc with 
-            | Tpat_value v -> (cacc, {c with c_lhs = (v :> value general_pattern) }::vacc)
-            | _ -> (cacc,vacc)
-            )
-            ([],vcases)
-            ccases 
-          in 
-
+        let ccases, vcases =
+          List.fold_left
+            (fun (cacc, vacc) c ->
+              match c.c_lhs.pat_desc with
+              | Tpat_value v ->
+                cacc, { c with c_lhs = (v :> value general_pattern) } :: vacc
+              | _ -> cacc, vacc)
+            ([], vcases)
+            ccases
+        in
         ctx.matched <- ctx.matched + 1;
         k |> fexpr ctx loc e |> fcomp_cases ctx loc ccases |> fval_cases ctx loc vcases
       | _ -> fail loc "texp_match")
 ;;
+
 [%%endif]
 
 let texp_ite (T pred) (T fthen) (T felse) =
@@ -857,6 +875,7 @@ let texp_ite (T pred) (T fthen) (T felse) =
 ;;
 
 [%%if ocaml_version < (5, 0, 0)]
+
 let texp_try (T fexpr) (T fcases) =
   T
     (fun ctx loc e k ->
@@ -866,7 +885,9 @@ let texp_try (T fexpr) (T fcases) =
         k |> fexpr ctx loc e |> fcases ctx loc cases
       | _ -> fail loc "texp_try")
 ;;
+
 [%%else]
+
 let texp_try (T fexpr) (T fcases) =
   T
     (fun ctx loc e k ->
@@ -876,6 +897,8 @@ let texp_try (T fexpr) (T fcases) =
         ctx.matched <- ctx.matched + 1;
         k |> fexpr ctx loc e |> fcases ctx loc cases
       | _ -> fail loc "texp_try")
+;;
+
 [%%endif]
 
 let texp_record (T fext) (T ffields) =
@@ -1062,7 +1085,32 @@ let attribute (T fname) (T fpayload) =
       k |> fname ctx loc attr.attr_name.txt |> fpayload ctx loc attr.attr_payload)
 ;;
 
+let payload_stru (T fstru) =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Parsetree.PStr stru -> k |> fstru ctx loc stru
+      | _ -> fail loc "payload_stru")
+;;
+
+let pstr_eval (T f) =
+  T
+    (fun ctx loc x k ->
+      match x.Parsetree.pstr_desc with
+      | Parsetree.Pstr_eval (e, _) -> k |> f ctx loc e
+      | _ -> fail loc "pstr_eval")
+;;
+
+let pexp_constant (T f) =
+  T
+    (fun ctx loc e k ->
+      match e.Parsetree.pexp_desc with
+      | Parsetree.Pexp_constant e -> k |> f ctx loc e
+      | _ -> fail loc "pexp_constant")
+;;
+
 [%%if ocaml_version < (5, 0, 0)]
+
 let pexp_function_cases (T fargs) (T fcases) =
   let open Parsetree in
   let rec helper acc ctx loc x k =
@@ -1083,68 +1131,61 @@ let pexp_function_body (T fargs) (T fcases) =
   in
   T (helper [])
 ;;
+
+let pconst_string (T fstring) =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Parsetree.Pconst_string (s, _, _) -> k |> fstring ctx loc s
+      | _ -> fail loc "pconst_string")
+;;
+
 [%%else]
 
 let pexp_function_body (T fargs) (T fbody) =
   let open Parsetree in
-  T (fun ctx loc x k ->
-    match x.pexp_desc with
-    | Pexp_function (params, _, Pfunction_body e) ->
-        let args = List.map (fun p ->
-          match p.pparam_desc with
-          | Pparam_val (Nolabel, _, pat) -> pat
-          | Pparam_newtype _
-          | _ -> fail loc "pexp_function_body: params"
-          ) params
+  T
+    (fun ctx loc x k ->
+      match x.pexp_desc with
+      | Pexp_function (params, _, Pfunction_body e) ->
+        let args =
+          List.map
+            (fun p ->
+              match p.pparam_desc with
+              | Pparam_val (Nolabel, _, pat) -> pat
+              | Pparam_newtype _ | _ -> fail loc "pexp_function_body: params")
+            params
         in
         k |> fargs ctx loc args |> fbody ctx loc e
-    | _ -> fail loc "pexp_function_body" )
+      | _ -> fail loc "pexp_function_body")
 ;;
 
 let pexp_function_cases (T fargs) (T fcases) =
   let open Parsetree in
-  T (fun ctx loc x k ->
-    match x.pexp_desc with
-    | Pexp_function (params, _, Pfunction_cases (cases,_,_)) ->
-        let args = List.map (fun p ->
-          match p.pparam_desc with
-          | Pparam_val (Nolabel, _, pat) -> pat
-          | Pparam_newtype _
-          | _ -> fail loc "pexp_function_cases: params"
-          ) params
+  T
+    (fun ctx loc x k ->
+      match x.pexp_desc with
+      | Pexp_function (params, _, Pfunction_cases (cases, _, _)) ->
+        let args =
+          List.map
+            (fun p ->
+              match p.pparam_desc with
+              | Pparam_val (Nolabel, _, pat) -> pat
+              | Pparam_newtype _ | _ -> fail loc "pexp_function_cases: params")
+            params
         in
         k |> fargs ctx loc args |> fcases ctx loc cases
-    | _ -> fail loc "pexp_function_cases" )
+      | _ -> fail loc "pexp_function_cases")
 ;;
 
-let pconst_string (T fstring)  =
+let pconst_string (T fstring) =
   T
     (fun ctx loc x k ->
       match x.Parsetree.pconst_desc with
-      | Parsetree.Pconst_string (s, _,_) -> k |> fstring ctx loc s
+      | Parsetree.Pconst_string (s, _, _) -> k |> fstring ctx loc s
       | _ -> fail loc "pconst_string")
 ;;
-let payload_stru (T fstru)  =
-  T
-    (fun ctx loc x k ->
-      match x with
-      | Parsetree.PStr stru -> k |> fstru ctx loc stru
-      | _ -> fail loc "payload_string")
-;;
-let pstr_eval (T f)  =
-  T
-    (fun ctx loc x k ->
-      match x.Parsetree.pstr_desc with
-      | Parsetree.Pstr_eval (e,_) -> k |> f ctx loc e
-      | _ -> fail loc "pstr_eval")
-;;
-let pexp_constant (T f)  =
-  T
-    (fun ctx loc e k ->
-      match e.Parsetree.pexp_desc with
-      | Parsetree.Pexp_constant e -> k |> f ctx loc e
-      | _ -> fail loc "pexp_constant")
-;;
+
 [%%endif]
 
 let pexp_apply (T f) (T fargs) =
@@ -1158,11 +1199,17 @@ let pexp_apply (T f) (T fargs) =
 ;;
 
 let tstr_docattr on_str =
-  tstr_attribute (attribute drop (payload_stru (pstr_eval (pexp_constant (pconst_string on_str)) ^:: nil)))
+  tstr_attribute
+    (attribute
+       drop
+       (payload_stru (pstr_eval (pexp_constant (pconst_string on_str)) ^:: nil)))
 ;;
 
 let tsig_docattr on_str =
-  tsig_attribute (attribute drop (payload_stru (pstr_eval (pexp_constant (pconst_string on_str)) ^:: nil)))
+  tsig_attribute
+    (attribute
+       drop
+       (payload_stru (pstr_eval (pexp_constant (pconst_string on_str)) ^:: nil)))
 ;;
 
 type context = Ast_pattern0.context
@@ -1173,7 +1220,7 @@ let fail = fail
 
 [%%if ocaml_version < (5, 0, 0)]
 
-let get_source_file info = info.Compile_common.source_file
+let source_of_info info = info.Compile_common.source_file
 
 [%%else]
 

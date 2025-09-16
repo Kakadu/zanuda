@@ -36,7 +36,7 @@ let expr ppf e =
 
 [%%if ocaml_version < (5, 0, 0)]
 
-let make_Tstr_module mb_name presence ~loc me =
+let make_Tstr_module mb_name _presence ~loc me =
   Typedtree.Tstr_module
     { mb_id = None
     ; mb_name
@@ -80,13 +80,13 @@ let me ppf me =
 ;;
 
 [%%if ocaml_version < (5, 0, 0)]
+
 let dummy_vb vb_pat vb_expr =
-  { Typedtree.vb_pat
-  ; vb_loc = Location.none
-  ; vb_attributes = []
-  ; vb_expr
-  }
+  { Typedtree.vb_pat; vb_loc = Location.none; vb_attributes = []; vb_expr }
+;;
+
 [%%else]
+
 let dummy_vb vb_pat vb_expr =
   { Typedtree.vb_pat
   ; vb_loc = Location.none
@@ -94,6 +94,8 @@ let dummy_vb vb_pat vb_expr =
   ; vb_attributes = []
   ; vb_expr
   }
+;;
+
 [%%endif]
 
 let pattern ppf pat =
@@ -110,10 +112,7 @@ let pattern ppf pat =
   implementation
     ppf
     { str_items =
-        [ { str_desc =
-              Tstr_value
-                ( Nonrecursive
-                , [ dummy_vb pat dummy_expr ])
+        [ { str_desc = Tstr_value (Nonrecursive, [ dummy_vb pat dummy_expr ])
           ; str_loc = pat.pat_loc
           ; str_env = pat.pat_env
           }
@@ -124,12 +123,19 @@ let pattern ppf pat =
 ;;
 
 [%%if ocaml_version < (5, 0, 0)]
-let make_int_const ~loc n = Pconst_integer (string_of_int n, None)
+
+let make_int_const ~loc:_ n = Parsetree.Pconst_integer (string_of_int n, None)
+
 [%%else]
+
 let make_int_const ~loc n =
   { Parsetree.pconst_desc = Pconst_integer (string_of_int n, None); pconst_loc = loc }
+;;
+
 [%%endif]
 
 let attrs ppf attrs =
-  Pprintast.expression ppf (Ast_helper.Exp.constant (make_int_const ~loc:Location.none 1) ~attrs)
+  Pprintast.expression
+    ppf
+    (Ast_helper.Exp.constant (make_int_const ~loc:Location.none 1) ~attrs)
 ;;
