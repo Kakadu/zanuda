@@ -114,7 +114,7 @@ let run _ (fallback : Tast_iterator.iterator) =
     Tast_pattern.parse
       (pat ())
       loc
-      ~on_error:(fun _desc () -> 
+      ~on_error:(fun _desc () ->
         (* Format. printf "Skipping because of '%s'\n@[%a@]\n" _desc Pprintast.binding (My_untype.value_binding vb); *)
         ())
       vb

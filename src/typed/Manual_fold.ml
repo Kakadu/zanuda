@@ -103,10 +103,6 @@ let rec fun_body expr =
     expr
     ~on_error:(fun _ -> expr)
     Fun.id
-  (* let result = expr in
-  match expr.pexp_desc with
-  | Pexp_fun (_, _, _, expr) -> fun_body expr
-  | _ -> result *)
 ;;
 
 let vb_pattern () =
@@ -190,9 +186,7 @@ let run _ (fallback : Tast_iterator.iterator) =
     Tast_pattern.parse
       (vb_pattern ())
       loc
-      ~on_error:(fun _desc () -> 
-        (* Format.printf "pattern failed: %s\n%!" _desc; *)
-        ())
+      ~on_error:(fun _desc () -> ())
       vb
       (fun (fun_name, _f, _init, long_expr) () ->
         (* Format.printf

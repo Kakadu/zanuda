@@ -59,7 +59,9 @@ let run info (fallback : Ast_iterator.iterator) =
         match si.pstr_desc with
         | Pstr_eval (_, _) ->
           let loc = si.pstr_loc in
-          Collected_lints.add ~loc (report ~filename:(Tast_pattern.source_of_info info) ~loc)
+          Collected_lints.add
+            ~loc
+            (report ~filename:(Tast_pattern.source_of_info info) ~loc)
         | _ -> ())
   ; expr =
       (fun self e ->

@@ -6,7 +6,6 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
 open Zanuda_core
 open Zanuda_core.Utils
 
@@ -35,11 +34,11 @@ let describe_as_json () =
 let msg ppf e0 =
   let open Parsetree in
   let e = My_untype.expr e0 in
-  let si =
-    let open Ast_helper in
-    Format.asprintf "%a" Pprintast.expression e
-  in
-  Format.fprintf ppf "Match is redundant. It's recommended to rewrite it as '%s'%!" si
+  Format.fprintf
+    ppf
+    "Match is redundant. It's recommended to rewrite it as @['%a'@]%!"
+    My_pprintast.expression
+    e
 ;;
 
 let report filename ~loc e =
@@ -66,7 +65,10 @@ let expr2string e0 =
   Format.asprintf "let (_: %a) = %a" Printtyp.type_expr e0.exp_type Pprintast.expression e
 ;;
 
-type if_cases_info = True_false | False_true | Other 
+type if_cases_info =
+  | True_false
+  | False_true
+  | Other
 
 let run _ fallback =
   let pat () =
@@ -75,16 +77,12 @@ let run _ fallback =
       case (tpat_constructor __ nil) none __
       ^:: case (tpat_constructor __ nil) none __
       ^:: nil
-      |> map4 ~f:(fun a b c d  -> ((a,b),(c,d)))
+      |> map4 ~f:(fun a b c d -> (a, b), (c, d))
     in
-    texp_function_cases (__ ^:: nil)  (cases_pat ())
-    |> map2 ~f:(fun arg cases -> (`Function arg, cases))
-    |||
-    (texp_match
-      __
-      drop
-      (cases_pat())
-      |> map2 ~f:(fun scru cases -> (`Match scru, cases)))
+    texp_function_cases (__ ^:: nil) (cases_pat ())
+    |> map2 ~f:(fun arg cases -> `Function arg, cases)
+    ||| (texp_match __ drop (cases_pat ())
+         |> map2 ~f:(fun scru cases -> `Match scru, cases))
   in
   let open Tast_iterator in
   { fallback with
@@ -93,38 +91,36 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         Tast_pattern.parse
-          (pat())
+          (pat ())
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun (info, ((id1, rhs1 ),(id2, rhs2))) () ->
-            let cases_shape k = 
+          (fun (info, ((id1, rhs1), (id2, rhs2))) () ->
+            let cases_shape k =
               match Longident.flatten id1, Longident.flatten id2 with
               | [ "true" ], [ "false" ] ->
-                k True_false
-                  (fun scru -> { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) })
+                k True_false (fun scru ->
+                  { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) })
               | [ "false" ], [ "true" ] ->
-                k False_true
-                  (fun scru -> { expr with exp_desc = Texp_ifthenelse (scru, rhs2, Some rhs1) })
+                k False_true (fun scru ->
+                  { expr with exp_desc = Texp_ifthenelse (scru, rhs2, Some rhs1) })
               | _ -> ()
-            in        
+            in
             cases_shape (fun _shape make_expr ->
-              match info with 
-            | `Match scru -> 
+              match info with
+              | `Match scru ->
                 Collected_lints.add
                   ~loc
-                  (report
-                    loc.Location.loc_start.Lexing.pos_fname
-                    ~loc
-                    (make_expr scru))
-            | `Function _arg1 ->
-              (* TODO: construct right expression *)
-              Collected_lints.add
-                  ~loc
-                  (report
-                    loc.Location.loc_start.Lexing.pos_fname
-                    ~loc
-                    expr)))
+                  (report loc.Location.loc_start.Lexing.pos_fname ~loc (make_expr scru))
+              | `Function (_, (_id, _idloc)) ->
+                (* Format.printf "id = %a\n%!" Ident.print id;
+                   Format.printf "idloc = %a\n%!" Location.print_loc idloc;
+                   if Utils.no_ident id (fun it -> it.expr it expr)
+                   then
+                   Collected_lints.add
+                   ~loc
+                   (report loc.Location.loc_start.Lexing.pos_fname ~loc expr); *)
+                ()))
           ();
         fallback.expr self expr)
   }

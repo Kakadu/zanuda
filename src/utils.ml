@@ -115,7 +115,7 @@ struct
         |> List.flatten
         |> List.sort (fun ((_, x), k) ((_, y), k') ->
           (* Make `S come before `E so that consecutive intervals get merged
-           together in the fold below *)
+             together in the fold below *)
           let kn = function
             | `S -> 0
             | `E -> 1
@@ -166,20 +166,20 @@ struct
 
   (* The number of lines already printed after input.
 
-   This is used by [highlight_terminfo] to identify the current position of the
-   input in the terminal. This would not be possible without this information,
-   since printing several warnings/errors adds text between the user input and
-   the bottom of the terminal.
+     This is used by [highlight_terminfo] to identify the current position of the
+     input in the terminal. This would not be possible without this information,
+     since printing several warnings/errors adds text between the user input and
+     the bottom of the terminal.
 
-   We also use for {!is_first_report}, see below.
+     We also use for {!is_first_report}, see below.
   *)
   let num_loc_lines = ref 0
 
   (* We use [num_loc_lines] to determine if the report about to be
-   printed is the first or a follow-up report of the current
-   "batch" -- contiguous reports without user input in between, for
-   example for the current toplevel phrase. We use this to print
-   a blank line between messages of the same batch.
+     printed is the first or a follow-up report of the current
+     "batch" -- contiguous reports without user input in between, for
+     example for the current toplevel phrase. We use this to print
+     a blank line between messages of the same batch.
   *)
   let is_first_message () = !num_loc_lines = 0
 
@@ -193,9 +193,9 @@ struct
   ;;
 
   (* Code printing errors and warnings must be wrapped using this function, in
-   order to update [num_loc_lines].
+     order to update [num_loc_lines].
 
-   [print_updating_num_loc_lines ppf f arg] is equivalent to calling [f ppf
+     [print_updating_num_loc_lines ppf f arg] is equivalent to calling [f ppf
    arg], and additionally updates [num_loc_lines]. *)
   let print_updating_num_loc_lines ppf f arg =
     let open Format in
@@ -249,17 +249,17 @@ struct
   ;;
 
   (* [get_lines] must return the lines to highlight, given starting and ending
-   positions.
+     positions.
 
-   See [lines_around_from_current_input] below for an instantiation of
-   [get_lines] that reads from the current input.
+     See [lines_around_from_current_input] below for an instantiation of
+     [get_lines] that reads from the current input.
   *)
   let highlight_quote
-        ppf
-        ~(get_lines : start_pos:position -> end_pos:position -> input_line list)
-        ?(max_lines = 10)
-        highlight_tag
-        locs
+    ppf
+    ~(get_lines : start_pos:position -> end_pos:position -> input_line list)
+    ?(max_lines = 10)
+    highlight_tag
+    locs
     =
     let iset =
       ISet.of_intervals
@@ -296,13 +296,13 @@ struct
          Fmt.fprintf ppf "%s | %s@," line_nb line;
          Fmt.fprintf ppf "%*s   " (String.length line_nb) "";
          (* Iterate up to [rightmost], which can be larger than the length of
-           the line because we may point to a location after the end of the
-           last token on the line, for instance:
-           {[
-             token
-                       ^
-             Did you forget ...
-           ]} *)
+            the line because we may point to a location after the end of the
+            last token on the line, for instance:
+            {[
+              token
+                        ^
+              Did you forget ...
+            ]} *)
          for i = 0 to rightmost.pos_cnum - line_start_cnum - 1 do
            let pos = line_start_cnum + i in
            if ISet.is_start iset ~pos <> None then Fmt.fprintf ppf "@{<%s>" highlight_tag;
@@ -311,7 +311,7 @@ struct
            else if i < String.length line
            then
              (* For alignment purposes, align using a tab for each tab in the
-               source code *)
+                source code *)
              if line.[i] = '\t'
              then Fmt.pp_print_char ppf '\t'
              else Fmt.pp_print_char ppf ' ';
@@ -336,10 +336,10 @@ struct
   ;;
 
   let lines_around
-        ~(start_pos : position)
-        ~(end_pos : position)
-        ~(seek : int -> unit)
-        ~(read_char : unit -> char option)
+    ~(start_pos : position)
+    ~(end_pos : position)
+    ~(seek : int -> unit)
+    ~(read_char : unit -> char option)
     : input_line list
     =
     seek start_pos.pos_bol;
@@ -388,7 +388,7 @@ struct
     if rel start_pos.pos_bol < 0
     then
       (* Do nothing if the buffer does not contain the input (because it has been
-       refilled while lexing it) *)
+         refilled while lexing it) *)
       []
     else (
       let pos = ref 0 in
@@ -407,9 +407,9 @@ struct
 
   (* Attempt to get lines from the phrase buffer *)
   let lines_around_from_phrasebuf
-        ~(start_pos : position)
-        ~(end_pos : position)
-        (pb : Buffer.t)
+    ~(start_pos : position)
+    ~(end_pos : position)
+    (pb : Buffer.t)
     : input_line list
     =
     let pos = ref 0 in
@@ -426,7 +426,7 @@ struct
   ;;
 
   (* A [get_lines] function for [highlight_quote] that reads from the current
-   input. *)
+     input. *)
   let lines_around_from_current_input ~start_pos ~end_pos =
     match !Location.input_lexbuf, !Location.input_phrase_buffer, !Location.input_name with
     | _, Some pb, "//toplevel//" -> lines_around_from_phrasebuf pb ~start_pos ~end_pos
@@ -439,10 +439,10 @@ struct
 
   let is_dummy_loc loc =
     (* Fixme: this should be just [loc.loc_ghost] and the function should be
-     inlined below. However, currently, the compiler emits in some places ghost
-     locations with valid ranges that should still be printed. These locations
-     should be made non-ghost -- in the meantime we just check if the ranges are
-     valid. *)
+       inlined below. However, currently, the compiler emits in some places ghost
+       locations with valid ranges that should still be printed. These locations
+       should be made non-ghost -- in the meantime we just check if the ranges are
+       valid. *)
     loc.loc_start.pos_cnum = -1 || loc.loc_end.pos_cnum = -1
   ;;
 
@@ -514,11 +514,11 @@ let string_of_impl = function
 ;;
 
 let describe_as_clippy_json
-      ?(group = LINT.Correctness)
-      ?(level = LINT.Deny)
-      ?(impl = LINT.Typed)
-      id
-      ~docs
+  ?(group = LINT.Correctness)
+  ?(level = LINT.Deny)
+  ?(impl = LINT.Typed)
+  id
+  ~docs
   : Yojson.Safe.t
   =
   (* List if clippy lints https://github.com/rust-lang/rust-clippy/blob/gh-pages/master/lints.json *)
@@ -598,10 +598,10 @@ type intf_or_impl =
   | Intf
   | Impl
 
-let with_info _kind filename f =
+let with_info _kind ~source_file f =
   Compile_common.with_info
     ~native:false
-    ~source_file:filename
+    ~source_file
     ~tool_name:"asdf" (* TODO: pass right tool name *)
     ~output_prefix:"asdf"
     ~dump_ext:"asdf"

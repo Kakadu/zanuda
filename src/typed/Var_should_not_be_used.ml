@@ -86,13 +86,12 @@ let occurs_check name =
           ~on_error:(fun _ -> ())
           (fun id -> if Ident.same id name then () else fallback.value_binding self vb)
         (* match vb.vb_pat.pat_desc with
-        | Tpat_var (id, _) when Ident.same id name -> ()
-        | _ -> fallback.value_binding self vb *)
-        )
+           | Tpat_var (id, _) when Ident.same id name -> ()
+           | _ -> fallback.value_binding self vb *))
   }
 ;;
 
-let check_occurances_exn txt e =
+let check_occurences_exn txt e =
   if Utils.no_ident txt (fun it -> it.expr it e) then () else raise Found
 ;;
 
@@ -133,7 +132,7 @@ let run info (fallback : Tast_iterator.iterator) =
                 (fun (_, (txt, loc)) ->
                   if is_name_suspicious (Ident.name txt)
                   then (
-                    try check_occurances_exn txt ebody with
+                    try check_occurences_exn txt ebody with
                     | Found ->
                       Collected_lints.add ~loc (report ~loc ~filename:source_file txt)))
                 args
@@ -144,13 +143,13 @@ let run info (fallback : Tast_iterator.iterator) =
                   then
                     List.iter
                       (fun case ->
-                        try check_occurances_exn txt case.Typedtree.c_rhs with
+                        try check_occurences_exn txt case.Typedtree.c_rhs with
                         | Found ->
                           Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
                       cases)
                 args
             | `Let1 (argid, _rhs, wher) when is_name_suspicious (Ident.name argid.txt) ->
-              (try check_occurances_exn argid.txt wher with
+              (try check_occurences_exn argid.txt wher with
                | Found ->
                  let loc = argid.loc in
                  Collected_lints.add ~loc (report ~loc ~filename:source_file argid.txt))
@@ -164,28 +163,29 @@ let run info (fallback : Tast_iterator.iterator) =
             vb.Typedtree.vb_pat
             ~on_error:(fun _ -> ())
             (fun id ->
-              if is_name_suspicious (Ident.name id) then
-              (try
-                let it = Utils.no_ident_iterator id in
-                it.expr it vb.vb_expr;
-                List.iter (it.structure_item it) wher
-              with
-              | Utils.Ident_is_found ->
-                let loc = vb.Typedtree.vb_pat.pat_loc in
-                Collected_lints.add ~loc (report ~loc ~filename:source_file id)));
+              if is_name_suspicious (Ident.name id)
+              then (
+                try
+                  let it = Utils.no_ident_iterator id in
+                  it.expr it vb.vb_expr;
+                  List.iter (it.structure_item it) wher
+                with
+                | Utils.Ident_is_found ->
+                  let loc = vb.Typedtree.vb_pat.pat_loc in
+                  Collected_lints.add ~loc (report ~loc ~filename:source_file id)))
           (* match vb.Typedtree.vb_pat.pat_desc with
-          | Tpat_var (id, _) when is_name_suspicious (Ident.name id) ->
-            (try
-               let it = Utils.no_ident_iterator id in
-               it.expr it vb.vb_expr;
-               List.iter (it.structure_item it) wher
+             | Tpat_var (id, _) when is_name_suspicious (Ident.name id) ->
+             (try
+             let it = Utils.no_ident_iterator id in
+             it.expr it vb.vb_expr;
+             List.iter (it.structure_item it) wher
              with
              | Utils.Ident_is_found ->
-               let loc = vb.Typedtree.vb_pat.pat_loc in
-               Collected_lints.add ~loc (report ~loc ~filename:source_file id))
-          | _ ->
-            (* TODO: support Ppat_as ... *)
-            () *)
+             let loc = vb.Typedtree.vb_pat.pat_loc in
+             Collected_lints.add ~loc (report ~loc ~filename:source_file id))
+             | _ ->
+             (* TODO: support Ppat_as ... *)
+             () *)
         in
         let rec loop_str = function
           | [] -> ()
