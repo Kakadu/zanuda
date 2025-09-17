@@ -83,16 +83,17 @@ let has_arg x args =
 let is_fold fun_name tail f args =
   if String.equal fun_name f && has_arg tail args
   then Some Fold_left
-  else if List.exists
-            (fun (_, arg) ->
-              match arg.pexp_desc with
-              | Pexp_apply (exp, args) ->
-                (match exp.pexp_desc with
-                 | Pexp_ident { txt = Lident f; _ } ->
-                   String.equal fun_name f && has_arg tail args
-                 | _ -> false)
-              | _ -> false)
-            args
+  else if
+    List.exists
+      (fun (_, arg) ->
+        match arg.pexp_desc with
+        | Pexp_apply (exp, args) ->
+          (match exp.pexp_desc with
+           | Pexp_ident { txt = Lident f; _ } ->
+             String.equal fun_name f && has_arg tail args
+           | _ -> false)
+        | _ -> false)
+      args
   then Some Fold_right
   else None
 ;;
@@ -147,10 +148,10 @@ let vb_pattern () =
                 _
                 long_expr
               ->
-              match list_path, list_scru with
-              | list_path, Path.Pident list_scru when Ident.same list_path list_scru ->
-                fold_, f_, init_, long_expr
-              | _ -> fail Location.none "Something"))
+            match list_path, list_scru with
+            | list_path, Path.Pident list_scru when Ident.same list_path list_scru ->
+              fold_, f_, init_, long_expr
+            | _ -> fail Location.none "Something"))
 ;;
 
 let rhs_parser pseudo_fold pseudo_f _pseudo_init =
@@ -165,7 +166,8 @@ let rhs_parser pseudo_fold pseudo_f _pseudo_init =
       when Ident.name fold = pseudo_fold && Ident.same f pseudo_f && Ident.same f f2 ->
       Fold_left
     | _ -> fail Location.none "Not the right rhs for fold_left")
-  ||| (* f _ (fold f acc tl) *)
+  |||
+  (* f _ (fold f acc tl) *)
   (texp_apply_nolabelled
      (texp_ident __)
      (drop

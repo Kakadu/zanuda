@@ -17,12 +17,14 @@ module OrderedType = struct
     }
 
   let compare
-    { location = { loc_start = { pos_cnum = sc; _ }; loc_end = { pos_cnum = ec; _ }; _ }
-    ; _
-    }
-    { location = { loc_start = { pos_cnum = sc'; _ }; loc_end = { pos_cnum = ec'; _ }; _ }
-    ; _
-    }
+        { location =
+            { loc_start = { pos_cnum = sc; _ }; loc_end = { pos_cnum = ec; _ }; _ }
+        ; _
+        }
+        { location =
+            { loc_start = { pos_cnum = sc'; _ }; loc_end = { pos_cnum = ec'; _ }; _ }
+        ; _
+        }
     =
     if sc > sc' && ec < ec' then 0 else if sc = sc' then ec - ec' else sc - sc'
   ;;

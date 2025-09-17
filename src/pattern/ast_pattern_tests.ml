@@ -78,7 +78,8 @@ let default_sk pats _cases =
 let%expect_test _ =
   let code = {| let f x y = function true -> 1 | false -> 0 |} in
   run_string code __LINE__ Tast_pattern.(pexp_function_cases __ __) default_sk;
-  [%expect {|
+  [%expect
+    {|
     patterns: x y
     success|}]
 ;;
@@ -90,7 +91,8 @@ let%expect_test _ =
     __LINE__
     Tast_pattern.(pexp_function_cases (as__ (drop ^:: drop ^:: nil)) __)
     default_sk;
-  [%expect {|
+  [%expect
+    {|
     patterns: x y
     success |}]
 ;;
@@ -119,7 +121,8 @@ let backslash = fun ch ->
        | _ -> assert false);
       Format.printf "cases count = %d\n%!" (List.length cases);
       print_endline "OK");
-  [%expect {|
+  [%expect
+    {|
     Ident = ch
     Ident = ch
     cases count = 3
@@ -131,7 +134,8 @@ let () = ()
 let%expect_test _ =
   let code = {| let f x y = function true -> 1 | false -> 0 |} in
   run_string code __LINE__ Tast_pattern.(pexp_function_cases (list __) __) default_sk;
-  [%expect {|
+  [%expect
+    {|
 
     patterns: x y
     success|}];

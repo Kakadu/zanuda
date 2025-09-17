@@ -19,9 +19,9 @@ type t =
   { mutable outfile : string option
   ; mutable outgolint : string option
   ; mutable out_rdjsonl : string option
-      (* Spec: https://github.com/reviewdog/reviewdog/tree/master/proto/rdf#rdjson *)
+    (* Spec: https://github.com/reviewdog/reviewdog/tree/master/proto/rdf#rdjson *)
   ; mutable mode : mode
-      (* Below options to manage file paths. Not sure are they really required *)
+    (* Below options to manage file paths. Not sure are they really required *)
   ; mutable prefix_to_cut : string option
   ; mutable prefix_to_add : string option
   ; mutable extra_includes : string list

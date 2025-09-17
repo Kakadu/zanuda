@@ -92,9 +92,9 @@ let run info (fallback : Tast_iterator.iterator) =
               List.iter
                 (fun (_, (txt, loc)) ->
                   if is_name_suspicious (Ident.name txt)
-                  then (
-                    if has_occurences txt ebody then
-                      Collected_lints.add ~loc (report ~loc ~filename:source_file txt)))
+                  then
+                    if has_occurences txt ebody
+                    then Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
                 args
             | `Fcases (args, cases) ->
               List.iter
@@ -103,14 +103,16 @@ let run info (fallback : Tast_iterator.iterator) =
                   then
                     List.iter
                       (fun case ->
-                        if has_occurences txt case.Typedtree.c_rhs then
+                        if has_occurences txt case.Typedtree.c_rhs
+                        then
                           Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
                       cases)
                 args
             | `Let1 (argid, _rhs, wher) when is_name_suspicious (Ident.name argid.txt) ->
-              (if has_occurences argid.txt wher then
-                 let loc = argid.loc in
-                 Collected_lints.add ~loc (report ~loc ~filename:source_file argid.txt))
+              if has_occurences argid.txt wher
+              then (
+                let loc = argid.loc in
+                Collected_lints.add ~loc (report ~loc ~filename:source_file argid.txt))
             | _ -> ())
           ())
   ; structure =

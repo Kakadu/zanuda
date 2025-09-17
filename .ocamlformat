@@ -1,5 +1,5 @@
 profile=janestreet
-version=0.26.2
+version=0.27.0
 sequence-style = terminator
 field-space=loose
 max-indent=2

@@ -167,27 +167,28 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
             if String.starts_with ~prefix:build_dir cmt_filename
             then
               if Stdlib.Sys.file_exists cmt_filename
-              then (fun f ->
-                Unix.chdir build_dir;
-                let infos =
-                  if Config.verbose ()
-                  then printfn "Reading cmt[i] file '%s'" cmt_filename;
-                  Cmt_format.read
-                    (Base.String.drop_prefix cmt_filename (String.length build_dir))
-                in
-                f infos;
-                Unix.chdir "../..")
+              then (
+                fun f ->
+                  Unix.chdir build_dir;
+                  let infos =
+                    if Config.verbose ()
+                    then printfn "Reading cmt[i] file '%s'" cmt_filename;
+                    Cmt_format.read
+                      (Base.String.drop_prefix cmt_filename (String.length build_dir))
+                  in
+                  f infos;
+                  Unix.chdir "../..")
               else
                 fun _ ->
-                Format.eprintf
-                  "File '%s' doesn't exist. Maybe some of source files are not compiled?\n\
-                   %!"
-                  cmt_filename
+                  Format.eprintf
+                    "File '%s' doesn't exist. Maybe some of source files are not compiled?\n\
+                     %!"
+                    cmt_filename
             else
               fun f ->
-              printfn "Loading CMT %S" cmt_filename;
-              let cmt = Cmt_format.read cmt_filename in
-              f cmt
+                printfn "Loading CMT %S" cmt_filename;
+                let cmt = Cmt_format.read cmt_filename in
+                f cmt
           in
           (* Format.printf "%s %d src=%S\n%!" __FILE__ __LINE__ source_filename; *)
           wrap (on_cmti source_filename))
@@ -209,8 +210,9 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
              (* Format.printf "Trying module %a...\n%!" Sexp.pp (Dune_project.sexp_of_module_ m); *)
              if fine_module m
              then on_module wrappedness m
-             else if (* Usually this happend with 'fake' wrapped modules from dune *)
-                     not (String.equal name (String.lowercase_ascii m.name))
+             else if
+               (* Usually this happend with 'fake' wrapped modules from dune *)
+               not (String.equal name (String.lowercase_ascii m.name))
              then if Config.verbose () then printfn "module %S is omitted" m.name)))
   in
   loop_database ()

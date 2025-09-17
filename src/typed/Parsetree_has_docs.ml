@@ -58,8 +58,9 @@ open Typedtree
 let run info (fallback : Tast_iterator.iterator) =
   let source_file = Utils.source_of_info info in
   if Config.verbose () then printfn "Trying lint '%s' on file '%s'" lint_id source_file;
-  if String.ends_with ~suffix:"arsetree.mli" source_file
-     || String.ends_with ~suffix:"ast.mli" source_file
+  if
+    String.ends_with ~suffix:"arsetree.mli" source_file
+    || String.ends_with ~suffix:"ast.mli" source_file
   then
     { fallback with
       type_kind =

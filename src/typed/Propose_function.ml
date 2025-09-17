@@ -92,8 +92,9 @@ let run _ fallback =
           (fun (scru_ident, scru_loc) match_expr _scru_loc scru_pat cases () ->
             match scru_pat with
             | Path.Pident id ->
-              if String.equal (Ident.name scru_ident) (Ident.name id)
-                 && List.for_all cases ~f:(no_ident scru_ident)
+              if
+                String.equal (Ident.name scru_ident) (Ident.name id)
+                && List.for_all cases ~f:(no_ident scru_ident)
               then (
                 Collected_lints.add
                   ~loc

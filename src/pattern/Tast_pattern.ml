@@ -715,7 +715,8 @@ let texp_function_body (T fargs) (T frhs) =
 
 let texp_function_cases
   :  ((Asttypes.arg_label * (Ident.t * Location.t)) list, 'a, 'b) t
-  -> (value case list, 'b, 'c) t -> (expression, 'a, 'c) t
+  -> (value case list, 'b, 'c) t
+  -> (expression, 'a, 'c) t
   =
   fun (T fargs) (T frhs) ->
   let rec helper acc ctx loc e k =

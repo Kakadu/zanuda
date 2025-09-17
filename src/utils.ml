@@ -255,11 +255,11 @@ struct
      [get_lines] that reads from the current input.
   *)
   let highlight_quote
-    ppf
-    ~(get_lines : start_pos:position -> end_pos:position -> input_line list)
-    ?(max_lines = 10)
-    highlight_tag
-    locs
+        ppf
+        ~(get_lines : start_pos:position -> end_pos:position -> input_line list)
+        ?(max_lines = 10)
+        highlight_tag
+        locs
     =
     let iset =
       ISet.of_intervals
@@ -336,10 +336,10 @@ struct
   ;;
 
   let lines_around
-    ~(start_pos : position)
-    ~(end_pos : position)
-    ~(seek : int -> unit)
-    ~(read_char : unit -> char option)
+        ~(start_pos : position)
+        ~(end_pos : position)
+        ~(seek : int -> unit)
+        ~(read_char : unit -> char option)
     : input_line list
     =
     seek start_pos.pos_bol;
@@ -407,9 +407,9 @@ struct
 
   (* Attempt to get lines from the phrase buffer *)
   let lines_around_from_phrasebuf
-    ~(start_pos : position)
-    ~(end_pos : position)
-    (pb : Buffer.t)
+        ~(start_pos : position)
+        ~(end_pos : position)
+        (pb : Buffer.t)
     : input_line list
     =
     let pos = ref 0 in
@@ -514,11 +514,11 @@ let string_of_impl = function
 ;;
 
 let describe_as_clippy_json
-  ?(group = LINT.Correctness)
-  ?(level = LINT.Deny)
-  ?(impl = LINT.Typed)
-  id
-  ~docs
+      ?(group = LINT.Correctness)
+      ?(level = LINT.Deny)
+      ?(impl = LINT.Typed)
+      id
+      ~docs
   : Yojson.Safe.t
   =
   (* List if clippy lints https://github.com/rust-lang/rust-clippy/blob/gh-pages/master/lints.json *)
@@ -632,7 +632,6 @@ let pp_path = Path.print
 let pp_path = Format_doc.compat Path.print
 
 [%%endif]
-
 [%%if ocaml_version < (5, 0, 0)]
 
 let source_of_info info = info.Compile_common.source_file

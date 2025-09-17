@@ -114,7 +114,8 @@ diff -N -u old/changed.txt new/changed.txt
     let%expect_test _ =
       let lst = recover_lines "aaaa\nbbbbb\ncccc\naaaaaaaaaaaaaa" in
       Format.printf "[%a]\n%!" pp_lines_db lst;
-      [%expect {|
+      [%expect
+        {|
     [(1, (1, 4)) (2, (6, 10)) (3, (12, 15))
     (4, (17, 29))] |}]
     ;;
@@ -122,7 +123,8 @@ diff -N -u old/changed.txt new/changed.txt
     let%expect_test _ =
       let lst = recover_lines "a\nb\nc\nd" in
       Format.printf "[%a]\n%!" pp_lines_db lst;
-      [%expect {|
+      [%expect
+        {|
     [(1, (1, 1)) (2, (3, 3)) (3, (5, 5))
     (4, (7, 6))] |}]
     ;;
@@ -130,7 +132,8 @@ diff -N -u old/changed.txt new/changed.txt
     let%expect_test _ =
       let lst = recover_lines "\n\n\n" in
       Format.printf "[%a]\n%!" pp_lines_db lst;
-      [%expect {|
+      [%expect
+        {|
     [(1, (1, 0)) (2, (2, 1))
     (3, (3, 2))] |}]
     ;;
