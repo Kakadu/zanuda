@@ -3,7 +3,7 @@
 
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Dmitrii Kosarev a.k.a. Kakadu *)
+(** Copyright 2021-2025, Dmitrii Kosarev a.k.a. Kakadu *)
 
 (** SPDX-License-Identifier: LGPL-3.0-only *)
 
@@ -82,7 +82,7 @@ These annotation allow automation tools to check code for license compliance.
 ````
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Vasya Pupkin *)
+(** Copyright 2021-2025, Vasya Pupkin *)
 
 (** SPDX-License-Identifier: LGPL-3.0-only *)
 
