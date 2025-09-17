@@ -56,8 +56,8 @@
   (menhir :with-test)
   (ocamlformat
    (and
-    (= 0.26.2)
-    :dev))
+    (= 0.27.0)
+    :with-dev-setup))
   (odoc :with-doc)
   (odig :with-doc)))
 
@@ -86,5 +86,5 @@
   bisect_ppx
   (ocamlformat
    (and
-    (= 0.26.2)
-    :dev))))
+    (= 0.27.0)
+    :with-dev-setup))))

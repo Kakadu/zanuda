@@ -29,7 +29,7 @@ depends: [
   "ppx_deriving" {with-test}
   "ppx_blob" {with-test}
   "menhir" {with-test}
-  "ocamlformat" {= "0.26.2" & dev}
+  "ocamlformat" {= "0.27.0" & with-dev-setup}
   "odoc" {with-doc}
   "odig" {with-doc}
 ]
