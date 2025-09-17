@@ -18,7 +18,6 @@ depends: [
   "bisect_ppx"
   "curly"
   "yojson"
-  "stdune"
   "angstrom" {>= "0.15.0"}
   "ocamlformat" {= "0.26.2" & dev}
   "odoc" {with-doc}

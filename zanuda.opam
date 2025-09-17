@@ -14,12 +14,11 @@ depends: [
   "dune" {>= "3.4"}
   "ocaml" {>= "4.14" & < "5.0"}
   "yojson" {>= "2.0.0"}
+  "angstrom" {>= "0.15.0" & <= "0.16.0"}
   "sexplib"
-  "ppx_assert"
   "bisect_ppx"
-  "stdune"
   "dune-build-info"
-  "angstrom" {>= "0.15.0"}
+  "ppx_assert"
   "ppx_expect_nobase"
   "ppx_optcomp"
   "base" {with-test}

@@ -29,7 +29,7 @@ clean:
 
 deps:
 	opam install --confirm-level=yes \
-		ppx_blob curly dune ppx_expect stdune angstrom sexplib \
+		ppx_blob curly dune ppx_expect angstrom sexplib \
 		ppx_fields_conv ppx_show bisect_ppx
 
 ODIG_SWITCHES = --odoc-theme=odig.gruvbox.light

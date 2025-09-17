@@ -34,13 +34,14 @@
   ;  (and
   ;   (>= 0.25.1)
   ;   (<= 0.28.0)))
-  sexplib
-  ppx_assert
-  bisect_ppx
-  stdune
-  dune-build-info
   (angstrom
-   (>= 0.15.0))
+   (and
+    (>= 0.15.0)
+    (<= 0.16.0)))
+  sexplib
+  bisect_ppx
+  dune-build-info
+  ppx_assert
   ppx_expect_nobase
   ppx_optcomp
   (base :with-test)
@@ -75,7 +76,6 @@
   bisect_ppx
   curly
   yojson
-  stdune
   (angstrom
    (>= 0.15.0))
   (ocamlformat
