@@ -145,13 +145,14 @@ let%expect_test _ =
     __LINE__
     Tast_pattern.(pexp_function_body drop (pexp_apply drop (list (drop ** __))))
     (fun args ->
-      List.iter (fun e -> Format.printf "%a\n%!" (Printast.expression 0) e) args);
+      Format.printf
+        "%a%!"
+        Format.(
+          pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf " ") Pprintast.expression)
+        args
+      (* List.iter (Format.printf "%a\n%!" Pprintast.expression) args *));
   [%expect
     {|
 
-    expression (tmp141.ml[1,0+13]..[1,0+14])
-      Pexp_ident "x" (tmp141.ml[1,0+13]..[1,0+14])
-
-    expression (tmp141.ml[1,0+15]..[1,0+16])
-      Pexp_ident "y" (tmp141.ml[1,0+15]..[1,0+16])|}]
+    x y|}]
 ;;
