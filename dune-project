@@ -25,9 +25,11 @@
   (lint test))
  (depends
   (ocaml
-   (and
-    (>= 4.14)
-    (< 5.0)))
+   (or
+    (= 4.14)
+    (and
+     (>= 5.3.0)
+     (< 5.4.0))))
   (yojson
    (>= 2.0.0))
   ; (ppxlib
@@ -67,17 +69,21 @@
   "The tool for creating review in GitHub Pull Requests by zanuda's report")
  (depends
   (ocaml
+   (or
+    (= 4.14)
+    (and
+     (>= 5.3.0)
+     (< 5.4.0))))
+  curly
+  yojson
+  (angstrom
    (and
-    (>= 4.14)
-    (< 5.0)))
+    (>= 0.15.0)
+    (<= 0.16.0)))
   ppx_inline_test
   ppx_show
   ppx_expect
   bisect_ppx
-  curly
-  yojson
-  (angstrom
-   (>= 0.15.0))
   (ocamlformat
    (and
     (= 0.26.2)
