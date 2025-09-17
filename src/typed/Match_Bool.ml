@@ -59,9 +59,7 @@ let report filename ~loc e =
 ;;
 
 let expr2string e0 =
-  let open Parsetree in
   let e = My_untype.expr e0 in
-  let open Ast_helper in
   Format.asprintf "let (_: %a) = %a" Printtyp.type_expr e0.exp_type Pprintast.expression e
 ;;
 

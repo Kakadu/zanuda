@@ -592,6 +592,8 @@ let no_ident ident f =
   | Ident_is_found -> false
 ;;
 
+let has_ident ident f = not (no_ident ident f)
+
 [%%if ocaml_version < (5, 0, 0)]
 
 type intf_or_impl =

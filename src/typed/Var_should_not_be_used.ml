@@ -54,46 +54,7 @@ let report ~loc ~filename ident =
   (module M : LINT.REPORTER)
 ;;
 
-exception Found
-
-let occurs_check name =
-  let fallback = Tast_iterator.default_iterator in
-  let open Typedtree in
-  { fallback with
-    expr =
-      (fun self e ->
-        match e.exp_desc with
-        | Typedtree.Texp_ident (Pident id, _, _) when Ident.same id name -> raise Found
-        | _ -> fallback.expr self e)
-  ; pat =
-      (fun (type a) self (p : a general_pattern) ->
-        match p.pat_desc with
-        | Tpat_value p ->
-          let p = (p :> Typedtree.pattern) in
-          Tast_pattern.(
-            parse
-              (tpat_id __)
-              p.pat_loc
-              p
-              ~on_error:(fun _ -> fallback.pat self p)
-              (fun ident -> if Ident.same ident name then ()))
-        | _ -> ())
-  ; value_binding =
-      (fun self vb ->
-        Tast_pattern.(parse (tpat_id __))
-          vb.Typedtree.vb_pat.pat_loc
-          vb.Typedtree.vb_pat
-          ~on_error:(fun _ -> ())
-          (fun id -> if Ident.same id name then () else fallback.value_binding self vb)
-        (* match vb.vb_pat.pat_desc with
-           | Tpat_var (id, _) when Ident.same id name -> ()
-           | _ -> fallback.value_binding self vb *))
-  }
-;;
-
-let check_occurences_exn txt e =
-  if Utils.no_ident txt (fun it -> it.expr it e) then () else raise Found
-;;
+let has_occurences txt e = Utils.has_ident txt (fun it -> it.expr it e)
 
 let is_name_suspicious txt =
   (* TODO(Kakadu): Invent better solution to deal with menhir generated files. *)
@@ -132,8 +93,7 @@ let run info (fallback : Tast_iterator.iterator) =
                 (fun (_, (txt, loc)) ->
                   if is_name_suspicious (Ident.name txt)
                   then (
-                    try check_occurences_exn txt ebody with
-                    | Found ->
+                    if has_occurences txt ebody then
                       Collected_lints.add ~loc (report ~loc ~filename:source_file txt)))
                 args
             | `Fcases (args, cases) ->
@@ -143,14 +103,12 @@ let run info (fallback : Tast_iterator.iterator) =
                   then
                     List.iter
                       (fun case ->
-                        try check_occurences_exn txt case.Typedtree.c_rhs with
-                        | Found ->
+                        if has_occurences txt case.Typedtree.c_rhs then
                           Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
                       cases)
                 args
             | `Let1 (argid, _rhs, wher) when is_name_suspicious (Ident.name argid.txt) ->
-              (try check_occurences_exn argid.txt wher with
-               | Found ->
+              (if has_occurences argid.txt wher then
                  let loc = argid.loc in
                  Collected_lints.add ~loc (report ~loc ~filename:source_file argid.txt))
             | _ -> ())

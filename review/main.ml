@@ -240,7 +240,7 @@ let () =
             Printf.printf
               "version: %s\n"
               (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
-      , " Print version" )
+      , " Print version" ) [@coverage off]
     ]
     (fun s ->
       Printf.eprintf "Anonymous arguments %S is not supported\n" s;

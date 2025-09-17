@@ -4,3 +4,7 @@
   5 | let foo x = x >>= fun y -> return y
                   ^^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Applying monad laws allows to write monadic code in more compact way.
+  File "laws.ml", line 6, characters 28-56:
+  6 | let _should_be_reported x = x >>= function x -> return x [@@warning "-27"]
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Alert zanuda-linter: Applying monad laws allows to write monadic code in more compact way.

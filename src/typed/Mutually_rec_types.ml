@@ -75,6 +75,8 @@ let report msg ~loc strct_items =
 
 module SCC = Strongly_connected_components.Make (Ident)
 
+[@@@coverage off]
+
 let pp_graph ppf : Ident.Set.t Ident.Map.t -> unit =
   fun map ->
   Format.fprintf ppf "digraph A {\n";
@@ -91,6 +93,8 @@ let pp_graph ppf : Ident.Set.t Ident.Map.t -> unit =
     map;
   Format.fprintf ppf "}\n%!"
 ;;
+
+[@@@coverage on]
 
 let run _ fallback =
   let pat =
