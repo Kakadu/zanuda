@@ -54,41 +54,7 @@ let report ~loc ~filename ident =
   (module M : LINT.REPORTER)
 ;;
 
-exception Found
-
-let occurs_check name =
-  let fallback = Tast_iterator.default_iterator in
-  let open Typedtree in
-  { fallback with
-    expr =
-      (fun self e ->
-        match e.exp_desc with
-        | Typedtree.Texp_ident (Pident id, _, _) when Ident.same id name -> raise Found
-        | _ -> fallback.expr self e)
-  ; pat =
-      (fun (type a) self (p : a general_pattern) ->
-        match p.pat_desc with
-        | Tpat_value p ->
-          let p = (p :> Typedtree.pattern) in
-          Tast_pattern.(
-            parse
-              (tpat_id __)
-              p.pat_loc
-              p
-              ~on_error:(fun _ -> fallback.pat self p)
-              (fun ident -> if Ident.same ident name then ()))
-        | _ -> ())
-  ; value_binding =
-      (fun self vb ->
-        match vb.vb_pat.pat_desc with
-        | Tpat_var (id, _) when Ident.same id name -> ()
-        | _ -> fallback.value_binding self vb)
-  }
-;;
-
-let check_occurances_exn txt e =
-  if Utils.no_ident txt (fun it -> it.expr it e) then () else raise Found
-;;
+let has_occurences txt e = Utils.has_ident txt (fun it -> it.expr it e)
 
 let is_name_suspicious txt =
   (* TODO(Kakadu): Invent better solution to deal with menhir generated files. *)
@@ -103,7 +69,8 @@ let is_name_suspicious txt =
   && not (String.starts_with txt ~prefix:"_menhir_")
 ;;
 
-let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
+let run info (fallback : Tast_iterator.iterator) =
+  let source_file = Utils.source_of_info info in
   { fallback with
     expr =
       (fun self expr ->
@@ -126,25 +93,22 @@ let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
                 (fun (_, (txt, loc)) ->
                   if is_name_suspicious (Ident.name txt)
                   then (
-                    try check_occurances_exn txt ebody with
-                    | Found ->
+                    if has_occurences txt ebody then
                       Collected_lints.add ~loc (report ~loc ~filename:source_file txt)))
                 args
             | `Fcases (args, cases) ->
               List.iter
-                (fun (_, (txt, { Location.loc })) ->
+                (fun (_, (txt, loc)) ->
                   if is_name_suspicious (Ident.name txt)
                   then
                     List.iter
                       (fun case ->
-                        try check_occurances_exn txt case.Typedtree.c_rhs with
-                        | Found ->
+                        if has_occurences txt case.Typedtree.c_rhs then
                           Collected_lints.add ~loc (report ~loc ~filename:source_file txt))
                       cases)
                 args
             | `Let1 (argid, _rhs, wher) when is_name_suspicious (Ident.name argid.txt) ->
-              (try check_occurances_exn argid.txt wher with
-               | Found ->
+              (if has_occurences argid.txt wher then
                  let loc = argid.loc in
                  Collected_lints.add ~loc (report ~loc ~filename:source_file argid.txt))
             | _ -> ())
@@ -152,19 +116,34 @@ let run { Compile_common.source_file; _ } (fallback : Tast_iterator.iterator) =
   ; structure =
       (fun self x ->
         let loop_vb wher vb =
-          match vb.Typedtree.vb_pat.pat_desc with
-          | Tpat_var (id, _) when is_name_suspicious (Ident.name id) ->
-            (try
-               let it = Utils.no_ident_iterator id in
-               it.expr it vb.vb_expr;
-               List.iter (it.structure_item it) wher
+          Tast_pattern.(parse (tpat_id __))
+            vb.Typedtree.vb_pat.pat_loc
+            vb.Typedtree.vb_pat
+            ~on_error:(fun _ -> ())
+            (fun id ->
+              if is_name_suspicious (Ident.name id)
+              then (
+                try
+                  let it = Utils.no_ident_iterator id in
+                  it.expr it vb.vb_expr;
+                  List.iter (it.structure_item it) wher
+                with
+                | Utils.Ident_is_found ->
+                  let loc = vb.Typedtree.vb_pat.pat_loc in
+                  Collected_lints.add ~loc (report ~loc ~filename:source_file id)))
+          (* match vb.Typedtree.vb_pat.pat_desc with
+             | Tpat_var (id, _) when is_name_suspicious (Ident.name id) ->
+             (try
+             let it = Utils.no_ident_iterator id in
+             it.expr it vb.vb_expr;
+             List.iter (it.structure_item it) wher
              with
              | Utils.Ident_is_found ->
-               let loc = vb.Typedtree.vb_pat.pat_loc in
-               Collected_lints.add ~loc (report ~loc ~filename:source_file id))
-          | _ ->
-            (* TODO: support Ppat_as ... *)
-            ()
+             let loc = vb.Typedtree.vb_pat.pat_loc in
+             Collected_lints.add ~loc (report ~loc ~filename:source_file id))
+             | _ ->
+             (* TODO: support Ppat_as ... *)
+             () *)
         in
         let rec loop_str = function
           | [] -> ()

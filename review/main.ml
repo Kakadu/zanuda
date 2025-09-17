@@ -4,7 +4,7 @@
 
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -240,7 +240,7 @@ let () =
             Printf.printf
               "version: %s\n"
               (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
-      , " Print version" )
+      , " Print version" ) [@coverage off]
     ]
     (fun s ->
       Printf.eprintf "Anonymous arguments %S is not supported\n" s;

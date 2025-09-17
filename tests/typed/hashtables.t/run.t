@@ -1,5 +1,13 @@
   $ dune build
-  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir .  -ordjsonl /dev/null
+  $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
+  File "Counter.ml", line 3, characters 18-22:
+  3 |   (fun () -> incr last; !last)
+                        ^^^^
+  Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.
+  File "Counter.ml", line 3, characters 25-29:
+  3 |   (fun () -> incr last; !last)
+                               ^^^^
+  Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.
   File "Hashtables.ml", line 3, characters 22-23:
   3 |   if None = None then h else h
                             ^
@@ -31,12 +39,4 @@
   File "Hashtables.ml", line 24, characters 14-32:
   24 | type args = { mutable count: int }
                      ^^^^^^^^^^^^^^^^^^
-  Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.
-  File "Counter.ml", line 3, characters 18-22:
-  3 |   (fun () -> incr last; !last)
-                        ^^^^
-  Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.
-  File "Counter.ml", line 3, characters 25-29:
-  3 |   (fun () -> incr last; !last)
-                               ^^^^
   Alert zanuda-linter: Using mutable data structures for teaching purposes is usually discouraged. Replace Hashtables by standard tree-like maps or consider Hash-Array Mapped Tries (HAMT). Use mutable `ref`erences and mutable structure fields only if it is really required. In all places where it is needed indeed, describe in a comment why it is needed there.

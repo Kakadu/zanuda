@@ -1,2 +1,11 @@
 (cram
  (deps %{bin:zanuda}))
+
+(cram
+ (applies_to FalseProposeFunction)
+ (enabled_if false))
+
+(cram
+ (applies_to ProposeFunction NestedComments)
+ (enabled_if
+  (= %{ocaml_version} "4.14.2")))

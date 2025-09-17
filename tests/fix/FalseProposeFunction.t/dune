@@ -4,7 +4,9 @@
  (modules FalseProposeFunction)
  (preprocess
   (pps ppx_show ppx_deriving.eq))
+ (flags
+  (:standard -w -37))
  (libraries ppx_show.runtime))
- 
+
 (cram
  (deps %{bin:zanuda.exe}))

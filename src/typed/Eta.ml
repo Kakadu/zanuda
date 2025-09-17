@@ -4,7 +4,7 @@
 
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu *)
+(** Copyright 2021-2025, Kakadu *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -54,9 +54,9 @@ let msg ppf (old_expr, new_expr) =
   Format.fprintf
     ppf
     "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
-    Pprintast.expression
+    My_pprintast.expression
     (My_untype.expr old_expr)
-    Pprintast.expression
+    My_pprintast.expression
     (My_untype.expr new_expr)
 ;;
 
@@ -121,22 +121,19 @@ let run _ fallback =
     let idents = List.filter_map extract_ident args in
     let args_len = List.length args in
     let no_ident_shadowing ids =
-      not
-        (Base.List.contains_dup
-           ~compare:(fun a b -> String.compare (Ident.name a) (Ident.name b))
-           ids)
+      let compare a b = String.compare (Ident.name a) (Ident.name b) in
+      not (Base.List.contains_dup ~compare ids)
     in
     if args_len > 0
        && args_len = List.length idents
        && List.equal (fun a b -> String.equal (Ident.name a) (Ident.name b)) ids idents
        && no_ident_shadowing ids
        && List.for_all (no_ident new_expr) idents
+       && not (Collected_lints.has_tdecl_at loc)
     then
-      if not (Collected_lints.has_tdecl_at loc)
-      then
-        Collected_lints.add
-          ~loc
-          (report loc.Location.loc_start.Lexing.pos_fname ~loc ~old_expr:expr new_expr)
+      Collected_lints.add
+        ~loc
+        (report loc.Location.loc_start.Lexing.pos_fname ~loc ~old_expr:expr new_expr)
   in
   { fallback with
     expr =

@@ -1,13 +1,11 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
-open Format
 open Zanuda_core
 open Utils
 open Parsetree
@@ -65,7 +63,7 @@ let is_applied_to_tail fun_name tail f args =
   match f.Typedtree.exp_desc with
   | Texp_ident (Pident fid, _, _) ->
     Ident.same fid fun_name
-    && List.exists
+    && ListLabels.exists
          ~f:(fun arg ->
            match arg.Typedtree.exp_desc with
            | Texp_ident (Pident aid, _, _) -> Ident.same aid tail
@@ -116,7 +114,9 @@ let run _ (fallback : Tast_iterator.iterator) =
     Tast_pattern.parse
       (pat ())
       loc
-      ~on_error:(fun _desc () -> ())
+      ~on_error:(fun _desc () ->
+        (* Format. printf "Skipping because of '%s'\n@[%a@]\n" _desc Pprintast.binding (My_untype.value_binding vb); *)
+        ())
       vb
       (fun (fun_name, tail, f, args) () ->
         if is_applied_to_tail fun_name tail f args
@@ -134,13 +134,13 @@ let run _ (fallback : Tast_iterator.iterator) =
       (fun self si ->
         fallback.structure_item self si;
         match si.str_desc with
-        | Tstr_value (Asttypes.Recursive, vbl) -> List.iter vbl ~f:parse
+        | Tstr_value (Asttypes.Recursive, vbl) -> List.iter parse vbl
         | _ -> ())
   ; expr =
       (fun self e ->
         fallback.expr self e;
         match e.exp_desc with
-        | Texp_let (Asttypes.Recursive, vbl, _) -> List.iter vbl ~f:parse
+        | Texp_let (Asttypes.Recursive, vbl, _) -> List.iter parse vbl
         | _ -> ())
   }
 ;;

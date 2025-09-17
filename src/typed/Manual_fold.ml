@@ -98,10 +98,11 @@ let is_fold fun_name tail f args =
 ;;
 
 let rec fun_body expr =
-  let result = expr in
-  match expr.pexp_desc with
-  | Pexp_fun (_, _, _, expr) -> fun_body expr
-  | _ -> result
+  Tast_pattern.(parse (texp_function_body drop __))
+    expr.Typedtree.exp_loc
+    expr
+    ~on_error:(fun _ -> expr)
+    Fun.id
 ;;
 
 let vb_pattern () =
@@ -149,7 +150,7 @@ let vb_pattern () =
               match list_path, list_scru with
               | list_path, Path.Pident list_scru when Ident.same list_path list_scru ->
                 fold_, f_, init_, long_expr
-              | _ -> fail Location.none "Something "))
+              | _ -> fail Location.none "Something"))
 ;;
 
 let rhs_parser pseudo_fold pseudo_f _pseudo_init =

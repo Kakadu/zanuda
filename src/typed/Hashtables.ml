@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -103,6 +103,13 @@ let run _ fallback =
     let typ_ref_base = typ_constr (path [ "Base"; "ref" ]) (drop ^:: nil) in
     core_typ (typ_ref ||| typ_ref_base)
   in
+  let kind_pat =
+    let open Tast_pattern in
+    map0 typ_kind_open ~f:`Skip
+    ||| map0 typ_kind_abstract ~f:`Skip
+    ||| map0 typ_kind_variant ~f:`Variant
+    ||| map1 (typ_kind_record __) ~f:(fun labels -> `Check_labels labels)
+  in
   let check loc pat x =
     Tast_pattern.parse
       pat
@@ -123,18 +130,18 @@ let run _ fallback =
   ; type_declaration =
       (fun self td ->
         fallback.type_declaration self td;
-        match td.Typedtree.typ_type.Types.type_kind with
-        | Types.Type_abstract | Type_open -> ()
-        | Type_record (labels, _) ->
-          ListLabels.iter labels ~f:(function
-            | { Types.ld_mutable = Mutable; ld_loc = loc; _ } ->
-              Collected_lints.add
-                ~loc
-                (report loc.Location.loc_start.Lexing.pos_fname ~loc ())
-            | _ -> ())
-        | Type_variant _ ->
-          (* TODO(Kakadu): Algebraic constuctors could have mutable record arguments (issue #59) *)
-          ())
+        Tast_pattern.(parse kind_pat) td.Typedtree.typ_loc td.Typedtree.typ_kind (function
+          | `Skip -> ()
+          | `Variant ->
+            ()
+            (* TODO(Kakadu): Algebraic constuctors could have mutable record arguments (issue #59) *)
+          | `Check_labels labels ->
+            ListLabels.iter labels ~f:(function
+              | { Typedtree.ld_mutable = Mutable; ld_loc = loc; _ } ->
+                Collected_lints.add
+                  ~loc
+                  (report loc.Location.loc_start.Lexing.pos_fname ~loc ())
+              | _ -> ())))
   ; expr =
       (fun self expr ->
         let loc = expr.Typedtree.exp_loc in

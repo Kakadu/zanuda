@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -135,7 +135,7 @@ module State = struct
       st_kept
       (pp_print_list
          ~pp_sep:(fun ppf () -> fprintf ppf " ")
-         (fun ppf (s, path) -> fprintf ppf "(%s,%a)" s Path.print path))
+         (fun ppf (s, path) -> fprintf ppf "(%s,%a)" s Utils.pp_path path))
       st_over_self
       (pp_print_list
          ~pp_sep:(fun ppf () -> fprintf ppf " ")

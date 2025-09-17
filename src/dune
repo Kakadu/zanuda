@@ -18,6 +18,7 @@
   LINT
   Lint_filesystem
   Load_dune
+  My_pprintast
   Unused_ML_logger
   Utils)
  (modules_without_implementation LINT)
@@ -29,6 +30,7 @@
   sexplib
   yojson
   dune-build-info
+  unix
   Tast_pattern)
  (preprocess
   (pps

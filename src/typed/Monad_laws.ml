@@ -1,13 +1,11 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
-module Format = Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Format
@@ -29,7 +27,7 @@ Warns if monadic code could be simplified.
   3) **(m >>= g) >>= k  ===  m >>= fun x -> ((g x) >>= k)** for any monadic values m,g,k
 
 |}
-  |> Stdlib.String.trim
+  |> String.trim
 ;;
 
 let describe_as_json () =
@@ -60,16 +58,31 @@ let report filename ~loc kind =
 ;;
 
 let run _ fallback =
-  let pat =
+  let pat () =
     let open Tast_pattern in
     texp_apply2 (texp_ident (pident (string ">>="))) drop
-    @@ texp_function
-         (case
-            (tpat_var __)
-            none
-            (texp_apply1 (texp_ident (pident (string "return"))) (texp_ident (pident __)))
-          ^:: nil)
-    (* TODO: invent monads to be able to check two identifiers during the matching *)
+    @@ (texp_function_cases
+          nil
+          (case
+             (tpat_var __)
+             none
+             (texp_apply1
+                (texp_ident (pident (string "return")))
+                (texp_ident (pident __)))
+           ^:: nil)
+        |> map2 ~f:(fun str1 str2 ->
+          if String.equal str1 str2
+          then ()
+          else fail Location.none "texp_function_cases for return law failed")
+        ||| (texp_function_body
+               (__ ^:: nil)
+               (texp_apply1
+                  (texp_ident (pident (string "return")))
+                  (texp_ident (pident __)))
+             |> map2 ~f:(fun (_, (l, _)) r ->
+               if String.equal (Ident.name l) r
+               then ()
+               else fail Location.none "texp_function_body for return law failed")))
   in
   let open Tast_iterator in
   { fallback with
@@ -79,16 +92,14 @@ let run _ fallback =
         (* let __ _ = Format.printf "%a\n%!" MyPrinttyped.expr expr in *)
         let loc = expr.exp_loc in
         Tast_pattern.parse
-          pat
+          (pat ())
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun id1 id2 () ->
-            if String.equal id1 id2
-            then
-              Collected_lints.add
-                ~loc
-                (report loc.Location.loc_start.Lexing.pos_fname ~loc ()))
+          (fun () () ->
+            Collected_lints.add
+              ~loc
+              (report loc.Location.loc_start.Lexing.pos_fname ~loc ()))
           ();
         fallback.expr self expr)
   }

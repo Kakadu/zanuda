@@ -3,15 +3,8 @@
  (wrapped false)
  (modules ifBool)
  (modes byte)
- (flags
-  (:standard
-   ;-dsource
-   ;
-   ))
  (preprocess
-  (pps
-   ;ppx_show
-   ppx_fields_conv)))
+  (pps ppx_fields_conv -- -pretty)))
 
 (cram
  (deps %{bin:zanuda.exe}))

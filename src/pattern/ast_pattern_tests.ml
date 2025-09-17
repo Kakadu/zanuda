@@ -113,15 +113,15 @@ let backslash = fun ch ->
         ((nolabel ** __) ^:: nil)
         (as__ (texp_match (texp_ident_loc __) drop __)))
     (fun (id, _) _ _ path cases ->
-      Format.printf "Ident = %a\n%!" Ident.print id;
+      Format.printf "Ident = %s\n%!" (Ident.name id);
       (match path with
-       | Path.Pident id -> Format.printf "Ident = %a\n%!" Ident.print id
+       | Path.Pident id -> Format.printf "Ident = %s\n%!" (Ident.name id)
        | _ -> assert false);
       Format.printf "cases count = %d\n%!" (List.length cases);
       print_endline "OK");
   [%expect {|
-    Ident = ch/269
-    Ident = ch/269
+    Ident = ch
+    Ident = ch
     cases count = 3
     OK |}]
 ;;

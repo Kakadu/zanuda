@@ -106,7 +106,7 @@ let run _ fallback =
         let () =
           Tast_pattern.(
             parse
-              (texp_function_cases nil __)
+              (texp_function_cases drop __)
               ~on_error:(fun _ -> ())
               e.Typedtree.exp_loc
               e

@@ -19,7 +19,7 @@ depends: [
   "ppx_show"
   "ppx_expect"
   "bisect_ppx"
-  "ocamlformat" {= "0.26.2" & dev}
+  "ocamlformat" {= "0.27.0" & with-dev-setup}
   "odoc" {with-doc}
 ]
 build: [

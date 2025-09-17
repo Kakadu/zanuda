@@ -4,7 +4,7 @@
 
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -173,16 +173,14 @@ val texp_apply_nolabelled
   -> (expression list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
-val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t
-
-(* TODO: Hardcoded triple is awful *)
+(* TODO(Kakadu): Hardcoded triple is awful *)
 val texp_function_body
-  :  ((Asttypes.arg_label * (Ident.t * Warnings.loc)) list, 'a, 'b) t
+  :  ((Asttypes.arg_label * (Ident.t * Location.t)) list, 'a, 'b) t
   -> (expression, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
 val texp_function_cases
-  :  ((Asttypes.arg_label * (Ident.t * string Location.loc)) list, 'a, 'b) t
+  :  ((Asttypes.arg_label * (Ident.t * Location.t)) list, 'a, 'b) t
   -> (value case list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
@@ -255,6 +253,10 @@ val typ_arrow
   -> (Types.type_expr, 'b, 'c) t
   -> (Types.type_expr, 'a, 'c) t
 
+val typ_kind_abstract : (type_kind, 'c, 'c) t
+val typ_kind_open : (type_kind, 'c, 'c) t
+val typ_kind_variant : (type_kind, 'c, 'c) t
+val typ_kind_record : (label_declaration list, 'b, 'c) t -> (type_kind, 'b, 'c) t
 val core_typ : (Types.type_expr, 'a, 'b) t -> (core_type, 'a, 'b) t
 
 (* Structure *)

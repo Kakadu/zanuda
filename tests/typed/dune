@@ -12,3 +12,13 @@
  (package zanuda)
  (action
   (copy %{deps} %{target})))
+
+(cram
+ (applies_to Eta)
+ (enabled_if
+  (< %{ocaml_version} "5.0.0")))
+
+(cram
+ (applies_to Eta53)
+ (enabled_if
+  (>= %{ocaml_version} "5.3.0")))
