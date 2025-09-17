@@ -4,7 +4,7 @@
 
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -292,6 +292,3 @@ val pexp_apply
   :  (Parsetree.expression, 'a, 'b) t
   -> ((Asttypes.arg_label * Parsetree.expression) list, 'b, 'c) t
   -> (Parsetree.expression, 'a, 'c) t
-
-(* TODO: move to some other module *)
-val source_of_info : Compile_common.info -> string

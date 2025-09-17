@@ -632,3 +632,13 @@ let pp_path = Path.print
 let pp_path = Format_doc.compat Path.print
 
 [%%endif]
+
+[%%if ocaml_version < (5, 0, 0)]
+
+let source_of_info info = info.Compile_common.source_file
+
+[%%else]
+
+let source_of_info info = Unit_info.source_file info.Compile_common.target
+
+[%%endif]

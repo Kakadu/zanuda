@@ -70,7 +70,7 @@ let is_name_suspicious txt =
 ;;
 
 let run info (fallback : Tast_iterator.iterator) =
-  let source_file = Tast_pattern.source_of_info info in
+  let source_file = Utils.source_of_info info in
   { fallback with
     expr =
       (fun self expr ->

@@ -61,7 +61,7 @@ let run info (fallback : Ast_iterator.iterator) =
           let loc = si.pstr_loc in
           Collected_lints.add
             ~loc
-            (report ~filename:(Tast_pattern.source_of_info info) ~loc)
+            (report ~filename:(Utils.source_of_info info) ~loc)
         | _ -> ())
   ; expr =
       (fun self e ->
