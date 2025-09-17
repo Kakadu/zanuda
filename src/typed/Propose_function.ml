@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -49,7 +49,7 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
-let msg ppf () = Caml.Format.fprintf ppf "Using `function` is recommended%!"
+let msg ppf () = Format.fprintf ppf "Using `function` is recommended%!"
 
 let report filename ~loc =
   let module M = struct
@@ -70,11 +70,14 @@ let report filename ~loc =
 
 let no_ident ident c = Utils.no_ident ident (fun it -> it.case it c)
 
+let pat () =
+  let open Tast_pattern in
+  texp_function_body
+    ((nolabel ** __) ^:: nil)
+    (as__ (texp_match (texp_ident_loc __) drop __))
+;;
+
 let run _ fallback =
-  let pat =
-    let open Tast_pattern in
-    texp_function (case (tpat_var __) none (texp_match (texp_ident __) __) ^:: nil)
-  in
   let open Tast_iterator in
   { fallback with
     expr =
@@ -82,20 +85,23 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         Tast_pattern.parse
-          pat
+          (pat ())
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun argname ident cases () ->
-            match ident with
+          (fun (scru_ident, scru_loc) match_expr _scru_loc scru_pat cases () ->
+            match scru_pat with
             | Path.Pident id ->
-              if String.equal argname (Ident.name id)
-                 && List.for_all cases ~f:(no_ident id)
+              if String.equal (Ident.name scru_ident) (Ident.name id)
+                 && List.for_all cases ~f:(no_ident scru_ident)
               then (
                 Collected_lints.add
                   ~loc
                   (report loc.Location.loc_start.Lexing.pos_fname ~loc);
-                Refactoring.Propose_function.apply_fix expr.exp_desc)
+                Refactoring.Propose_function.register_fix
+                  ~loc:match_expr.exp_loc
+                  scru_loc
+                  cases)
             | _ -> ())
           ();
         fallback.expr self expr)

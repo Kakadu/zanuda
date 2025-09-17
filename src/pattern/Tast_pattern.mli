@@ -44,6 +44,7 @@ val ( ** ) : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
 val ( ||| ) : ('a, 'b, 'c) t -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
 val loc : ('a, 'b, 'c) t -> ('a Location.loc, 'b, 'c) t
 val ( >>| ) : ('a, 'b, 'c) t -> ('d -> 'b) -> ('a, 'd, 'c) t
+val list : ('a, 'b -> 'b, 'c) t -> ('a list, 'c list -> 'd, 'd) t
 
 (** Mapping results of applying pattern-combinator *)
 
@@ -66,6 +67,16 @@ val map5
   :  ('a, 'b -> 'c -> 'd -> 'e -> 'f -> 'g, 'h) t
   -> f:('b -> 'c -> 'd -> 'e -> 'f -> 'i)
   -> ('a, 'i -> 'g, 'h) t
+
+val map6
+  :  ('a, 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h, 'i) t
+  -> f:('b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'j)
+  -> ('a, 'j -> 'h, 'i) t
+
+val map7
+  :  ('a, 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h -> 'i, 'j) t
+  -> f:('b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h -> 'k)
+  -> ('a, 'k -> 'i, 'j) t
 
 val map_result : ('a, 'b, 'c) t -> f:('c -> 'd) -> ('a, 'b, 'd) t
 
@@ -103,7 +114,11 @@ type comp_pat = computation pattern_desc pattern_data
 val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val labelled : (string, 'a, 'b) t -> (Asttypes.arg_label, 'a, 'b) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
-val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
+val tpat_id : (Ident.t, 'a, 'b) t -> (pattern, 'a, 'b) t
+
+val tpat_tuple
+  :  (value general_pattern list, 'a, 'b) t
+  -> (value pattern_desc pattern_data, 'a, 'b) t
 
 val tpat_constructor
   :  (Longident.t, 'a, 'b) t
@@ -121,6 +136,9 @@ val pident : (string, 'a, 'b) t -> (Path.t, 'a, 'b) t
     texp_ident (path [ "&&" ])  (* WRONG *)
     texp_ident (path [ "Stdlib"; "&&" ])  (* CORRECT *) *)
 val texp_ident : (Path.t, 'a, 'b) t -> (expression, 'a, 'b) t
+(* TODO: Implement pattern for solo variable *)
+
+val texp_ident_loc : (Path.t, 'a, 'b) t -> (expression, Warnings.loc -> 'a, 'b) t
 
 val texp_ident_typ
   :  (Path.t, 'a, 'b) t
@@ -128,6 +146,11 @@ val texp_ident_typ
   -> (expression, 'a, 'c) t
 
 val texp_assert : (expression, 'a, 'b) t -> (expression, 'a, 'b) t
+
+val texp_let
+  :  (value_binding list, 'a, 'b) t
+  -> (expression, 'b, 'c) t
+  -> (expression, 'a, 'c) t
 
 val texp_apply
   :  (expression, 'a, 'b) t
@@ -152,6 +175,17 @@ val texp_apply_nolabelled
 
 val texp_function : (case_val list, 'a, 'b) t -> (expression, 'a, 'b) t
 
+(* TODO: Hardcoded triple is awful *)
+val texp_function_body
+  :  ((Asttypes.arg_label * (Ident.t * Warnings.loc)) list, 'a, 'b) t
+  -> (expression, 'b, 'c) t
+  -> (expression, 'a, 'c) t
+
+val texp_function_cases
+  :  ((Asttypes.arg_label * (Ident.t * string Location.loc)) list, 'a, 'b) t
+  -> (value case list, 'b, 'c) t
+  -> (expression, 'a, 'c) t
+
 val case
   :  (pattern, 'a, 'b) t
   -> (expression option, 'b, 'c) t
@@ -173,7 +207,8 @@ val texp_construct
 val texp_match
   :  (expression, 'a, 'b) t
   -> (case_comp list, 'b, 'c) t
-  -> (expression, 'a, 'c) t
+  -> (case_val list, 'c, 'd) t
+  -> (expression, 'a, 'd) t
 
 val texp_ite
   :  (expression, 'a, 'b) t
@@ -205,6 +240,11 @@ val rld_overriden
   -> (expression, 'b, 'c) t
   -> (record_label_definition, 'a, 'c) t
 
+val value_binding
+  :  (pattern, 'a, 'b) t
+  -> (expression, 'b, 'c) t
+  -> (value_binding, 'a, 'c) t
+
 val typ_constr
   :  (Path.t, 'a, 'b) t
   -> (Types.type_expr list, 'b, 'c) t
@@ -235,3 +275,18 @@ type context
 val of_func : (context -> Location.t -> 'a -> 'b -> 'c) -> ('a, 'b, 'c) t
 val to_func : ('a, 'b, 'c) t -> context -> Location.t -> 'a -> 'b -> 'c
 val fail : Warnings.loc -> string -> 'a
+
+val pexp_function_body
+  :  (Parsetree.pattern list, 'a, 'b) t
+  -> (Parsetree.expression, 'b, 'c) t
+  -> (Parsetree.expression, 'a, 'c) t
+
+val pexp_function_cases
+  :  (Parsetree.pattern list, 'a, 'b) t
+  -> (Parsetree.case list, 'b, 'c) t
+  -> (Parsetree.expression, 'a, 'c) t
+
+val pexp_apply
+  :  (Parsetree.expression, 'a, 'b) t
+  -> ((Asttypes.arg_label * Parsetree.expression) list, 'b, 'c) t
+  -> (Parsetree.expression, 'a, 'c) t

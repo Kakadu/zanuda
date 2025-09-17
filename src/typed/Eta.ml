@@ -31,7 +31,7 @@ Let's look at the expression 'let f x = g x'.
 It may be simply replaced with an expression, `let f = g` which has the same semantics.
 In general, wrappers like this may be confusing, so it is recommended to get rid of them.
 |}
-  |> Stdlib.String.trim
+  |> String.trim
 ;;
 
 let describe_as_json () =
@@ -51,8 +51,7 @@ let expr2string e0 =
 ;;
 
 let msg ppf (old_expr, new_expr) =
-  let open Parsetree in
-  Caml.Format.fprintf
+  Format.fprintf
     ppf
     "Eta reduction proposed. It's recommended to rewrite @['%a'@] as @['%a'@]%!"
     Pprintast.expression
@@ -81,29 +80,36 @@ let report filename ~loc ~old_expr new_expr =
 let no_ident c ident = Utils.no_ident ident (fun it -> it.expr it c)
 
 let run _ fallback =
-  let pattern_cons_map f id = function
-    | ids, func, args -> f (id :: ids, func, args)
-  in
-  let var_pattern_func = to_func (tpat_var __) in
-  let extract_path = function
-    | Asttypes.Nolabel, Some { Typedtree.exp_desc = Typedtree.Texp_ident (path, _, _) } ->
-      Some path
-    | _ -> None
-  in
-  let rec pat_func ctx lc e k =
+  let pat =
     let open Tast_pattern in
-    match e.Typedtree.exp_desc with
-    | Texp_function
-        { arg_label = Nolabel; cases = { c_lhs; c_guard = None; c_rhs } :: [] } ->
-      pattern_cons_map k |> var_pattern_func ctx lc c_lhs |> pat_func ctx lc c_rhs
-    | Texp_apply (({ Typedtree.exp_desc = Texp_ident _; _ } as body), args) ->
-      let paths = List.filter_map extract_path args in
-      if List.length args = List.length paths
-      then k ([], body, paths)
-      else fail lc "eta-reduction FC pattern"
-    | _ -> fail lc "eta-reduction FC pattern"
+    let is_ident_expr arg =
+      parse
+        (texp_ident __)
+        arg.Typedtree.exp_loc
+        ~on_error:(fun _ -> None)
+        arg
+        (fun s -> Some s)
+    in
+    fun loca ->
+      texp_function_body __ (texp_apply_nolabelled (as__ (texp_ident drop)) __)
+      |> map3 ~f:(fun formal_args fid real_args ->
+        let formal_len = List.length formal_args in
+        if formal_len <> List.length real_args
+        then fail loca "Not for eta-expansion"
+        else (
+          let formal_pats =
+            List.map
+              (function
+                | Asttypes.Nolabel, (id, _) -> id
+                | _ -> fail loca "labels")
+              formal_args
+          in
+          let formal_idents = List.filter_map is_ident_expr real_args in
+          let idents_len = List.length formal_idents in
+          if List.length formal_pats = idents_len && idents_len = formal_len
+          then formal_pats, fid, formal_idents
+          else fail loca "Not for eta-expansion"))
   in
-  let pat = of_func pat_func in
   let open Tast_iterator in
   let check expr (ids, new_expr, args) () =
     let open Typedtree in
@@ -112,19 +118,18 @@ let run _ fallback =
       | Path.Pident id -> Some id
       | _ -> None
     in
-    (*              Format.printf "Expr: `%s`\nInner=`%s`\nFormal args=`%s`\nReal args=`%s`\nLengths: %d %d\n"
-                    (expr2string expr)
-                    (expr2string func)
-                    (String.concat ~sep:", " ids)
-                    (String.concat ~sep:", " (List.map ~f:ident2string args))
-                    (List.length ids)
-                    (List.length args); *)
     let idents = List.filter_map extract_ident args in
     let args_len = List.length args in
+    let no_ident_shadowing ids =
+      not
+        (Base.List.contains_dup
+           ~compare:(fun a b -> String.compare (Ident.name a) (Ident.name b))
+           ids)
+    in
     if args_len > 0
        && args_len = List.length idents
-       && List.equal String.equal ids (List.map Ident.name idents)
-       && (not (Base.List.contains_dup ~compare:String.compare ids))
+       && List.equal (fun a b -> String.equal (Ident.name a) (Ident.name b)) ids idents
+       && no_ident_shadowing ids
        && List.for_all (no_ident new_expr) idents
     then
       if not (Collected_lints.has_tdecl_at loc)
@@ -138,7 +143,7 @@ let run _ fallback =
       (fun self expr ->
         let open Typedtree in
         Tast_pattern.parse
-          pat
+          (pat expr.exp_loc)
           expr.exp_loc
           ~on_error:(fun _desc () -> ())
           expr

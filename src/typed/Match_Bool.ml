@@ -39,10 +39,7 @@ let msg ppf e0 =
     let open Ast_helper in
     Format.asprintf "%a" Pprintast.expression e
   in
-  Caml.Format.fprintf
-    ppf
-    "Match is redundant. It's recommended to rewrite it as '%s'%!"
-    si
+  Format.fprintf ppf "Match is redundant. It's recommended to rewrite it as '%s'%!" si
 ;;
 
 let report filename ~loc e =
@@ -74,8 +71,9 @@ let run _ fallback =
     let open Tast_pattern in
     texp_match
       __
-      (ccase (tpat_constructor __ nil |> tpat_value) none __
-       ^:: ccase (tpat_constructor __ nil |> tpat_value) none __
+      __
+      (case (tpat_constructor __ nil) none __
+       ^:: case (tpat_constructor __ nil) none __
        ^:: nil)
   in
   let open Tast_iterator in
@@ -89,7 +87,7 @@ let run _ fallback =
           loc
           ~on_error:(fun _desc () -> ())
           expr
-          (fun scru id1 rhs1 id2 rhs2 () ->
+          (fun scru _ id1 rhs1 id2 rhs2 () ->
             (*            Format.printf "%a -> %s\n%a -> %s\n"
                           Pprintast.longident
                           id1

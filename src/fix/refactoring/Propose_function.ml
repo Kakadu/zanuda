@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -10,41 +10,32 @@ open Tast_pattern
 open Utils
 open Typedtree
 
-let first_case cs = List.nth cs 0
-
-let get_match_constr_payload ematch_case =
-  let e =
-    let c = first_case ematch_case in
-    c.c_rhs
-  in
-  let pat = texp_match (texp_ident __) __ in
-  parse
-    pat
-    e.exp_loc
-    e
-    (fun _ cs () ->
-      let pat =
-        let c = first_case cs in
-        c.c_lhs
-      in
-      let point = exp_start e in
-      let shift_point = shift_point_cnum point 5 in
-      set_padding shift_point (pat_point pat Start) Space_padding;
-      set_padding point shift_point (Padding "function"))
-    ()
+let first_case = function
+  | h :: _ -> h
+  | [] ->
+    Format.eprintf "Error at %s %d\n%!" __FILE__ __LINE__;
+    exit 1
 ;;
 
-let get_propose_function_payload ematch_case =
-  let extra_arg =
-    let c = first_case ematch_case in
+let get_match_constr_payload loc ematch_cases =
+  let pat =
+    let c = first_case ematch_cases in
     c.c_lhs
   in
-  set_empty_padding (pat_point extra_arg Start) (pat_point extra_arg End)
+  let point = Utils.{ loc; pos = Start } in
+  let shift_point = shift_point_cnum point 5 in
+  set_padding shift_point (pat_point pat Start) Space_padding;
+  set_padding point shift_point (Padding "function")
 ;;
 
-let apply_fix = function
-  | Texp_function { cases } ->
-    get_match_constr_payload cases;
-    get_propose_function_payload cases
-  | _ -> failwith "invalid_arg"
+let get_propose_function_payload loc =
+  set_empty_padding (make_point loc Start) (make_point loc End)
+;;
+
+(* TODO(Kakadu): describe difference between two locations *)
+let register_fix ~loc scru_pat_loc cases =
+  (* Format.printf "%s: %a\n%!" __FUNCTION__ My_printtyped.expr e; *)
+  (* Format.printf "loc = %a\n%!" Location.print_loc loc; *)
+  get_match_constr_payload loc cases;
+  get_propose_function_payload scru_pat_loc
 ;;

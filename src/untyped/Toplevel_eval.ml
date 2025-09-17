@@ -6,7 +6,7 @@
 
 [@@@ocaml.text "/*"]
 
-open Caml.Format
+open Format
 open Zanuda_core
 open Utils
 open Parsetree

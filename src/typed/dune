@@ -10,7 +10,6 @@
   Equality_phys
   Eta
   Failwith
-  Format
   Guard_instead_of_if
   Hashtables
   If_bool
@@ -18,15 +17,20 @@
   License
   List_fusion
   List_length
+  Manual_fold
+  Manual_map
   Match_Bool
   Monad_laws
   Mutually_rec_types
   Nested_if
+  Parsetree_has_docs
+  Printf
   Propose_function
   Record_punning
   String_concat
   String_concat_fold
   Tuple_matching
+  Var_should_not_be_used
   ;
   )
  (preprocess

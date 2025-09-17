@@ -50,7 +50,7 @@ let msg ppf kind =
       , "List.filter_map (fun x -> let r = g x in if f r then Some y else None) xs" )
     | ConcatMap -> "List.concat (List.map f xs)", "List.concat_map f xs"
   in
-  Caml.Format.fprintf
+  Format.fprintf
     ppf
     "Performance issue. It's recommended to rewrite\n\t'%s'\nas\n\t'%s'\n%!"
     s1

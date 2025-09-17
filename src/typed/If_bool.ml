@@ -1,13 +1,11 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
-module Format = Caml.Format
 open Zanuda_core
 open Zanuda_core.Utils
 
@@ -38,14 +36,14 @@ is semantically equivalent to false unless `f x` performs any effect (mutation, 
 The general rule of thumb is not to depend of the order of evaluation of this conjucts.
 (The same idea as our functions should not depend on evaluation order of its' arguments.)
 |}
-  |> Stdlib.String.trim
+  |> String.trim
 ;;
 
 let describe_as_json () =
   describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
-let msg ppf s = Caml.Format.fprintf ppf "%s\n%!" s
+let msg ppf s = Format.fprintf ppf "%s\n%!" s
 
 let report filename ~loc e =
   let module M = struct
@@ -117,7 +115,7 @@ let run _ fallback =
       (fun self si ->
         match si.str_desc with
         | Tstr_include { incl_attributes; _ }
-          when List.exists incl_attributes ~f:is_merlin_hide ->
+          when ListLabels.exists incl_attributes ~f:is_merlin_hide ->
           do_check := false;
           fallback.structure_item self si;
           do_check := true

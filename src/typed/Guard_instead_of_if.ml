@@ -1,13 +1,12 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
-open Caml.Format
+open Format
 open Zanuda_core
 open Utils
 
@@ -105,11 +104,13 @@ let run _ fallback =
     expr =
       (fun self e ->
         let () =
-          match e.exp_desc with
-          | Texp_function { cases = _ :: _ :: _ as cases } ->
-            (* When we have a single case, we probably don't have a pattern matching *)
-            List.iter ~f:oncase cases
-          | _ -> ()
+          Tast_pattern.(
+            parse
+              (texp_function_cases nil __)
+              ~on_error:(fun _ -> ())
+              e.Typedtree.exp_loc
+              e
+              (List.iter oncase))
         in
         fallback.expr self e)
   }

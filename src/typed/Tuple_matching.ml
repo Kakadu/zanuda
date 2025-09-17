@@ -32,7 +32,7 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group ~level ~docs:documentation
 ;;
 
-let msg ppf () = Caml.Format.fprintf ppf "Using `let ... in` is recommended%!"
+let msg ppf () = Format.fprintf ppf "Using `let ... in` is recommended%!"
 
 let report filename ~loc =
   let module M = struct
@@ -54,15 +54,17 @@ let report filename ~loc =
 let run _ fallback =
   let pat =
     let open Tast_pattern in
-    texp_match drop (__ ^:: nil)
+    texp_match drop drop (__ ^:: nil)
   in
+  (* TODO: Maybe embed check for tuples into FCP? *)
   let with_Tpat_tuple cs =
     let open Typedtree in
     match cs.c_lhs.pat_desc with
-    | Tpat_value v ->
+    | Tpat_tuple _ -> true
+    (* | Tpat_value v ->
       (match (v :> pattern) with
        | { pat_desc = Tpat_tuple _ } -> true
-       | _ -> false)
+       | _ -> false) *)
     | _ -> false
   in
   let open Tast_iterator in

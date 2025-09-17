@@ -25,22 +25,25 @@
   (lint test))
  (depends
   (ocaml
-   (and
-    (>= 4.14)
-    (< 5.0)))
+   (or
+    (= 4.14)
+    (and
+     (>= 5.3.0)
+     (< 5.4.0))))
   (yojson
    (>= 2.0.0))
   ; (ppxlib
   ;  (and
   ;   (>= 0.25.1)
   ;   (<= 0.28.0)))
-  sexplib
-  ppx_assert
-  bisect_ppx
-  stdune
-  dune-build-info
   (angstrom
-   (>= 0.15.0))
+   (and
+    (>= 0.15.0)
+    (<= 0.16.0)))
+  sexplib
+  bisect_ppx
+  dune-build-info
+  ppx_assert
   ppx_expect_nobase
   ppx_optcomp
   (base :with-test)
@@ -66,18 +69,21 @@
   "The tool for creating review in GitHub Pull Requests by zanuda's report")
  (depends
   (ocaml
+   (or
+    (= 4.14)
+    (and
+     (>= 5.3.0)
+     (< 5.4.0))))
+  curly
+  yojson
+  (angstrom
    (and
-    (>= 4.14)
-    (< 5.0)))
+    (>= 0.15.0)
+    (<= 0.16.0)))
   ppx_inline_test
   ppx_show
   ppx_expect
   bisect_ppx
-  curly
-  yojson
-  stdune
-  (angstrom
-   (>= 0.15.0))
   (ocamlformat
    (and
     (= 0.26.2)

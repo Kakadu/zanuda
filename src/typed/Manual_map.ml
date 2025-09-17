@@ -7,12 +7,12 @@
 [@@@ocaml.text "/*"]
 
 open Base
-open Caml.Format
+open Format
 open Zanuda_core
 open Utils
 open Parsetree
 
-type input = Ast_iterator.iterator
+type input = Tast_iterator.iterator
 
 let lint_id = "manual_map"
 let lint_source = LINT.Camelot
@@ -62,77 +62,85 @@ let report ~loc ~filename name =
 ;;
 
 let is_applied_to_tail fun_name tail f args =
-  match f.pexp_desc with
-  | Pexp_ident { txt = Lident f; _ } ->
-    String.equal f fun_name
+  match f.Typedtree.exp_desc with
+  | Texp_ident (Pident fid, _, _) ->
+    Ident.same fid fun_name
     && List.exists
-         ~f:(fun (_, arg) ->
-           match arg.pexp_desc with
-           | Pexp_ident { txt = Lident a; _ } -> String.equal a tail
+         ~f:(fun arg ->
+           match arg.Typedtree.exp_desc with
+           | Texp_ident (Pident aid, _, _) -> Ident.same aid tail
            | _ -> false)
          args
   | _ -> false
 ;;
 
-let run _ (fallback : Ast_iterator.iterator) =
-  let pat =
-    let open Ppxlib.Ast_pattern in
+let run _ (fallback : Tast_iterator.iterator) =
+  let pat () =
+    let open Tast_pattern in
     let cases =
       let empty_case () =
         case
-          ~lhs:(ppat_construct (lident (string "[]")) drop)
-          ~guard:none
-          ~rhs:(pexp_construct (lident (string "[]")) drop)
+          (tpat_constructor (lident (string "[]")) drop)
+          none
+          (texp_construct (lident (string "[]")) drop nil)
       in
       let cons_case () =
         case
-          ~lhs:
-            (ppat_construct
-               (lident (string "::"))
-               (some (drop ** ppat_tuple (drop ^:: ppat_var __ ^:: nil))))
-          ~guard:none
-          ~rhs:
-            (pexp_construct
-               (lident (string "::"))
-               (some (pexp_tuple (drop ^:: pexp_apply __ __ ^:: nil))))
+          (tpat_constructor (lident (string "::")) (drop ^:: tpat_id __ ^:: nil))
+          none
+          (texp_construct
+             (lident (string "::"))
+             drop
+             (drop ^:: texp_apply_nolabelled __ __ ^:: nil))
       in
       cons_case () ^:: empty_case () ^:: nil ||| empty_case () ^:: cons_case () ^:: nil
     in
-    value_binding
-      ~pat:(ppat_var __)
-      ~expr:(pexp_fun drop drop drop (pexp_function cases) ||| pexp_function cases)
+    value_binding (tpat_id __) (texp_function_cases (drop ^:: nil) cases)
+    |> map4 ~f:(fun a b c d -> a, b, c, d)
+    ||| (value_binding
+           (tpat_id __)
+           (texp_function_body
+              (drop ^:: __ ^:: nil)
+              (texp_match (texp_ident __) drop cases))
+         |> map6 ~f:(fun a (_, (id2, _)) id1 b c d ->
+           match id1 with
+           | Path.Pident id1 when Ident.same id1 id2 -> a, b, c, d
+           | _ -> fail Location.none "Some shadowing happenned"))
   in
   let parse vb =
-    (* We hide attributes. Don't know why it is really needed.
+    (* TODO: We hide attributes. Don't know why it is really needed.
        TODO: Rewrite to typed tree and see what will happen.
     *)
-    let vb = { vb with pvb_attributes = [] } in
-    let loc = vb.pvb_loc in
-    Ppxlib.Ast_pattern.parse
-      pat
+    let vb = { vb with Typedtree.vb_attributes = [] } in
+    let loc = vb.vb_loc in
+    Tast_pattern.parse
+      (pat ())
       loc
       ~on_error:(fun _desc () -> ())
       vb
-      (fun fun_name tail f args () ->
+      (fun (fun_name, tail, f, args) () ->
         if is_applied_to_tail fun_name tail f args
         then
           Collected_lints.add
             ~loc
-            (report ~filename:loc.Location.loc_start.Lexing.pos_fname ~loc fun_name))
+            (report
+               ~filename:loc.Location.loc_start.Lexing.pos_fname
+               ~loc
+               (Ident.name fun_name)))
       ()
   in
   { fallback with
     structure_item =
       (fun self si ->
         fallback.structure_item self si;
-        match si.pstr_desc with
-        | Pstr_value (Asttypes.Recursive, vbl) -> List.iter vbl ~f:parse
+        match si.str_desc with
+        | Tstr_value (Asttypes.Recursive, vbl) -> List.iter vbl ~f:parse
         | _ -> ())
   ; expr =
       (fun self e ->
         fallback.expr self e;
-        match e.pexp_desc with
-        | Pexp_let (Asttypes.Recursive, vbl, _) -> List.iter vbl ~f:parse
+        match e.exp_desc with
+        | Texp_let (Asttypes.Recursive, vbl, _) -> List.iter vbl ~f:parse
         | _ -> ())
   }
 ;;

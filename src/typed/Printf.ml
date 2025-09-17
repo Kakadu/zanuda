@@ -1,13 +1,11 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2024, Kakadu. *)
+(** Copyright 2021-2025, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
 [@@@ocaml.text "/*"]
 
-open Base
-module Format = Stdlib.Format
 open Zanuda_core
 open Zanuda_core.Utils
 open Format
@@ -76,7 +74,7 @@ let run _ fallback =
           ~on_error:(fun _msg () -> ())
           expr
           (fun fmt_string () ->
-            if String.is_substring fmt_string ~substring:"\"%s\""
+            if Base.String.is_substring fmt_string ~substring:"\"%s\""
             then
               Collected_lints.add
                 ~loc
