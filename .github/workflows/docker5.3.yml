@@ -9,7 +9,6 @@ on:
       - '*.md'
     branches:
       - 'master'
-      - 'ocaml53-2'
 
 env:
   OPAMROOT: /home/opam/.opam
