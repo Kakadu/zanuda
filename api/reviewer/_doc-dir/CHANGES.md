@@ -1,5 +1,14 @@
 ## Working version
 
+
+## 2.0.0 (18-09-2025)
+
+### New
+
+- Add OCaml 5.3 support. Now it works both on 4.14.2 and 5.3.0
+
+## 1.1.0 (18-02-2025)
+
 ### New
 
 - #13: Add lint that discourages matching a tuple using 'match' expression with single branch
