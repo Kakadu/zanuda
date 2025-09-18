@@ -48,5 +48,3 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/Kakadu/zanuda.git"
-# We have issues with tests on these distributions. TODO: Fix later
-available: os-family != "alpine" & os-family != "opensuse"
