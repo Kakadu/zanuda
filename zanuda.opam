@@ -48,3 +48,5 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/Kakadu/zanuda.git"
+x-maintenance-intent: ["(latest)"]
+
