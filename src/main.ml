@@ -219,6 +219,7 @@ let () =
         | "forward" :: lint_id :: rest
           when String.equal lint_id TypedLints.Equality_phys.lint_id ->
           TypedLints.Equality_phys.process_switches rest
+        | "ignore" :: [ rest ] -> Collected_lints.process_switches rest
         | _ -> Format.eprintf ".zanuda: Don't know what to do with %S\n%!" s)))
 ;;
 

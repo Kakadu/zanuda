@@ -8,6 +8,21 @@
 
 open Dune_project
 
+let lint_id = "lint_filesystem"
+
+(* type config = { mutable files_to_skip : string list }
+
+let config = { files_to_skip = [] }
+
+let process_switches = function
+  | [ "ignore"; files ] ->
+    config.files_to_skip <- Stdlib.String.split_on_char ',' files @ config.files_to_skip
+  | other ->
+    Printf.eprintf "Lint %s: Unsuported switches: %s\n" lint_id (String.concat " " other)
+;; *)
+
+let should_be_omitted filename = String.ends_with ~suffix:".ml-gen" filename
+
 let on_module { impl; intf } =
   match impl, intf with
   | None, None -> failwith "Not implemented"
@@ -15,10 +30,11 @@ let on_module { impl; intf } =
   | None, Some _ | Some _, Some _ -> ()
   | Some ml, None ->
     let filename = Config.recover_filepath ml in
-    if not (String.ends_with ~suffix:".ml-gen" filename)
-    then
+    if should_be_omitted filename
+    then ()
+    else
       Collected_lints.add
-        ~loc:Location.none
+        ~loc:(Warnings.ghost_loc_in_file ml)
         (module struct
           let msg ppf file =
             Format.fprintf ppf "File '%s' doesn't have corresponding .mli interface" file
@@ -79,5 +95,4 @@ TODO: Add custom configuration for this.
   |> Stdlib.String.trim
 ;;
 
-let lint_id = "lint_filesystem"
 let describe_as_json () = Utils.describe_as_clippy_json lint_id ~docs
