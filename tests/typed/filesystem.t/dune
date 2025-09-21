@@ -2,4 +2,7 @@
  (name test_filesystem)
  (wrapped false)
  (modes byte)
- (modules Ast Asdf no_iface))
+ (modules Ast Asdf no_iface)
+ (libraries lib1))
+
+(vendored_dirs duniverse)
