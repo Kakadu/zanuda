@@ -6,13 +6,34 @@
 
 [@@@ocaml.text "/*"]
 
+type config = { mutable files_to_skip : string list }
+
+let config = { files_to_skip = [] }
+
+let process_switches = function
+  | files ->
+    config.files_to_skip <- Stdlib.String.split_on_char ',' files @ config.files_to_skip
+;;
+
 open Utils
 
 include struct
   let found_Lints : (Location.t * (module LINT.REPORTER)) Queue.t = Queue.create ()
   let clear () = Queue.clear found_Lints
   let is_empty () = Queue.is_empty found_Lints
-  let add ~loc m = Queue.add (loc, m) found_Lints
+
+  let add ~loc m =
+    if
+      List.exists
+        (fun prefix ->
+          let fname = loc.Warnings.loc_start.Lexing.pos_fname in
+          String.starts_with ~prefix fname
+          || String.starts_with ~prefix:("_build/default/" ^ prefix) fname)
+        config.files_to_skip
+    then ()
+    else Queue.add (loc, m) found_Lints
+  ;;
+
   let loc_lints f = Queue.fold (fun acc x -> f x :: acc) [] found_Lints
 end
 

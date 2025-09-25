@@ -22,3 +22,15 @@
  (applies_to Eta53)
  (enabled_if
   (>= %{ocaml_version} "5.3.0")))
+
+(cram
+ (applies_to ToplevelEval)
+ (enabled_if %{lib-available:ppx_blob}))
+
+(cram
+ (applies_to ifbool)
+ (enabled_if %{lib-available:ppx_fields_conv}))
+
+(cram
+ (applies_to License)
+ (enabled_if %{lib-available:bisect_ppx}))

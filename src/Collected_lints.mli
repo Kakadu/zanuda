@@ -29,3 +29,4 @@ val report : unit -> unit
 val add_tdecl : Warnings.loc -> unit
 val has_tdecl_at : Warnings.loc -> bool
 val clear_tdecls : unit -> unit
+val process_switches : string -> unit

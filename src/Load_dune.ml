@@ -117,16 +117,6 @@ let%expect_test _ =
 ;;
 
 let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti path =
-  Unix.chdir path;
-  let s =
-    let ch = Unix.open_process_in "dune describe" in
-    let s = Sexplib.Sexp.input_sexp ch in
-    close_in ch;
-    s
-  in
-  let db = [%of_sexp: t Base.list] s in
-  (* List.iter db ~f:(fun x -> Format.printf "%a\n%!" Sexplib.Sexp.pp_hum (sexp_of_t x)); *)
-  Lint_filesystem.check db;
   let on_module (is_wrapped : w) m =
     (* printf "\t Working on module %S (wrapped = %b)\n%!" m.name is_wrapped; *)
     (* we analyze syntax tree without expanding syntax extensions *)
@@ -193,7 +183,7 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
           (* Format.printf "%s %d src=%S\n%!" __FILE__ __LINE__ source_filename; *)
           wrap (on_cmti source_filename))
   in
-  let loop_database () =
+  let loop_database db =
     ListLabels.iter db ~f:(function
       | Build_context _ | Root _ -> ()
       | Executables { modules; requires = _ } ->
@@ -215,5 +205,22 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
                not (String.equal name (String.lowercase_ascii m.name))
              then if Config.verbose () then printfn "module %S is omitted" m.name)))
   in
-  loop_database ()
+  let str =
+    let cmd = Printf.sprintf "dune describe workspace %s" path in
+    (* let _ = Sys.command (Printf.sprintf "notify-send %S" cmd) in *)
+    (* print_endline cmd; *)
+    let ch = Unix.open_process_in cmd in
+    let s = In_channel.input_all ch in
+    close_in ch;
+    s
+  in
+  try
+    let s = Sexplib.Sexp.of_string str in
+    let db = [%of_sexp: t Base.list] s in
+    Lint_filesystem.check db;
+    loop_database db
+  with
+  | Failure s ->
+    Printf.eprintf "%s\n%!" s;
+    exit 1
 ;;
