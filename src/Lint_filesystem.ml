@@ -34,7 +34,7 @@ let on_module { impl; intf } =
     then ()
     else
       Collected_lints.add
-        ~loc:(Warnings.ghost_loc_in_file ml)
+        ~loc:(Location.none)
         (module struct
           let msg ppf file =
             Format.fprintf ppf "File '%s' doesn't have corresponding .mli interface" file
