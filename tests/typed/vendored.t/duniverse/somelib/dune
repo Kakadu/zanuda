@@ -1,0 +1,4 @@
+(library
+ (name lib1)
+ (modules lib1)
+ (libraries doesnt_exist))
