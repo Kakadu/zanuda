@@ -1,0 +1,7 @@
+(library
+ (name test_filesystem)
+ (wrapped false)
+ (modes byte)
+ (modules Asdf))
+
+(vendored_dirs duniverse)
