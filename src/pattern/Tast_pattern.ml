@@ -296,7 +296,7 @@ let path_pident (T fident) =
       | Path.Pident id ->
         ctx.matched <- ctx.matched + 1;
         k |> fident ctx loc id
-      | _ -> fail loc (sprintf "path_pident"))
+      | _ -> fail loc "path_pident")
 ;;
 
 let path xs =
@@ -331,6 +331,8 @@ let path_of_list = function
 
 let%test_module " " =
   (module struct
+    [@@@coverage off]
+
     let names = [ "Stdlib!"; "List"; "length" ]
 
     [%%if ocaml_version < (5, 0, 0)]
@@ -1222,3 +1224,60 @@ type context = Ast_pattern0.context
 let of_func f = T f
 let to_func (T f) = f
 let fail = fail
+
+let%test_module "Fake tests, only to increase coverage" =
+  (module struct
+    [@@@coverage off]
+
+    let noloc =
+      Warnings.
+        { loc_start = Lexing.dummy_pos; loc_end = Lexing.dummy_pos; loc_ghost = true }
+    ;;
+
+    let%test _ =
+      match path_of_list [] with
+      | exception Failure _ -> true
+      | _ -> false
+    ;;
+
+    let%test_unit _ =
+      let mk p ?(inv = false) what =
+        let on_error, rez =
+          if inv then Fun.const true, false else Fun.const false, true
+        in
+        parse p noloc ~on_error what rez
+      in
+      [%test_eq: Base.bool]
+        true
+        (mk
+           ~inv:true
+           (path_pident drop)
+           Path.(Pdot (Pident (Ident.create_local "List"), "map")));
+      [%test_eq: Base.bool]
+        true
+        (mk (path_pident drop) Path.(Pident (Ident.create_local "compare")));
+      [%test_eq: Base.bool] true (mk ~inv:true (labelled drop) Asttypes.Nolabel);
+      [%test_eq: Base.bool]
+        true
+        (mk
+           (econst drop)
+           { Typedtree.exp_desc = Texp_constant (Asttypes.Const_string ("", noloc, None))
+           ; exp_extra = []
+           ; exp_type = Predef.type_string
+           ; exp_loc = noloc
+           ; exp_env = Env.empty
+           ; exp_attributes = []
+           });
+      let _42 =
+        { Typedtree.exp_desc = Texp_constant (Asttypes.Const_int 42)
+        ; exp_extra = []
+        ; exp_type = Predef.type_int
+        ; exp_loc = noloc
+        ; exp_env = Env.empty
+        ; exp_attributes = []
+        }
+      in
+      [%test_eq: Base.bool] true (mk (econst drop) _42)
+    ;;
+  end)
+;;
