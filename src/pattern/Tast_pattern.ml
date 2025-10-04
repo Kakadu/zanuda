@@ -811,7 +811,11 @@ let texp_match (T fexpr) (T fcomp_cases) (T fval_cases) =
         | { c_lhs = { pat_desc = Tpat_exception _ }; _ } ->
           (case :> case_comp) :: comps, vals
         | { c_lhs = { pat_desc = Tpat_or _ }; _ } ->
-          failwith "Or-patterns are not yet implemented"
+          (* TODO(Kakadu): What to do here? We need to look deeply into or-pattern to understand where to place it?
+            See issue #76
+          *)
+          (* failwith "Or-patterns are not yet implemented" *)
+          comps, vals
         | { c_lhs; _ } ->
           (* Format.eprintf "%a\n%!" My_printtyped.pattern c_lhs; *)
           Format.eprintf

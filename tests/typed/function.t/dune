@@ -1,7 +1,7 @@
 (library
  (name test_function)
  (wrapped false)
- (modules function)
+ (modules function orpat)
  (modes byte)
  (flags
   (:standard
