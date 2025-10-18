@@ -10,16 +10,16 @@ open Tast_pattern
 open Utils
 open Typedtree
 
-let first_case = function
+exception Fix_error of Warnings.loc * string
+
+let first_case ~loc = function
   | h :: _ -> h
-  | [] ->
-    Format.eprintf "Error at %s %d\n%!" __FILE__ __LINE__;
-    exit 1
+  | [] -> raise (Fix_error (loc, "Can't match cases"))
 ;;
 
 let get_match_constr_payload loc ematch_cases =
   let pat =
-    let c = first_case ematch_cases in
+    let c = first_case ~loc ematch_cases in
     c.c_lhs
   in
   let point = Utils.{ loc; pos = Start } in
@@ -36,6 +36,11 @@ let get_propose_function_payload loc =
 let register_fix ~loc scru_pat_loc cases =
   (* Format.printf "%s: %a\n%!" __FUNCTION__ My_printtyped.expr e; *)
   (* Format.printf "loc = %a\n%!" Location.print_loc loc; *)
-  get_match_constr_payload loc cases;
-  get_propose_function_payload scru_pat_loc
+  try
+    get_match_constr_payload loc cases;
+    get_propose_function_payload scru_pat_loc
+  with
+  | Fix_error (loc, msg) ->
+    Format.eprintf "Error at %s %d\n%!" __FILE__ __LINE__;
+    Format.eprintf "While analyzing source at %a\n%!" Location.print_loc loc
 ;;
