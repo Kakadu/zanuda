@@ -2,6 +2,14 @@
  (name test_filesystem)
  (wrapped false)
  (modes byte)
- (modules Asdf))
+ (modules Asdf Generated))
+
+(rule
+ (targets Generated.ml)
+ (deps gen.sh)
+ (action
+  (with-stdout-to
+   %{targets}
+   (run sh gen.sh))))
 
 (vendored_dirs duniverse)
