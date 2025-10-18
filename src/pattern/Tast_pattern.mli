@@ -35,6 +35,7 @@ val __ : ('a, 'a -> 'b, 'b) t
 val __' : ('a, 'a Location.loc -> 'b, 'b) t
 
 val drop : ('a, 'b, 'b) t
+val ( +?? ) : ('a, 'b, 'b) t -> string -> ('a, 'b, 'b) t
 val nil : ('a list, 'b, 'b) t
 val ( ^:: ) : ('a, 'b, 'c) t -> ('a list, 'c, 'd) t -> ('a list, 'b, 'd) t
 val none : ('a option, 'b, 'b) t
@@ -42,6 +43,7 @@ val some : ('a, 'b, 'c) t -> ('a option, 'b, 'c) t
 val pair : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
 val ( ** ) : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
 val ( ||| ) : ('a, 'b, 'c) t -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
+val conde : ('a, 'b, 'c) t list -> ('a, 'b, 'c) t
 val loc : ('a, 'b, 'c) t -> ('a Location.loc, 'b, 'c) t
 val ( >>| ) : ('a, 'b, 'c) t -> ('d -> 'b) -> ('a, 'd, 'c) t
 val list : ('a, 'b -> 'b, 'c) t -> ('a list, 'c list -> 'd, 'd) t

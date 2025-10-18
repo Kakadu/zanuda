@@ -98,6 +98,13 @@ let drop : 'a 'b. ('a, 'b, 'b) t =
       k)
 ;;
 
+let ( +?? ) (T fargs) msg =
+  T
+    (fun ctx loc e k ->
+      try fargs ctx loc e k with
+      | Ast_pattern0.Expected (loc, _) -> fail loc msg)
+;;
+
 let cst ~to_string ?(equal = Stdlib.( = )) v =
   T
     (fun ctx loc x k ->
@@ -226,6 +233,12 @@ let alt (T f1) (T f2) =
 ;;
 
 let ( ||| ) = alt
+
+let conde = function
+  | [] -> fail Location.none "Bad argument"
+  | h :: tl -> List.fold_left ( ||| ) h tl
+;;
+
 let map (T func) ~f = T (fun ctx loc x k -> func ctx loc x (f k))
 let map' (T func) ~f = T (fun ctx loc x k -> func ctx loc x (f loc k))
 let map_result (T func) ~f = T (fun ctx loc x k -> f (func ctx loc x k))
