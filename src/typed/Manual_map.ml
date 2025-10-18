@@ -93,17 +93,29 @@ let run _ (fallback : Tast_iterator.iterator) =
       in
       cons_case () ^:: empty_case () ^:: nil ||| empty_case () ^:: cons_case () ^:: nil
     in
-    value_binding (tpat_id __) (texp_function_cases (drop ^:: nil) cases)
-    |> map4 ~f:(fun a b c d -> a, b, c, d)
-    ||| (value_binding
-           (tpat_id __)
-           (texp_function_body
-              (drop ^:: __ ^:: nil)
-              (texp_match (texp_ident __) drop cases))
-         |> map6 ~f:(fun a (_, (id2, _)) id1 b c d ->
-           match id1 with
-           | Path.Pident id1 when Ident.same id1 id2 -> a, b, c, d
-           | _ -> fail Location.none "Some shadowing happenned"))
+    conde
+      [ value_binding (tpat_id __) (texp_function_cases (drop ^:: nil) cases)
+        |> map4 ~f:(fun a b c d -> a, b, c, d)
+      ; value_binding
+          (tpat_id __)
+          (texp_function_body
+             (drop ^:: __ ^:: nil)
+             (texp_match (texp_ident __) drop cases))
+        |> map6 ~f:(fun a (_, (id2, _)) id1 b c d ->
+          match id1 with
+          | Path.Pident id1 when Ident.same id1 id2 -> a, b, c, d
+          | _ -> fail Location.none "Some shadowing happenned")
+        (* Maps with specialized functions *)
+      ; value_binding
+          (tpat_id __)
+          (texp_function_body (__ ^:: nil) (texp_match (texp_ident __) drop cases))
+        |> map6 ~f:(fun a (_, (id2, _)) id1 b c d ->
+          match id1 with
+          | Path.Pident id1 when Ident.same id1 id2 -> a, b, c, d
+          | _ -> fail Location.none "Some shadowing happenned")
+      ; value_binding (tpat_id __) (texp_function_cases nil cases)
+        |> map4 ~f:(fun a b c d -> a, b, c, d)
+      ]
   in
   let parse vb =
     (* TODO: We hide attributes. Don't know why it is really needed.
@@ -115,7 +127,13 @@ let run _ (fallback : Tast_iterator.iterator) =
       (pat ())
       loc
       ~on_error:(fun _desc () ->
-        (* Format. printf "Skipping because of '%s'\n@[%a@]\n" _desc Pprintast.binding (My_untype.value_binding vb); *)
+        let __ _ =
+          Format.printf
+            "Skipping because of '%s'\n@[%a@]\n"
+            _desc
+            Pprintast.binding
+            (My_untype.value_binding vb)
+        in
         ())
       vb
       (fun (fun_name, tail, f, args) () ->
