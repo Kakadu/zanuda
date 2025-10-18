@@ -469,18 +469,23 @@ end)
 
 module Report = struct
   let txt ~loc ~filename ppf msg msg_arg =
-    Location.input_name := cut_build_dir filename;
-    Clflags.error_style := Some Misc.Error_style.Contextual;
-    let file_contents = In_channel.with_open_text filename In_channel.input_all in
-    Location.input_lexbuf := Some (Lexing.from_string file_contents);
-    let loc =
-      let open Location in
-      { loc with
-        loc_start = { loc.loc_start with pos_fname = !input_name }
-      ; loc_end = { loc.loc_end with pos_fname = !input_name }
-      }
-    in
-    report_printer ppf loc msg msg_arg
+    if Sys.file_exists filename
+    then (
+      Location.input_name := cut_build_dir filename;
+      Clflags.error_style := Some Misc.Error_style.Contextual;
+      let file_contents = In_channel.with_open_text filename In_channel.input_all in
+      Location.input_lexbuf := Some (Lexing.from_string file_contents);
+      let loc =
+        let open Location in
+        { loc with
+          loc_start = { loc.loc_start with pos_fname = !input_name }
+        ; loc_end = { loc.loc_end with pos_fname = !input_name }
+        }
+      in
+      report_printer ppf loc msg msg_arg)
+    else (
+      Format.fprintf ppf "@[Alert zanuda-linter: @[%a@]@]@," msg msg_arg;
+      Format.fprintf ppf "%!")
   ;;
 
   let rdjsonl ~loc ~filename ~code ppf msg msg_arg =
