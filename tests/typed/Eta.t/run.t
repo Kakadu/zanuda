@@ -21,9 +21,3 @@
   Alert zanuda-linter: Eta reduction proposed. It's recommended to rewrite 
                        'fun lhs -> fun rhs -> String.equal lhs rhs' as 
                        'String.equal'
-  File "deriv.ml", line 1:
-  Alert zanuda-linter: Identifier `__0` used somewhere else but supposed to be unused.
-  File "deriv.ml", line 13, characters 12-33:
-  13 | type expr = FuncCall of expr list [@@deriving eq ]
-                   ^^^^^^^^^^^^^^^^^^^^^
-  Alert zanuda-linter: Identifier `__0` used somewhere else but supposed to be unused.

@@ -2,13 +2,11 @@
  (name test_var_should_not_be_used)
  (wrapped false)
  (modes byte)
- (modules lib)
+ (modules lib false_positives)
+ (preprocess
+  (pps ppx_deriving.show))
  (instrumentation
-  (backend bisect_ppx))
- (flags
-  (:standard
-   ;
-   )))
+  (backend bisect_ppx)))
 
 (cram
  (deps %{bin:zanuda.exe}))
