@@ -54,7 +54,33 @@ let report ~loc ~filename ident =
   (module M : LINT.REPORTER)
 ;;
 
-let has_occurences txt e = Utils.has_ident txt (fun it -> it.expr it e)
+let length_of_loc loc =
+  loc.Location.loc_end.Lexing.pos_cnum - loc.Location.loc_start.Lexing.pos_cnum
+;;
+
+let has_occurences txt e =
+  try
+    let it = Utils.no_ident_iterator txt in
+    it.expr it e;
+    false
+  with
+  | Utils.Ident_is_found loc ->
+    let loc_len = length_of_loc loc in
+    let strlen = String.length (Ident.name txt) in
+    if loc_len = strlen
+    then
+      (* let __ =Format.printf "ident '%a' found at %a\n%!" Ident.print txt Location.print_loc loc; *)
+      true
+    else
+      (* Format.eprintf
+        "Ident '%s' found but omitted. strlen=%d, loclen = %d\n%!"
+        (Ident.name txt)
+        strlen
+        loc_len; *)
+      false
+;;
+
+(* has_ident txt (fun it -> it.expr it e) *)
 
 let is_name_suspicious txt =
   (* TODO(Kakadu): Invent better solution to deal with menhir generated files. *)
@@ -130,7 +156,7 @@ let run info (fallback : Tast_iterator.iterator) =
                   it.expr it vb.vb_expr;
                   List.iter (it.structure_item it) wher
                 with
-                | Utils.Ident_is_found ->
+                | Utils.Ident_is_found _ ->
                   let loc = vb.Typedtree.vb_pat.pat_loc in
                   Collected_lints.add ~loc (report ~loc ~filename:source_file id)))
           (* match vb.Typedtree.vb_pat.pat_desc with

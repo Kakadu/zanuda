@@ -541,7 +541,7 @@ let describe_as_clippy_json
     ]
 ;;
 
-exception Ident_is_found
+exception Ident_is_found of Location.t
 
 let no_ident_iterator ident =
   let open Tast_iterator in
@@ -568,7 +568,8 @@ let no_ident_iterator ident =
           (function
           | `Function (args, _rhs) when ident_in_list args -> ()
           | `Function (_, rhs) -> self.expr self rhs
-          | `Ident (Pident id) when Ident.same id ident -> raise_notrace Ident_is_found
+          | `Ident (Pident id) when Ident.same id ident ->
+            raise_notrace (Ident_is_found e.exp_loc)
           | _ -> default_iterator.expr self e))
   ; case =
       (fun (type a) self (c : a case) ->
@@ -594,7 +595,7 @@ let no_ident ident f =
     f (no_ident_iterator ident);
     true
   with
-  | Ident_is_found -> false
+  | Ident_is_found _loc -> false
 ;;
 
 let has_ident ident f = not (no_ident ident f)
