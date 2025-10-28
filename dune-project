@@ -50,6 +50,7 @@
   ppx_optcomp
   (base :with-test)
   (ppx_assert :with-test)
+  (ppx_let :with-test)
   (ppx_inline_test :with-test)
   (ppx_expect :with-test)
   (ppx_fields_conv :with-test)
