@@ -1,5 +1,10 @@
 ## Working version
 
+### New
+
+### Changed
+
+- #78: Fix false positives while detecting used variables that start from `_`
 
 ## 2.0.0 (18-09-2025)
 
