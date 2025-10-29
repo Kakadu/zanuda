@@ -79,13 +79,16 @@ let get_ite_loc e ie te ee pbool_site =
   match_ite (pbool_site, bool_value ee)
 ;;
 
-let apply_fix exp = function
-  | Unwise_conjuction ebool ->
-    (match exp.exp_desc with
-     | Texp_apply (_, args) -> check_bool args ebool
-     | _ -> failwith "invalid_arg")
-  | Unwise_ite ite_type ->
-    (match exp.exp_desc with
-     | Texp_ifthenelse (ie, te, ee) -> get_ite_loc exp ie te (Option.get ee) ite_type
-     | _ -> failwith "invalid_arg")
+let apply_fix exp kind =
+  if Zanuda_core.Config.gen_replacements ()
+  then (
+    match kind with
+    | Unwise_conjuction ebool ->
+      (match exp.exp_desc with
+       | Texp_apply (_, args) -> check_bool args ebool
+       | _ -> failwith "invalid_arg")
+    | Unwise_ite ite_type ->
+      (match exp.exp_desc with
+       | Texp_ifthenelse (ie, te, ee) -> get_ite_loc exp ie te (Option.get ee) ite_type
+       | _ -> failwith "invalid_arg"))
 ;;
