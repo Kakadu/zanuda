@@ -34,13 +34,15 @@ let get_propose_function_payload loc =
 
 (* TODO(Kakadu): describe difference between two locations *)
 let register_fix ~loc scru_pat_loc cases =
-  (* Format.printf "%s: %a\n%!" __FUNCTION__ My_printtyped.expr e; *)
-  (* Format.printf "loc = %a\n%!" Location.print_loc loc; *)
-  try
-    get_match_constr_payload loc cases;
-    get_propose_function_payload scru_pat_loc
-  with
-  | Fix_error (loc, msg) ->
-    Format.eprintf "Error at %s %d\n%!" __FILE__ __LINE__;
-    Format.eprintf "While analyzing source at %a\n%!" Location.print_loc loc
+  if Zanuda_core.Config.gen_replacements ()
+  then (
+    (* Format.printf "%s: %a\n%!" __FUNCTION__ My_printtyped.expr e; *)
+    (* Format.printf "loc = %a\n%!" Location.print_loc loc; *)
+    try
+      get_match_constr_payload loc cases;
+      get_propose_function_payload scru_pat_loc
+    with
+    | Fix_error (loc, msg) ->
+      Format.eprintf "Error at %s %d\n%!" __FILE__ __LINE__;
+      Format.eprintf "While analyzing source at %a\n%!" Location.print_loc loc)
 ;;
