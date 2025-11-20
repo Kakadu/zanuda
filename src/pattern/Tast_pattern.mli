@@ -294,3 +294,8 @@ val pexp_apply
   :  (Parsetree.expression, 'a, 'b) t
   -> ((Asttypes.arg_label * Parsetree.expression) list, 'b, 'c) t
   -> (Parsetree.expression, 'a, 'c) t
+
+val pconst_string : (string, 'a, 'b) t -> (Parsetree.constant, 'a, 'b) t
+val pexp_constant : (Parsetree.constant, 'a, 'b) t -> (Parsetree.expression, 'a, 'b) t
+val pstr_eval : (Parsetree.expression, 'a, 'b) t -> (Parsetree.structure_item, 'a, 'b) t
+val payload_str : (Parsetree.structure, 'a, 'b) t -> (Parsetree.payload, 'a, 'b) t
