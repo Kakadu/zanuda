@@ -1,0 +1,7 @@
+(executable
+ (name main)
+ (modules main)
+ (modes byte))
+
+(cram
+ (deps %{bin:zanuda.exe}))
