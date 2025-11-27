@@ -13,7 +13,7 @@
   (pps
    ppx_optcomp
    ppx_assert
-   ppx_inline_test_nobase
+   ppx_inline_test
    ;
    ))
  (instrumentation
@@ -26,6 +26,6 @@
  (inline_tests)
  (libraries Tast_pattern compiler-libs compiler-libs.common)
  (preprocess
-  (pps ppx_optcomp ppx_expect_nobase))
+  (pps ppx_optcomp ppx_expect))
  (instrumentation
   (backend bisect_ppx)))

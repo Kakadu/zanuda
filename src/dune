@@ -36,7 +36,7 @@
   (pps
    ppx_optcomp
    ppx_sexp_conv
-   ppx_expect_nobase
+   ppx_expect
    ;
    ))
  (instrumentation
@@ -57,7 +57,7 @@
   TypedLints
   UntypedLints)
  (preprocess
-  (pps ppx_inline_test_nobase))
+  (pps ppx_inline_test))
  (instrumentation
   (backend bisect_ppx))
  (package zanuda))

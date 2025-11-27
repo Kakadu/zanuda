@@ -490,6 +490,8 @@ let tpat_constructor (T fname) (T fargs) =
       | _ -> fail loc "tpat_constructor")
 ;;
 
+[%%if ocaml_version < (5, 4, 0)]
+
 let tpat_tuple (T fargs) =
   T
     (fun ctx loc x k ->
@@ -499,6 +501,22 @@ let tpat_tuple (T fargs) =
         k |> fargs ctx loc pats
       | _ -> fail loc "tpat_tuple")
 ;;
+
+[%%else]
+
+let tpat_tuple (T fargs) =
+  T
+    (fun ctx loc x k ->
+      match x.pat_desc with
+      | Tpat_tuple pats ->
+        ctx.matched <- ctx.matched + 1;
+        (* TODO: support names tuples *)
+        k |> fargs ctx loc (List.map snd pats)
+      | _ -> fail loc "tpat_tuple")
+;;
+
+[%%endif]
+
 
 let tpat_value (T fpat) =
   T
@@ -614,6 +632,29 @@ let texp_apply (T f0) (T args0) =
       | _ -> fail loc "texp_apply")
 ;;
 
+[%%if ocaml_version < (5, 4, 0)]
+
+let option_of_info = Fun.id
+let is_arg_omitted x = Option.is_none x
+let default_values_specified = some
+
+[%%else]
+let option_of_info = function Omitted () -> None | Arg x -> Some x
+let is_arg_omitted = function Omitted _ -> true | _ -> false
+let default_value_specified (T f0) =
+  T
+    (fun ctx loc x k ->
+      match (x : _ arg_or_omitted) with
+      | Omitted _ -> fail loc "Omitted"
+      | Arg x0 ->
+        ctx.matched <- ctx.matched + 1;
+        let k = f0 ctx loc x0 k in
+        k
+      )
+;;
+
+[%%endif]
+
 let texp_apply_nolabelled (T f0) (T args0) =
   let exception EarlyExit in
   T
@@ -624,8 +665,9 @@ let texp_apply_nolabelled (T f0) (T args0) =
         let k = f0 ctx loc f k in
         (try
            let args =
-             ListLabels.map args ~f:(function
-               | Asttypes.Labelled _, _ | Asttypes.Optional _, _ | _, None ->
+             ListLabels.map args ~f:(fun (lab, info) ->
+              match lab,option_of_info info with
+               | Asttypes.Labelled _, _ | Asttypes.Optional _, _ | _, None  ->
                  raise EarlyExit
                | _, Some x -> x)
            in
@@ -678,8 +720,9 @@ let labelled (T fstr) =
       | _ -> fail loc "labelled")
 ;;
 
-let texp_apply1 f x = texp_apply f ((nolabel ** some x) ^:: nil)
-let texp_apply2 f x y = texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
+let texp_apply1 f x = texp_apply f ((nolabel ** default_value_specified x) ^:: nil)
+let texp_apply2 f x y =
+  texp_apply f ((nolabel ** default_value_specified x) ^:: (nolabel ** default_value_specified y) ^:: nil)
 
 [%%if ocaml_version < (4, 11, 2)]
 
@@ -697,6 +740,21 @@ type value_pat = value pattern_desc pattern_data
 type comp_pat = computation pattern_desc pattern_data
 
 [%%endif]
+
+[%%if ocaml_version < (5, 4, 0)]
+
+type constructor_description = Types.constructor_description
+type label_description = Types.label_description
+type apply_arg = expression option
+
+[%%else]
+
+type constructor_description = Data_types.constructor_description
+type label_description = Data_types.label_description
+type apply_arg = Typedtree.apply_arg
+
+[%%endif]
+
 [%%if ocaml_version < (5, 0, 0)]
 
 let texp_function (T fcases) =
@@ -944,8 +1002,8 @@ let texp_field (T fexpr) (T fdesc) =
 let label_desc (T fname) =
   T
     (fun ctx loc e k ->
-      match e with
-      | { Types.lbl_name; _ } ->
+      match (e : label_description) with
+      | { lbl_name; _ } ->
         ctx.matched <- ctx.matched + 1;
         k |> fname ctx loc lbl_name)
 ;;

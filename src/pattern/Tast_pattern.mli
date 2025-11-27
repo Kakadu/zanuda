@@ -113,6 +113,20 @@ type comp_pat = computation pattern_desc pattern_data
 
 [%%endif]
 
+[%%if ocaml_version < (5, 4, 0)]
+
+type constructor_description = Types.constructor_description
+type label_description = Types.label_description
+type apply_arg = expression option
+
+[%%else]
+
+type constructor_description = Data_types.constructor_description
+type label_description = Data_types.label_description
+type apply_arg = Typedtree.apply_arg
+
+[%%endif]
+
 val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val labelled : (string, 'a, 'b) t -> (Asttypes.arg_label, 'a, 'b) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
@@ -156,7 +170,7 @@ val texp_let
 
 val texp_apply
   :  (expression, 'a, 'b) t
-  -> ((Asttypes.arg_label * expression option) list, 'b, 'c) t
+  -> ((Asttypes.arg_label * apply_arg) list, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
 val texp_apply1
@@ -200,7 +214,7 @@ val ccase
 
 val texp_construct
   :  (Longident.t, 'a, 'b) t
-  -> (Types.constructor_description, 'b, 'c) t
+  -> (constructor_description, 'b, 'c) t
   -> (expression list, 'c, 'd) t
   -> (expression, 'a, 'd) t
 
@@ -223,16 +237,16 @@ val texp_try
 
 val texp_record
   :  (expression option, 'a, 'b) t
-  -> ((Types.label_description * record_label_definition) array, 'b, 'c) t
+  -> ((label_description * record_label_definition) array, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
 val texp_field
   :  (expression, 'a, 'b) t
-  -> (Types.label_description, 'b, 'c) t
+  -> (label_description, 'b, 'c) t
   -> (expression, 'a, 'c) t
 
 val texp_assert_false : unit -> (expression, 'a, 'a) t
-val label_desc : (string, 'a, 'b) t -> (Types.label_description, 'a, 'b) t
+val label_desc : (string, 'a, 'b) t -> (label_description, 'a, 'b) t
 val rld_kept : (record_label_definition, 'a, 'a) t
 
 val rld_overriden
