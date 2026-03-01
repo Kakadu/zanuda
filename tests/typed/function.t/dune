@@ -1,15 +1,15 @@
 (library
  (name test_function)
  (wrapped false)
- (modules function orpat)
+ (modules function orpat false_positive)
  (modes byte)
  (flags
   (:standard
-   ;-dtypedtree
+   ;  -dtypedtree
    ;
    -warn-error
    -11
    -w
    -11))
  (preprocess
-  (pps ppx_deriving.show)))
+  (pps ppx_let ppx_deriving.show)))

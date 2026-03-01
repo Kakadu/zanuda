@@ -1,4 +1,5 @@
-  $ dune build
+  $ dune build @check
+$ dune show pp false_positive.ml
   $ ../zanuda.exe -no-check-filesystem -no-top_file_license -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
   File "Function.ml", line 1, characters 23-56:
   1 | let should_give_a_lint x = match x with [] -> 1 | _ -> 2
@@ -15,4 +16,9 @@
   12 |   | ch when List.mem ch [ "$"; "'"; "\""; "\\"; "\n" ] -> ch
   13 |   | "\n" -> ""
   14 |   | ch -> "" ^ ch
+  Alert zanuda-linter: Using `function` is recommended
+  File "false_positive.ml", lines 7-9, characters 2-13:
+  7 | ..let%bind res = Option.some 42 in
+  8 |   match res with
+  9 |   | _ -> None
   Alert zanuda-linter: Using `function` is recommended
