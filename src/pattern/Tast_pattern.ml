@@ -1208,6 +1208,15 @@ let pconst_string (T fstring) =
 
 [%%endif]
 
+let payload_str (T fstru) =
+  let open Parsetree in
+  T
+    (fun ctx loc x k ->
+      match x with
+      | PStr stru -> fstru ctx loc stru k
+      | _ -> fail loc "payload_str")
+;;
+
 let pexp_apply (T f) (T fargs) =
   let open Parsetree in
   let helper ctx loc x k =
@@ -1216,6 +1225,15 @@ let pexp_apply (T f) (T fargs) =
     | _ -> fail loc "pexp_apply"
   in
   T helper
+;;
+
+let pstr_eval (T f) =
+  let open Parsetree in
+  T
+    (fun ctx loc x k ->
+      match x.pstr_desc with
+      | Pstr_eval (e, _attrs) -> k |> f ctx loc e
+      | _ -> fail loc "pstr_eval")
 ;;
 
 let tstr_docattr on_str =

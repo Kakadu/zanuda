@@ -56,7 +56,12 @@ let report () =
   Config.out_rdjsonl ()
   |> Option.iter (fun filename ->
     (* TODO: Create file without shell call *)
-    let (_ : int) = Sys.command (Format.asprintf "touch %s" filename) in
+    let () =
+      if not (String.equal filename "/dev/null")
+      then (
+        let (_ : int) = Sys.command (Format.asprintf "touch %s" filename) in
+        ())
+    in
     Out_channel.with_open_text filename (fun ch ->
       let ppf = Format.formatter_of_out_channel ch in
       iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.rdjsonl ppf ());

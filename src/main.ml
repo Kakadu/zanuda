@@ -27,6 +27,7 @@ let typed_linters =
   [ (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
     (module Aggregate_defs : LINT.TYPED)
   ; (module Ambiguous_constructors : LINT.TYPED)
+  ; (module Disabling_all_warnings : LINT.TYPED)
   ; (module Exc_try_with_wildcard : LINT.TYPED)
   ; (module Failwith : LINT.TYPED)
   ; (module Equality : LINT.TYPED)

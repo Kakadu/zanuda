@@ -5,6 +5,7 @@
  (modules
   Aggregate_defs
   Ambiguous_constructors
+  Disabling_all_warnings
   Exc_try_with_wildcard
   Equality
   Equality_phys
