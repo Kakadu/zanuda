@@ -28,7 +28,7 @@ workflows:
               - opam --version
 
           - name: install-opam
-            image: ubuntu:24.04
+            image: ubuntu:26.04
             script:
               - apt-get install opam curl xz-utils wget make --no-install-recommends --yes
               - cd $SOURCECRAFT_ROOT_DIRECTORY
@@ -37,8 +37,9 @@ workflows:
               - opam switch create comp25 --packages=ocaml-variants.4.14.2+options,ocaml-option-flambda --yes
 
           - name: install-deps
-            image: ubuntu:24.04
+            image: ubuntu:26.04
             script:
+              - apt-get install opam curl xz-utils wget make --no-install-recommends --yes
               - cd $SOURCECRAFT_ROOT_DIRECTORY
               - cd zanuda
               - opam install . --deps-only --yes
