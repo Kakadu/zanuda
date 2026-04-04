@@ -20,10 +20,6 @@ workflows:
             script:
               - apt-get update
               - apt-get install opam curl xz-utils wget make --no-install-recommends --yes
-              #- curl https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh -O install.sh
-              #- ls
-              #- cat install.sh /tmp | sh
-              #- ls
               - which opam
               - opam --version
 
@@ -31,7 +27,7 @@ workflows:
             image: ubuntu:26.04
             script:
               - apt-get update
-              - sudo apt-get install opam curl xz-utils wget make --no-install-recommends --yes
+              - apt-get install opam curl xz-utils wget make --no-install-recommends --yes
               - cd $SOURCECRAFT_ROOT_DIRECTORY
               - echo "I am $(whoami)"
               - opam init --bare
@@ -41,7 +37,7 @@ workflows:
             image: ubuntu:26.04
             script:
               - apt-get update
-              - sudo apt-get install opam curl xz-utils wget make --no-install-recommends --yes
+              - apt-get install opam curl xz-utils wget make --no-install-recommends --yes
               - cd $SOURCECRAFT_ROOT_DIRECTORY
               - cd zanuda
               - opam install . --deps-only --yes
