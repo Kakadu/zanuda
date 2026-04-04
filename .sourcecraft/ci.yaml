@@ -30,7 +30,8 @@ workflows:
           - name: install-opam
             image: ubuntu:26.04
             script:
-              - apt-get install opam curl xz-utils wget make --no-install-recommends --yes
+              - apt-get update
+              - sudo apt-get install opam curl xz-utils wget make --no-install-recommends --yes
               - cd $SOURCECRAFT_ROOT_DIRECTORY
               - echo "I am $(whoami)"
               - opam init --bare
@@ -39,7 +40,8 @@ workflows:
           - name: install-deps
             image: ubuntu:26.04
             script:
-              - apt-get install opam curl xz-utils wget make --no-install-recommends --yes
+              - apt-get update
+              - sudo apt-get install opam curl xz-utils wget make --no-install-recommends --yes
               - cd $SOURCECRAFT_ROOT_DIRECTORY
               - cd zanuda
               - opam install . --deps-only --yes
