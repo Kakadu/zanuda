@@ -23,13 +23,13 @@ workflows:
               - cd $SOURCECRAFT_ROOT_DIRECTORY
               - ls
 
-          - name: install opam
+          - name: install-opam
             image: ubuntu:24.04
             script:
               - cd $SOURCECRAFT_ROOT_DIRECTORY
               - opam switch create comp25 --packages=ocaml-variants.4.14.2+options,ocaml-option-flambda --yes
 
-          - name: install opam
+          - name: install-deps
             image: ubuntu:24.04
             script:
               - cd $SOURCECRAFT_ROOT_DIRECTORY
