@@ -1,0 +1,57 @@
+name: setup-dune experiment 4.14
+
+on:
+  push:
+    paths-ignore:
+      - '*.md'
+    branches:
+      - 'master'
+
+env:
+  #OPAMROOT: /home/opam/.opam
+  OPAMCONFIRMLEVEL: unsafe-yes
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+
+      # By some reason depext doesn't install it for conf-autoconf
+      - run: |
+          sudo apt-get update -y
+          sudo apt-get install autoconf -y
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+
+      - name: Use dune
+        uses: ocaml-dune/setup-dune@v2
+
+      # - name: Update opam repo
+      #   run: |
+      #     opam remote -vvvv
+      #     opam update default
+
+      # checking out the code seems to be important because local switch is used
+      - name: Installing dependencies
+        run: |
+          opam pin add ./ -n
+          opam install . --deps-only --with-test --with-doc
+        #opam depext zanuda reviewer -y
+
+      - name: Building...
+        run: opam exec -- dune build --profile=release
+
+      - run: opam exec -- dune build @install --profile=release
+
+      - name: Running tests in release...
+        run: |
+          opam exec -- dune test --profile=release

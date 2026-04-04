@@ -1,0 +1,6 @@
+(lang dune 3.18)
+
+(lock_dir
+ (constraints
+  (ocaml
+   (= 4.14.2))))
