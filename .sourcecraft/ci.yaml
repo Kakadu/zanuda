@@ -16,11 +16,12 @@ workflows:
 
         cubes:
           - name: sample-cube1
-            image: ubuntu:24.04
+            image: ubuntu:26.04
             script:
               - apt-get update
               - apt-get install curl xz-utils wget make --no-install-recommends --yes
               - curl https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh -O install.sh
+              - ls
               - cat install.sh /tmp | sh
               - ls
               - opam --version
