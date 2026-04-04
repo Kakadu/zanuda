@@ -56,11 +56,14 @@ let report () =
   Config.out_rdjsonl ()
   |> Option.iter (fun filename ->
     (* TODO: Create file without shell call *)
-    let (_ : int) = Sys.command (Format.asprintf "touch %s" filename) in
-    Out_channel.with_open_text filename (fun ch ->
-      let ppf = Format.formatter_of_out_channel ch in
-      iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.rdjsonl ppf ());
-      Format.fprintf ppf "%!"))
+    if String.equal filename Filename.null
+    then ()
+    else (
+      let (_ : int) = Sys.command (Format.asprintf "touch %s" filename) in
+      Out_channel.with_open_text filename (fun ch ->
+        let ppf = Format.formatter_of_out_channel ch in
+        iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.rdjsonl ppf ());
+        Format.fprintf ppf "%!")))
 ;;
 
 let tdecls : (Location.t, unit) Hashtbl.t = Hashtbl.create 123
