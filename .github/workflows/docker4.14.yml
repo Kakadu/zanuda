@@ -57,7 +57,7 @@ jobs:
           opam exec -- dune test --profile=release
 
       - name: Send coverage report to Coveralls
-        if: github.event_name != 'pull_request'
+        if: false && (github.event_name != 'pull_request')
         run: |
           git config --global --add safe.directory /__w/zanuda/zanuda
           opam exec -- make coverage
@@ -84,7 +84,7 @@ jobs:
           destination_dir: lints
 
       - name: Build API documentation
-        if: github.event_name != 'pull_request'
+        if: false && (github.event_name != 'pull_request')
         run: |
           opam exec -- make install odig
           echo "ODIG_DOC_LOC=$(opam exec -- odig cache path)/html" >> $GITHUB_ENV
@@ -95,7 +95,7 @@ jobs:
         run: echo ${{ env.ODIG_DOC_LOC }}
 
       - name: Deploy API documentation
-        if: github.event_name != 'pull_request'
+        if: false && (github.event_name != 'pull_request')
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

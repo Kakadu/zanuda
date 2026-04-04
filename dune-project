@@ -60,8 +60,9 @@
    (and
     (= 0.27.0)
     :with-dev-setup))
-  (odoc :with-doc)
-  (odig :with-doc)))
+  ;odig ; documentation flag remove for an experiment
+  (odig :with-doc)
+  (odoc :with-doc)))
 
 (package
  (name reviewer)

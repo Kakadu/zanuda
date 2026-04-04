@@ -1,6 +1,8 @@
 (lang dune 3.18)
 
 (lock_dir
+ (solver_env
+  (with-doc true))
  (constraints
   (ocaml
    (= 4.14.2))))

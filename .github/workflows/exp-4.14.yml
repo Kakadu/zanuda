@@ -8,7 +8,6 @@ on:
       - 'master'
 
 env:
-  #OPAMROOT: /home/opam/.opam
   OPAMCONFIRMLEVEL: unsafe-yes
 
 jobs:
@@ -20,38 +19,56 @@ jobs:
       cancel-in-progress: true
 
     steps:
-
-      # By some reason depext doesn't install it for conf-autoconf
-      - run: |
-          sudo apt-get update -y
-          sudo apt-get install autoconf -y
-
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
-
       - name: Use dune
         uses: ocaml-dune/setup-dune@v2
-
-      # - name: Update opam repo
-      #   run: |
-      #     opam remote -vvvv
-      #     opam update default
-
-      # checking out the code seems to be important because local switch is used
-      - name: Installing dependencies
-        run: |
-          opam pin add ./ -n
-          opam install . --deps-only --with-test --with-doc
-        #opam depext zanuda reviewer -y
-
-      - name: Building...
-        run: opam exec -- dune build --profile=release
-
-      - run: opam exec -- dune build @install --profile=release
+        with:
+          display: progress
+          workspace: dune-workspace.ci
 
       - name: Running tests in release...
         run: |
-          opam exec -- dune test --profile=release
+          which dune
+          dune test --profile=release
+
+
+      # - run: find . -type f -executable
+      # - run: tree
+
+      - name: Send coverage report to Coveralls
+        if: false && (github.event_name != 'pull_request')
+        run: |
+          make coverage
+          bisect-ppx-report send-to Coveralls --coverage-path $BISECT_DIR
+        env:
+          BISECT_DIR: /tmp/zanudacov
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST_NUMBER: ${{ github.event.number }}
+
+      # - name: Build API documentation
+      #   if: github.event_name != 'pull_request'
+      #   run: |
+      #     dune build @install -p reviewer,zanuda
+
+      # - if: github.event_name != 'pull_request'
+      #   run: dune install reviewer zanuda
+      - run: dune b @install
+      - run: dune install --verbose
+
+      - if: github.event_name != 'pull_request'
+        run: dune exec -- make odig
+      - if: github.event_name != 'pull_request'
+        run: echo "ODIG_DOC_LOC=$(dune exec -- odig cache path)/html" >> $GITHUB_ENV
+
+      - name: Deploy API documentation
+        if:  (github.event_name != 'pull_request')
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ env.ODIG_DOC_LOC }}
+          keep_files: true
+          destination_dir: api
