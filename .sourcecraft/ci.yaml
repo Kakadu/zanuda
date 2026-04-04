@@ -1,0 +1,37 @@
+# Это базовый рабочий процесс (workflow), который
+# поможет вам начать работу с SourceCraft CI/CD
+
+# Настройка события-триггера для запуска рабочего процесса
+on:
+  push:
+    - workflows: [ sample-workflow ]
+      filter:
+        branches: [ master ]
+        #paths: [ '.sourcecraft/**', 'draft/sub/**' ]
+
+workflows:
+  sample-workflow:
+    tasks:
+      - name: sample-task
+
+        cubes:
+          - name: sample-cube1
+            image: ubuntu:24.04
+            script:
+              - apt-get update
+              - apt-get install opam xz-utils wget make --no-install-recommends --yes
+              - cd $SOURCECRAFT_ROOT_DIRECTORY
+              - ls
+
+          - name: install opam
+            image: ubuntu:24.04
+            script:
+              - cd $SOURCECRAFT_ROOT_DIRECTORY
+              - opam switch create comp25 --packages=ocaml-variants.4.14.2+options,ocaml-option-flambda --yes
+
+          - name: install opam
+            image: ubuntu:24.04
+            script:
+              - cd $SOURCECRAFT_ROOT_DIRECTORY
+              - cd zanuda
+              - opam install . --deps-only --yes
