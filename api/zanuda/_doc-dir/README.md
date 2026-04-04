@@ -46,7 +46,7 @@ Examples of 'zanuda' usage could be found in the 'tests' directory. But in short
   (This reporting is not implemented yet.)
 
 
-##### Developping
+##### Developing
 
 To get dependecies you could use standard dune/opam machinery:
 
