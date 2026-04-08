@@ -27,10 +27,10 @@ workflows:
             image: ubuntu:26.04
             script:
               - apt-get update
-              - apt-get install opam curl xz-utils wget make --no-install-recommends --yes
+              - apt-get install git opam curl xz-utils wget make --no-install-recommends --yes
               - cd $SOURCECRAFT_ROOT_DIRECTORY
               - echo "I am $(whoami)"
-              - opam init --bare
+              - opam init https://se.math.spbu.ru/opam/ --bare --disable-sandboxing --no-setup
               - opam switch create comp25 --packages=ocaml-variants.4.14.2+options,ocaml-option-flambda --yes
 
           - name: install-deps
