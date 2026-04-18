@@ -37,7 +37,20 @@ include struct
   let loc_lints f = Queue.fold (fun acc x -> f x :: acc) [] found_Lints
 end
 
+let make_sarif_json results : Utils.json =
+  let tool =
+    `Assoc
+      [ "driver", `Assoc [ "name", `String "zanuda"; "semanticVersion", `String "1.0.0" ]
+      ]
+  in
+  `Assoc
+    [ "version", `String "2.1.0"
+    ; "runs", `List [ `Assoc [ "tool", tool; "results", `List results ] ]
+    ]
+;;
+
 let report () =
+  let touch filename = Unix.close (Unix.openfile filename [ Unix.O_CREAT ] 0o640) in
   let iter_lints =
     let arr = Queue.to_seq found_Lints |> Array.of_seq in
     let cmp : Location.t * _ -> _ -> _ = fun (a, _) (b, _) -> Stdlib.compare a b in
@@ -53,13 +66,32 @@ let report () =
   in
   iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.txt Format.std_formatter ());
   Format.pp_print_flush Format.std_formatter ();
-  Config.out_rdjsonl ()
-  |> Option.iter (fun filename ->
-    (* TODO: Create file without shell call *)
+  let maybe_report config f = config () |> Option.iter f in
+  maybe_report Config.out_sarif (fun filename ->
     if String.equal filename Filename.null
     then ()
     else (
-      let (_ : int) = Sys.command (Format.asprintf "touch %s" filename) in
+      let () = touch filename in
+      let json =
+        let jsons = ref [] in
+        iter_lints (fun (_loc, (module M : LINT.REPORTER)) ->
+          match M.sarif () with
+          | None ->
+            Format.eprintf
+              "Sarif output is not implemented for something. Message is:\n%a"
+              M.txt
+              ();
+            ()
+          | Some j -> if M.is_valid () then jsons := j :: !jsons);
+        make_sarif_json (List.rev !jsons)
+      in
+      Out_channel.with_open_text filename (fun ch ->
+        Yojson.Safe.pretty_to_channel ch json)));
+  maybe_report Config.out_rdjsonl (fun filename ->
+    if String.equal filename Filename.null
+    then ()
+    else (
+      let () = touch filename in
       Out_channel.with_open_text filename (fun ch ->
         let ppf = Format.formatter_of_out_channel ch in
         iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.rdjsonl ppf ());

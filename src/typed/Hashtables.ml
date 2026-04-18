@@ -62,26 +62,13 @@ let msg ppf () =
      needed there.%!"
 ;;
 
-let report filename ~loc kind =
-  let module M = struct
-    let txt ppf () =
-      if not (Base.List.mem config.files_to_skip filename ~equal:String.equal)
-      then Utils.Report.txt ~filename ~loc ppf msg kind
-    ;;
 
-    let rdjsonl ppf () =
-      if not (Base.List.mem config.files_to_skip filename ~equal:String.equal)
-      then
-        RDJsonl.pp
-          ppf
-          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum
-          msg
-          kind
-    ;;
-  end
-  in
-  (module M : LINT.REPORTER)
+let report =
+  Utils.make_reporter
+    ~is_good:(fun filename ->
+      not (Base.List.mem config.files_to_skip filename ~equal:String.equal))
+    lint_id
+    msg
 ;;
 
 let run _ fallback =
@@ -117,7 +104,8 @@ let run _ fallback =
       ~on_error:(fun _desc () -> ())
       x
       (fun () ->
-        Collected_lints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc ()))
+        let filename = loc.Location.loc_start.Lexing.pos_fname in
+        Collected_lints.add ~loc (report ~filename ~loc ()))
       ()
   in
   let open Tast_iterator in
@@ -138,9 +126,8 @@ let run _ fallback =
           | `Check_labels labels ->
             ListLabels.iter labels ~f:(function
               | { Typedtree.ld_mutable = Mutable; ld_loc = loc; _ } ->
-                Collected_lints.add
-                  ~loc
-                  (report loc.Location.loc_start.Lexing.pos_fname ~loc ())
+                let filename = loc.Location.loc_start.Lexing.pos_fname in
+                Collected_lints.add ~loc (report ~filename ~loc ())
               | _ -> ())))
   ; expr =
       (fun self expr ->
@@ -151,9 +138,8 @@ let run _ fallback =
           ~on_error:(fun _desc () -> ())
           expr
           (fun () ->
-            Collected_lints.add
-              ~loc
-              (report loc.Location.loc_start.Lexing.pos_fname ~loc ()))
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            Collected_lints.add ~loc (report ~filename ~loc ()))
           ();
         fallback.expr self expr)
   }

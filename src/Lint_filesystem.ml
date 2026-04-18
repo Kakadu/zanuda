@@ -34,18 +34,18 @@ let on_module { impl; intf } =
     then ()
     else
       Collected_lints.add
-        ~loc:(Location.none)
+        ~loc:Location.none
         (module struct
+          let filename = Config.recover_filepath ml
+
           let msg ppf file =
             Format.fprintf ppf "File '%s' doesn't have corresponding .mli interface" file
           ;;
 
           let txt ppf () = Format.fprintf ppf "%a\n" msg ml
-
-          let rdjsonl ppf () =
-            let filename = Config.recover_filepath ml in
-            Utils.RDJsonl.pp ppf ~filename ~line:1 msg filename
-          ;;
+          let rdjsonl ppf () = Utils.RDJsonl.pp ppf ~filename ~line:1 msg filename
+          let is_valid () = true
+          let sarif () = Utils.Report.sarif ~loc:Location.none ~filename ~msg filename
         end)
 ;;
 

@@ -98,4 +98,9 @@ module type REPORTER = sig
 
       @deprecated *)
   val rdjsonl : Format.formatter -> unit -> unit
+
+  val sarif : unit -> Yojson.Safe.t option
+
+  (* TODO: maybe this functionality shold be implemented in every lint  *)
+  val is_valid : unit -> bool
 end
