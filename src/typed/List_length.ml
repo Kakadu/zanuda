@@ -60,7 +60,7 @@ let report filename ~loc l r =
         (l, r)
     ;;
 
-    let sarif _ _ = ()
+    let sarif _ = None
   end
   in
   (module M : LINT.REPORTER)

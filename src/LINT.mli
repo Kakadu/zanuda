@@ -99,5 +99,5 @@ module type REPORTER = sig
       @deprecated *)
   val rdjsonl : Format.formatter -> unit -> unit
 
-  val sarif : Format.formatter -> unit -> unit
+  val sarif : unit -> Yojson.Safe.t option
 end

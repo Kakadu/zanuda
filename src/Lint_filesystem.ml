@@ -47,7 +47,7 @@ let on_module { impl; intf } =
             Utils.RDJsonl.pp ppf ~filename ~line:1 msg filename
           ;;
 
-          let sarif _ _ = ()
+          let sarif _ = None
         end)
 ;;
 

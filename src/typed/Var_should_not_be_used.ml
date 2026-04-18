@@ -50,7 +50,7 @@ let report ~loc ~filename ident =
         (Ident.name ident)
     ;;
 
-    let sarif _ _ = ()
+    let sarif () = None
   end
   in
   (module M : LINT.REPORTER)

@@ -54,14 +54,7 @@ let report ~loc ~filename typ_name =
         typ_name
     ;;
 
-    let sarif ppf () =
-      Utils.make_sarif_message
-        ~loc
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ppf
-        ~msg
-        typ_name
-    ;;
+    let sarif () = Option.some (Utils.make_sarif_message ~loc ~filename ~msg typ_name)
   end
   in
   (module M : LINT.REPORTER)

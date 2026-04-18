@@ -62,7 +62,7 @@ let report ~loc ~filename names =
         names
     ;;
 
-    let sarif _ _ = ()
+    let sarif _ = None
   end
   in
   (module M : LINT.REPORTER)

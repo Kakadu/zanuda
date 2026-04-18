@@ -116,7 +116,7 @@ let report ~loc ~filename reason =
         reason
     ;;
 
-    let sarif _ _ = ()
+    let sarif _ = None
   end
   in
   (module M : LINT.REPORTER)

@@ -37,29 +37,16 @@ include struct
   let loc_lints f = Queue.fold (fun acc x -> f x :: acc) [] found_Lints
 end
 
-let sarif_header =
-  {|
-{
-  "version": "2.1.0",
-  "runs": [
-    {
-      "tool": {
-        "driver": {
-          "name": "SimpleScanner",
-          "semanticVersion": "1.0.0"
-        }
-      },
-      "results": [
-|}
-;;
-
-let sarif_footer =
-  {|
+let make_sarif_json results : Utils.json =
+  let tool =
+    `Assoc
+      [ "driver", `Assoc [ "name", `String "zanuda"; "semanticVersion", `String "1.0.0" ]
       ]
-    }
-  ]
-}
-  |}
+  in
+  `Assoc
+    [ "version", `String "2.1.0"
+    ; "runs", `List [ `Assoc [ "tool", tool; "results", `List results ] ]
+    ]
 ;;
 
 let report () =
@@ -100,15 +87,18 @@ let report () =
     then ()
     else (
       let () = Unix.close (Unix.openfile filename [ Unix.O_CREAT ] 0o640) in
+      let json =
+        let jsons = ref [] in
+        iter_lints (fun _ (_loc, (module M : LINT.REPORTER)) ->
+          match M.sarif () with
+          | None -> ()
+          | Some j -> jsons := j :: !jsons);
+        make_sarif_json (List.rev !jsons)
+      in
       Out_channel.with_open_text filename (fun ch ->
         let ppf = Format.formatter_of_out_channel ch in
-        Format.fprintf ppf "%s\n" sarif_header;
-        iter_lints (fun i (_loc, (module M : LINT.REPORTER)) ->
-          Printf.printf "i  = %d\n%!" i;
-          if i > 0 then Format.fprintf ppf ",\n";
-          M.sarif ppf ());
-        Format.fprintf ppf "%s\n" sarif_footer;
-        Format.fprintf ppf "%!")))
+        Yojson.Safe.pretty_print ppf json;
+        Format.fprintf ppf "\n%!")))
 ;;
 
 let tdecls : (Location.t, unit) Hashtbl.t = Hashtbl.create 123

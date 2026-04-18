@@ -49,17 +49,7 @@ let report ~filename cname ~loc =
         cname
     ;;
 
-    let sarif ppf _ =
-      Format.fprintf
-        ppf
-        {|{
-          "message": {
-            "text": "%a"
-          }
-        }|}
-        msg
-        cname
-    ;;
+    let sarif () = Option.some (Utils.make_sarif_message ~loc ~filename ~msg cname)
   end
   in
   (module M : LINT.REPORTER)
