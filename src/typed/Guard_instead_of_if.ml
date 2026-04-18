@@ -76,6 +76,8 @@ let report ~filename ~loc () =
         pp_print_string
         msg
     ;;
+
+    let sarif _ _ = ()
   end
   in
   (module M : LINT.REPORTER)

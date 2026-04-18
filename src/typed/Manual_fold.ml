@@ -66,6 +66,8 @@ let report ~loc ~filename k n =
         msg
         (k, n)
     ;;
+
+    let sarif _ _ = ()
   end
   in
   (module M : LINT.REPORTER)

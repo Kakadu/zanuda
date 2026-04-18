@@ -8,6 +8,26 @@
 
 [@@@ocaml.text "/*"]
 
+let make_sarif_message ~loc ~filename ppf ~msg arg =
+  let open Format in
+  (* let rec pp_json ppf = function
+    | `Message -> fprintf ppf {|@[ "message": { "text": "%a" }@]@,|} msg arg
+    | `Filename (file, _) -> pp_json ppf (`Assoc [ "locations", `Null ])
+    | #Yojson.Safe.t as j -> Yojson.Safe.pretty_print ppf j
+  in *)
+  let jmsg = `Assoc [ "text", `String (Format.asprintf "%a" msg arg) ] in
+  Yojson.Safe.pretty_print ppf (`Assoc [ "message", jmsg ])
+;;
+
+(* Format.fprintf ppf "@[<v 2>{@,";
+  pp_json ppf `Message;
+  pp_json ppf (`Location (filename, loc));
+  (* Format.fprintf ppf "%S: {@," "message";
+  Format.fprintf ppf "  %S: " "text";
+  Format.fprintf ppf "\"@[%a@]\"@," msg arg;
+  Format.fprintf ppf "  }@,"; *)
+  Format.fprintf ppf "}@]" *)
+
 open Format
 
 let printfn fmt = kfprintf (fun ppf -> fprintf ppf "\n%!") std_formatter fmt

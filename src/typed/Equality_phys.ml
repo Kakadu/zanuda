@@ -70,6 +70,8 @@ let report filename ~loc =
           (fun _ _ -> ())
           ()
     ;;
+
+    let sarif _ _ = ()
   end
   in
   (module M : LINT.REPORTER)

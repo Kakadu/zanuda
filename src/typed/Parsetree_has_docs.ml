@@ -48,6 +48,18 @@ let report ~filename cname ~loc =
         msg
         cname
     ;;
+
+    let sarif ppf _ =
+      Format.fprintf
+        ppf
+        {|{
+          "message": {
+            "text": "%a"
+          }
+        }|}
+        msg
+        cname
+    ;;
   end
   in
   (module M : LINT.REPORTER)

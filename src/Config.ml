@@ -18,6 +18,7 @@ type mode =
 type t =
   { mutable outfile : string option
   ; mutable outgolint : string option
+  ; mutable out_sarif : string option
   ; mutable out_rdjsonl : string option
     (* Spec: https://github.com/reviewdog/reviewdog/tree/master/proto/rdf#rdjson *)
   ; mutable mode : mode
@@ -36,6 +37,7 @@ type t =
 let opts =
   { outfile = None
   ; outgolint = None
+  ; out_sarif = None
   ; out_rdjsonl = None
   ; mode = Unspecified
   ; prefix_to_cut = Some "_build/default/"
@@ -67,6 +69,7 @@ let add_include s = opts.extra_includes <- s :: opts.extra_includes
 let set_out_file s = opts.outfile <- Some s
 let set_out_golint s = opts.outgolint <- Some s
 let set_out_rdjsonl s = opts.out_rdjsonl <- Some s
+let set_out_sarif s = opts.out_sarif <- Some s
 let set_prefix_to_cut s = opts.prefix_to_cut <- Some s
 let set_prefix_to_add s = opts.prefix_to_add <- Some s
 let includes () = opts.extra_includes
@@ -78,6 +81,7 @@ let all_lints () = opts.all_lints
 let outfile () = opts.outfile
 let out_golint () = opts.outgolint
 let out_rdjsonl () = opts.out_rdjsonl
+let out_sarif () = opts.out_sarif
 let unset_check_filesystem () = opts.check_filesystem <- false
 let verbose () = opts.verbose
 let gen_replacements () = opts.gen_replacements
@@ -127,6 +131,7 @@ let parse_args () =
       , "[FILE] Look for unused definitions" )
     ; "-ogolint", Arg.String set_out_golint, "Set output file in golint format"
     ; "-ordjsonl", Arg.String set_out_rdjsonl, "Set output file in rdjsonl format"
+    ; "-osarif", Arg.String set_out_sarif, "Set output file in SARIF format"
     ; ( "-del-prefix"
       , Arg.String set_prefix_to_cut
       , "Set prefix to cut from pathes in OUTPUT file" )

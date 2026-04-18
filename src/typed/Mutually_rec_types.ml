@@ -68,6 +68,8 @@ let report msg ~loc strct_items =
         msg
         strct_items
     ;;
+
+    let sarif _ _ = ()
   end
   in
   (module M : LINT.REPORTER)

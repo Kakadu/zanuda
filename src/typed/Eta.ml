@@ -72,6 +72,8 @@ let report filename ~loc ~old_expr new_expr =
         msg
         (old_expr, new_expr)
     ;;
+
+    let sarif _ _ = ()
   end
   in
   (module M : LINT.REPORTER)

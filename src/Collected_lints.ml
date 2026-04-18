@@ -37,6 +37,31 @@ include struct
   let loc_lints f = Queue.fold (fun acc x -> f x :: acc) [] found_Lints
 end
 
+let sarif_header =
+  {|
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "SimpleScanner",
+          "semanticVersion": "1.0.0"
+        }
+      },
+      "results": [
+|}
+;;
+
+let sarif_footer =
+  {|
+      ]
+    }
+  ]
+}
+  |}
+;;
+
 let report () =
   let iter_lints =
     let arr = Queue.to_seq found_Lints |> Array.of_seq in
@@ -46,23 +71,43 @@ let report () =
       if Array.length arr = 0
       then ()
       else (
-        f arr.(0);
+        let n = ref 0 in
+        f !n arr.(0);
+        incr n;
         for i = 1 to Array.length arr - 1 do
-          if cmp arr.(i) arr.(i - 1) <> 0 then f arr.(i)
+          if cmp arr.(i) arr.(i - 1) <> 0
+          then (
+            f !n arr.(i);
+            incr n)
         done)
   in
-  iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.txt Format.std_formatter ());
+  iter_lints (fun _ (_loc, (module M : LINT.REPORTER)) -> M.txt Format.std_formatter ());
   Format.pp_print_flush Format.std_formatter ();
   Config.out_rdjsonl ()
   |> Option.iter (fun filename ->
-    (* TODO: Create file without shell call *)
     if String.equal filename Filename.null
     then ()
     else (
+      (* TODO: Create file without shell call *)
       let (_ : int) = Sys.command (Format.asprintf "touch %s" filename) in
       Out_channel.with_open_text filename (fun ch ->
         let ppf = Format.formatter_of_out_channel ch in
-        iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.rdjsonl ppf ());
+        iter_lints (fun _ (_loc, (module M : LINT.REPORTER)) -> M.rdjsonl ppf ());
+        Format.fprintf ppf "%!")));
+  Config.out_sarif ()
+  |> Option.iter (fun filename ->
+    if String.equal filename Filename.null
+    then ()
+    else (
+      let () = Unix.close (Unix.openfile filename [ Unix.O_CREAT ] 0o640) in
+      Out_channel.with_open_text filename (fun ch ->
+        let ppf = Format.formatter_of_out_channel ch in
+        Format.fprintf ppf "%s\n" sarif_header;
+        iter_lints (fun i (_loc, (module M : LINT.REPORTER)) ->
+          Printf.printf "i  = %d\n%!" i;
+          if i > 0 then Format.fprintf ppf ",\n";
+          M.sarif ppf ());
+        Format.fprintf ppf "%s\n" sarif_footer;
         Format.fprintf ppf "%!")))
 ;;
 
