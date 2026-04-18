@@ -116,7 +116,7 @@ let report ~loc ~filename reason =
         reason
     ;;
 
-    let sarif _ = None
+    let sarif _ = Option.some (Utils.make_sarif_message ~loc ~filename ~msg reason)
   end
   in
   (module M : LINT.REPORTER)
