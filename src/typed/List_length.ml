@@ -47,7 +47,7 @@ let msg_long ppf (l, r) =
     (My_untype.expr r)
 ;;
 
-let report filename ~loc l r =
+(* let report filename ~loc l r =
   let module M = struct
     let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg_long (l, r)
 
@@ -64,7 +64,8 @@ let report filename ~loc l r =
   end
   in
   (module M : LINT.REPORTER)
-;;
+;; *)
+let report filename = Utils.make_reporter lint_id msg_long ~filename
 
 open Typedtree
 open Tast_pattern
@@ -142,9 +143,8 @@ let run _ fallback =
                MyPrinttyped.expr
                e2
                in *)
-            Collected_lints.add
-              ~loc
-              (report loc.Location.loc_start.Lexing.pos_fname ~loc e1 e2))
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            Collected_lints.add ~loc (report filename ~loc (e1, e2)))
           ~on_error:(fun _desc () -> fallback.expr self expr)
           ())
   }

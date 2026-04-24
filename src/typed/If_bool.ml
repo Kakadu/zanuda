@@ -44,8 +44,8 @@ let describe_as_json () =
 ;;
 
 let msg ppf s = Format.fprintf ppf "%s\n%!" s
-
-let report filename ~loc e =
+let report = Utils.make_reporter lint_id msg
+(* let report filename ~loc e =
   let module M = struct
     let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg e
 
@@ -62,7 +62,7 @@ let report filename ~loc e =
   end
   in
   (module M : LINT.REPORTER)
-;;
+;; *)
 
 (* TODO(Kakadu): This simple hack is not enough. See #71 for details. *)
 let do_check = ref true
@@ -108,9 +108,8 @@ let run _ fallback =
              ~on_error:(fun _desc () -> ())
              expr
              (fun (s, unwise_type) () ->
-               Collected_lints.add
-                 ~loc
-                 (report loc.Location.loc_start.Lexing.pos_fname ~loc s);
+               let filename = loc.Location.loc_start.Lexing.pos_fname in
+               Collected_lints.add ~loc (report ~filename ~loc s);
                Refactoring.If_bool.apply_fix expr unwise_type)
              ());
         fallback.expr self expr)

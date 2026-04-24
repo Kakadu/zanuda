@@ -53,28 +53,11 @@ let msg ppf () =
     "Do you really need physical equality? Physical means the equality of pointers.%!"
 ;;
 
-let report filename ~loc =
-  let module M = struct
-    let txt ppf () =
-      if not (List.mem filename config.files_to_skip)
-      then Utils.Report.txt ~filename ~loc ppf msg ()
-    ;;
-
-    let rdjsonl ppf () =
-      if not (List.mem filename config.files_to_skip)
-      then
-        RDJsonl.pp
-          ppf
-          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum
-          (fun _ _ -> ())
-          ()
-    ;;
-
-    let sarif _ = None
-  end
-  in
-  (module M : LINT.REPORTER)
+let report =
+  Utils.make_reporter
+    ~is_good:(fun filename -> not (List.mem filename config.files_to_skip))
+    lint_id
+    msg
 ;;
 
 let run _ fallback =
@@ -96,7 +79,8 @@ let run _ fallback =
           ~on_error:(fun _msg () -> ())
           expr
           (fun _ ->
-            Collected_lints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc))
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            Collected_lints.add ~loc (report ~filename ~loc ()))
           ();
         fallback.expr self expr)
   }

@@ -48,24 +48,7 @@ let msg ppf e0 =
   Format.fprintf ppf "Unsafe ingore. It's recommended to rewrite it as '%s'%!" si
 ;;
 
-let report filename ~loc e =
-  let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg e
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        e
-    ;;
-
-    let sarif _ = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let run _ fallback =
   let pat =
@@ -87,9 +70,8 @@ let run _ fallback =
           ~on_error:(fun _desc () -> ())
           expr
           (fun e () ->
-            Collected_lints.add
-              ~loc
-              (report loc.Location.loc_start.Lexing.pos_fname ~loc e))
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            Collected_lints.add ~loc (report ~filename ~loc e))
           ();
         fallback.expr self expr)
   }

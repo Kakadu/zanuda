@@ -31,26 +31,7 @@ let describe_as_json () =
 
 let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
 let msg ppf () = fprintf ppf "Toplevel eval not recommended"
-
-let report ~filename ~loc =
-  let module M = struct
-    let txt ppf () = Report.txt ~loc ~filename ppf msg ()
-
-    let rdjsonl ppf () =
-      Report.rdjsonl
-        ~loc
-        ~code:lint_id
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        msg
-        ()
-    ;;
-
-    let sarif () = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let run info (fallback : Ast_iterator.iterator) =
   { fallback with
@@ -61,7 +42,7 @@ let run info (fallback : Ast_iterator.iterator) =
         match si.pstr_desc with
         | Pstr_eval (_, _) ->
           let loc = si.pstr_loc in
-          Collected_lints.add ~loc (report ~filename:(Utils.source_of_info info) ~loc)
+          Collected_lints.add ~loc (report ~filename:(Utils.source_of_info info) ~loc ())
         | _ -> ())
   ; expr =
       (fun self e ->

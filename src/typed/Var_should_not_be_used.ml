@@ -32,29 +32,14 @@ let describe_as_json () =
   describe_as_clippy_json lint_id ~group:LINT.Style ~impl:LINT.Untyped ~docs:documentation
 ;;
 
-let msg ppf =
-  Format.fprintf ppf "Identifier `%s` used somewhere else but supposed to be unused."
+let msg ppf ident =
+  Format.fprintf
+    ppf
+    "Identifier `%s` used somewhere else but supposed to be unused."
+    (Ident.name ident)
 ;;
 
-let report ~loc ~filename ident =
-  let module M = struct
-    let txt ppf () = Report.txt ~loc ~filename ppf msg (Ident.name ident)
-
-    let rdjsonl ppf () =
-      Report.rdjsonl
-        ~loc
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~code:lint_id
-        ppf
-        msg
-        (Ident.name ident)
-    ;;
-
-    let sarif () = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let length_of_loc loc =
   loc.Location.loc_end.Lexing.pos_cnum - loc.Location.loc_start.Lexing.pos_cnum

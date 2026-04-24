@@ -38,24 +38,7 @@ let msg ppf () =
     "The format string is too much verbose (rewrite \"%%s\" -> %%S)%!"
 ;;
 
-let report filename ~loc =
-  let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg ()
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        (fun _ _ -> ())
-        ()
-    ;;
-
-    let sarif () = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let run _ fallback =
   let pat =
@@ -77,10 +60,9 @@ let run _ fallback =
           expr
           (fun fmt_string () ->
             if Base.String.is_substring fmt_string ~substring:"\"%s\""
-            then
-              Collected_lints.add
-                ~loc
-                (report loc.Location.loc_start.Lexing.pos_fname ~loc))
+            then (
+              let filename = loc.Location.loc_start.Lexing.pos_fname in
+              Collected_lints.add ~loc (report ~filename ~loc ())))
           ();
         fallback.expr self expr)
   }

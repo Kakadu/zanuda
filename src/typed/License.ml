@@ -101,26 +101,7 @@ let describe_as_json () =
 type input = Tast_iterator.iterator
 
 let msg ppf s = Stdlib.Format.fprintf ppf "%s" s
-
-let report ~loc ~filename reason =
-  let module M = struct
-    let txt ppf () = Report.txt ~loc ~filename ppf msg reason
-
-    let rdjsonl ppf () =
-      Report.rdjsonl
-        ~loc
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~code:lint_id
-        ppf
-        msg
-        reason
-    ;;
-
-    let sarif _ = Option.some (Utils.make_sarif_message ~loc ~filename ~msg reason)
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 type panic_mode =
   | No_license_at_all

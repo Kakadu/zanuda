@@ -34,26 +34,7 @@ let describe_as_json () =
 
 let is_doc_attribute attr = String.equal "ocaml.doc" attr.attr_name.txt
 let msg ppf = Format.fprintf ppf "Constructor '%s' has no documentation attribute"
-
-let report ~filename cname ~loc =
-  let module M = struct
-    let txt ppf () = Report.txt ~loc ~filename ppf msg cname
-
-    let rdjsonl ppf () =
-      Report.rdjsonl
-        ~code:lint_id
-        ~loc
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        msg
-        cname
-    ;;
-
-    let sarif () = Option.some (Utils.make_sarif_message ~loc ~filename ~msg cname)
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 open Typedtree
 

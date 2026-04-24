@@ -61,27 +61,11 @@ open Ast_iterator
 
 type input = Tast_iterator.iterator
 
-let msg = "Prefer guard instead of if-then-else in case construction"
-
-let report ~filename ~loc () =
-  let module M = struct
-    let txt ppf () = Report.txt ~loc ~filename ppf pp_print_string msg
-
-    let rdjsonl ppf () =
-      Report.rdjsonl
-        ~loc
-        ~code:lint_id
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        pp_print_string
-        msg
-    ;;
-
-    let sarif _ = None
-  end
-  in
-  (module M : LINT.REPORTER)
+let msg ppf () =
+  Format.pp_print_string ppf "Prefer guard instead of if-then-else in case construction"
 ;;
+
+let report = Utils.make_reporter lint_id msg
 
 let run _ fallback =
   let pm =

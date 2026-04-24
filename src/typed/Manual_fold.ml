@@ -54,24 +54,7 @@ let msg ppf (kind, name) =
   Format.fprintf ppf "Consider using `%s` instead of `%s`%!" s name
 ;;
 
-let report ~loc ~filename k n =
-  let module M = struct
-    let txt ppf () = Report.txt ~filename ~loc ppf msg (k, n)
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        (k, n)
-    ;;
-
-    let sarif _ = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let has_arg x args =
   List.exists
@@ -204,13 +187,8 @@ let run _ (fallback : Tast_iterator.iterator) =
           long_expr
           ~on_error:(fun _ () -> ())
           (fun kind () ->
-            Collected_lints.add
-              ~loc
-              (report
-                 ~filename:loc.Location.loc_start.Lexing.pos_fname
-                 ~loc
-                 kind
-                 fun_name))
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            Collected_lints.add ~loc (report ~filename ~loc (kind, fun_name)))
           ())
       ()
   in

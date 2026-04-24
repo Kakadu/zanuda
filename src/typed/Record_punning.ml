@@ -43,25 +43,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf expr = Format.fprintf ppf "Rewrite record as '%a'%!" Pprintast.expression expr
-
-let report filename ~loc expr =
-  let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg expr
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        expr
-    ;;
-
-    let sarif () = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 exception NotApplicable
 
@@ -190,9 +172,8 @@ let run _ fallback =
               match State.get_result ans with
               | None -> ()
               | Some expr ->
-                Collected_lints.add
-                  ~loc
-                  (report loc.Location.loc_start.Lexing.pos_fname ~loc expr);
+                let filename = loc.Location.loc_start.Lexing.pos_fname in
+                Collected_lints.add ~loc (report ~filename ~loc expr);
                 Refactoring.Record_punning.apply_fix loc expr
             with
             | NotApplicable -> ())

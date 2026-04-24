@@ -100,4 +100,5 @@ module type REPORTER = sig
   val rdjsonl : Format.formatter -> unit -> unit
 
   val sarif : unit -> Yojson.Safe.t option
+  val is_valid : unit -> bool
 end

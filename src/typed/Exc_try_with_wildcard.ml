@@ -32,25 +32,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf () = Format.fprintf ppf "Antipattern: error swallowing%!"
-
-let report filename ~loc =
-  let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg ()
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        ()
-    ;;
-
-    let sarif _ = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let run _ fallback =
   let pat =
@@ -73,7 +55,8 @@ let run _ fallback =
             (* Reported location is a location of whole match and not of pattern
                TODO: understand how to fix it *)
             (* Format.printf "%a\n%!" Location.print_loc loc; *)
-            Collected_lints.add ~loc (report loc.Location.loc_start.Lexing.pos_fname ~loc))
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            Collected_lints.add ~loc (report ~filename ~loc ()))
           ();
         fallback.expr self expr)
   }

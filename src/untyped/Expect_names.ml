@@ -37,25 +37,7 @@ let msg ppf () =
   fprintf ppf "A test without description. Try `let%%expect_test %S = ..." "name"
 ;;
 
-let report ~loc ~filename info =
-  let module M = struct
-    let txt ppf () = Report.txt ~loc ~filename ppf msg info
-
-    let rdjsonl ppf () =
-      Report.rdjsonl
-        ~loc
-        ~code:lint_id
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        msg
-        info
-    ;;
-
-    let sarif () = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let run _ fallback =
   let open Ast_iterator in

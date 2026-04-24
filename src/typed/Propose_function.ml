@@ -50,26 +50,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf () = Format.fprintf ppf "Using `function` is recommended%!"
-
-let report filename ~loc =
-  let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg ()
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        ()
-    ;;
-
-    let sarif () = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
-
+let report = Utils.make_reporter lint_id msg
 let no_ident ident c = Utils.no_ident ident (fun it -> it.case it c)
 
 let pat () =
@@ -98,9 +79,8 @@ let run _ fallback =
                 String.equal (Ident.name scru_ident) (Ident.name id)
                 && List.for_all cases ~f:(no_ident scru_ident)
               then (
-                Collected_lints.add
-                  ~loc
-                  (report loc.Location.loc_start.Lexing.pos_fname ~loc);
+                let filename = loc.Location.loc_start.Lexing.pos_fname in
+                Collected_lints.add ~loc (report ~filename ~loc ());
                 Refactoring.Propose_function.register_fix
                   ~loc:match_expr.exp_loc
                   scru_loc

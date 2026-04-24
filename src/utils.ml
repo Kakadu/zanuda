@@ -508,7 +508,38 @@ module Report = struct
     let code = code, Some "https://kakadu.github.io/zanuda/" in
     RDJsonl.pp ppf ~filename ~line:loc.Location.loc_start.pos_lnum ~code msg msg_arg
   ;;
+
+  let sarif ~loc ~filename ~msg arg = Some (make_sarif_message ~loc ~filename ~msg arg)
 end
+
+let make_reporter ?(is_good = fun _ -> true) lint_id msg ~loc ~filename info =
+  let module M = struct
+    let txt ppf () = if is_good filename then Report.txt ~loc ~filename ppf msg info
+    let is_valid () = is_good filename
+
+    let rdjsonl ppf () =
+      if is_good filename
+      then
+        Report.rdjsonl
+          ~loc
+          ~code:lint_id
+          ppf
+          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
+          msg
+          info
+    ;;
+
+    let sarif () =
+      Report.sarif
+        ~loc
+        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
+        ~msg
+        info
+    ;;
+  end
+  in
+  (module M : LINT.REPORTER)
+;;
 
 let string_of_group : LINT.group -> string = function
   | LINT.Correctness -> "correctness"

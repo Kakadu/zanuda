@@ -48,25 +48,7 @@ let msg ppf names =
     show_names
 ;;
 
-let report ~loc ~filename names =
-  let module M = struct
-    let txt ppf () = Report.txt ~loc ~filename ppf msg names
-
-    let rdjsonl ppf () =
-      Report.rdjsonl
-        ~loc
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~code:lint_id
-        ppf
-        msg
-        names
-    ;;
-
-    let sarif _ = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let run _ fallback =
   let pat =

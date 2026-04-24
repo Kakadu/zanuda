@@ -60,25 +60,7 @@ let msg ppf (old_expr, new_expr) =
     (My_untype.expr new_expr)
 ;;
 
-let report filename ~loc ~old_expr new_expr =
-  let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg (old_expr, new_expr)
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        (old_expr, new_expr)
-    ;;
-
-    let sarif _ = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
-
+let report = Utils.make_reporter lint_id msg
 let no_ident c ident = Utils.no_ident ident (fun it -> it.expr it c)
 
 let run _ fallback =
@@ -133,10 +115,9 @@ let run _ fallback =
       && no_ident_shadowing ids
       && List.for_all (no_ident new_expr) idents
       && not (Collected_lints.has_tdecl_at loc)
-    then
-      Collected_lints.add
-        ~loc
-        (report loc.Location.loc_start.Lexing.pos_fname ~loc ~old_expr:expr new_expr)
+    then (
+      let filename = loc.Location.loc_start.Lexing.pos_fname in
+      Collected_lints.add ~loc (report ~filename ~loc (expr, new_expr)))
   in
   { fallback with
     expr =

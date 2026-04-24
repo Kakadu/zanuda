@@ -40,26 +40,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf name = Format.fprintf ppf "Consider using `List.map` instead of `%s`%!" name
-
-let report ~loc ~filename name =
-  let module M = struct
-    let txt ppf () = Report.txt ~filename ~loc ppf msg name
-
-    let rdjsonl ppf () =
-      Report.rdjsonl
-        ~loc
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~code:lint_id
-        ppf
-        msg
-        name
-    ;;
-
-    let sarif _ = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let is_applied_to_tail fun_name tail f args =
   match f.Typedtree.exp_desc with

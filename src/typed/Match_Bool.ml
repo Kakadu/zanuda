@@ -41,24 +41,7 @@ let msg ppf e0 =
     e
 ;;
 
-let report filename ~loc e =
-  let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg e
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        e
-    ;;
-
-    let sarif () = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report filename = Utils.make_reporter lint_id msg ~filename
 
 let expr2string e0 =
   let e = My_untype.expr e0 in
@@ -109,9 +92,8 @@ let run _ fallback =
             cases_shape (fun _shape make_expr ->
               match info with
               | `Match scru ->
-                Collected_lints.add
-                  ~loc
-                  (report loc.Location.loc_start.Lexing.pos_fname ~loc (make_expr scru))
+                let filename = loc.Location.loc_start.Lexing.pos_fname in
+                Collected_lints.add ~loc (report filename ~loc (make_expr scru))
               | `Function (_, (_id, _idloc)) ->
                 (* Format.printf "id = %a\n%!" Ident.print id;
                    Format.printf "idloc = %a\n%!" Location.print_loc idloc;
@@ -119,7 +101,7 @@ let run _ fallback =
                    then
                    Collected_lints.add
                    ~loc
-                   (report loc.Location.loc_start.Lexing.pos_fname ~loc expr); *)
+                   (report ~filename ~loc expr); *)
                 ()))
           ();
         fallback.expr self expr)

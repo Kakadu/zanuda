@@ -39,26 +39,7 @@ let describe_as_json () =
 ;;
 
 let msg ppf name = fprintf ppf "Type name `%s` should be in snake case" name
-
-let report ~loc ~filename typ_name =
-  let module M = struct
-    let txt ppf () = Report.txt ~loc ~filename ppf msg typ_name
-
-    let rdjsonl ppf () =
-      Report.rdjsonl
-        ~loc
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~code:lint_id
-        ppf
-        msg
-        typ_name
-    ;;
-
-    let sarif () = Option.some (Utils.make_sarif_message ~loc ~filename ~msg typ_name)
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 let run _ (fallback : Ast_iterator.iterator) =
   { fallback with

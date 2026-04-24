@@ -49,24 +49,7 @@ let msg ppf kind =
     kind
 ;;
 
-let report filename ~loc kind =
-  let module M = struct
-    let txt ppf () = Utils.Report.txt ~filename ~loc ppf msg kind
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-        ~line:loc.loc_start.pos_lnum
-        msg
-        kind
-    ;;
-
-    let sarif _ = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 (* TODO: Maybe forbid an equality on algebraic data types too ? *)
 let run _ fallback =
@@ -105,9 +88,8 @@ let run _ fallback =
           ~on_error:(fun _desc () -> ())
           expr
           (fun k ->
-            Collected_lints.add
-              ~loc
-              (report loc.Location.loc_start.Lexing.pos_fname ~loc k))
+            let filename = loc.Location.loc_start.Lexing.pos_fname in
+            Collected_lints.add ~loc (report ~filename ~loc k))
           ();
         fallback.expr self expr)
   }

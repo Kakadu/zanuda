@@ -54,26 +54,7 @@ let msg ppf strct_items =
     strct_items
 ;;
 
-let report msg ~loc strct_items =
-  let module M = struct
-    let txt ppf () =
-      Utils.Report.txt ~loc ~filename:loc.Location.loc_start.pos_fname ppf msg strct_items
-    ;;
-
-    let rdjsonl ppf () =
-      RDJsonl.pp
-        ppf
-        ~filename:(Config.recover_filepath loc.Location.loc_start.pos_fname)
-        ~line:loc.Location.loc_start.pos_lnum
-        msg
-        strct_items
-    ;;
-
-    let sarif () = None
-  end
-  in
-  (module M : LINT.REPORTER)
-;;
+let report = Utils.make_reporter lint_id msg
 
 module SCC = Strongly_connected_components.Make (Ident)
 
@@ -188,7 +169,8 @@ let run _ fallback =
                   Some (Ast_helper.Str.type_ Recursive mtly_decls)))
             |> Array.to_list
           in
-          Collected_lints.add ~loc (report msg ~loc correct_strcts));
+          let filename = loc.Location.loc_start.Lexing.pos_fname in
+          Collected_lints.add ~loc (report ~filename ~loc correct_strcts));
         fallback.type_declarations self typ_decls)
   }
 ;;

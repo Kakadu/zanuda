@@ -75,8 +75,7 @@ let report () =
     if String.equal filename Filename.null
     then ()
     else (
-      (* TODO: Create file without shell call *)
-      let (_ : int) = Sys.command (Format.asprintf "touch %s" filename) in
+      let () = Unix.close (Unix.openfile filename [ Unix.O_CREAT ] 0o640) in
       Out_channel.with_open_text filename (fun ch ->
         let ppf = Format.formatter_of_out_channel ch in
         iter_lints (fun _ (_loc, (module M : LINT.REPORTER)) -> M.rdjsonl ppf ());
@@ -91,8 +90,13 @@ let report () =
         let jsons = ref [] in
         iter_lints (fun _ (_loc, (module M : LINT.REPORTER)) ->
           match M.sarif () with
-          | None -> ()
-          | Some j -> jsons := j :: !jsons);
+          | None ->
+            Format.eprintf
+              "Sarif output is not impelemnted for something. txt is\n%a"
+              M.txt
+              ();
+            ()
+          | Some j -> if M.is_valid () then jsons := j :: !jsons);
         make_sarif_json (List.rev !jsons)
       in
       Out_channel.with_open_text filename (fun ch ->
