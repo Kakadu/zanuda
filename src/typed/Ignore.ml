@@ -45,7 +45,7 @@ let msg ppf e0 =
       Pprintast.expression
       e
   in
-  Format.fprintf ppf "Unsafe ingore. It's recommended to rewrite it as '%s'%!" si
+  Format.fprintf ppf "Unsafe ignore. It's recommended to rewrite it as '%s'%!" si
 ;;
 
 let report filename ~loc e =
