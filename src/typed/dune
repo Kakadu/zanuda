@@ -3,6 +3,7 @@
  (libraries zanuda_core Tast_pattern Refactoring)
  (package zanuda)
  (modules
+ On_offer
   Aggregate_defs
   Ambiguous_constructors
   Exc_try_with_wildcard

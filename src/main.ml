@@ -25,7 +25,8 @@ let untyped_linters =
 let typed_linters =
   let open TypedLints in
   [ (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
-    (module Aggregate_defs : LINT.TYPED)
+    (module On_offer.First : LINT.TYPED)
+  ; (module Aggregate_defs : LINT.TYPED)
   ; (module Ambiguous_constructors : LINT.TYPED)
   ; (module Exc_try_with_wildcard : LINT.TYPED)
   ; (module Failwith : LINT.TYPED)
@@ -53,6 +54,7 @@ let typed_linters =
   ; (module Tuple_matching : LINT.TYPED)
   ; (module Var_should_not_be_used : LINT.TYPED)
     (* *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *)
+  ; (module On_offer.Last : LINT.TYPED)
   ]
 ;;
 

@@ -1218,6 +1218,13 @@ let pexp_apply (T f) (T fargs) =
   T helper
 ;;
 
+let tstr_zanuda_attr str =
+  tstr_attribute
+    (attribute
+       (string "zanuda")
+       (payload_stru (pstr_eval (pexp_constant (pconst_string str)) ^:: nil)))
+;;
+
 let tstr_docattr on_str =
   tstr_attribute
     (attribute

@@ -57,11 +57,27 @@ let run_string code line pat sk =
   Tast_pattern.parse pat Location.none expr sk ~on_error:(Printf.printf "ERROR: %s\n")
 ;;
 
+let run_si code line pat sk =
+  let filename = Printf.sprintf "tmp%d.ml" line in
+  Out_channel.with_open_text filename (fun ch -> output_string ch code);
+  let parsetree, _ = translate filename in
+  let expr = List.hd parsetree in
+  Tast_pattern.parse pat Location.none expr sk ~on_error:(Printf.printf "ERROR: %s\n")
+;;
+
 let run_string_typed code line pat sk =
   let filename = Printf.sprintf "tmp%d.ml" line in
   Out_channel.with_open_text filename (fun ch -> output_string ch code);
   let _, ttree = translate filename in
   let expr = extract_first_typed ttree in
+  Tast_pattern.parse pat Location.none expr sk ~on_error:(Printf.printf "ERROR: %s\n")
+;;
+
+let run_si_typed code line pat sk =
+  let filename = Printf.sprintf "tmp%d.ml" line in
+  Out_channel.with_open_text filename (fun ch -> output_string ch code);
+  let _, ttree = translate filename in
+  let expr = List.hd ttree.Typedtree.str_items in
   Tast_pattern.parse pat Location.none expr sk ~on_error:(Printf.printf "ERROR: %s\n")
 ;;
 
@@ -155,4 +171,10 @@ let%expect_test _ =
     {|
 
     x y|}]
+;;
+
+let%expect_test "Parse typed zanuda attribute" =
+  let code = {| [@@@zanuda "asdf"] |} in
+  run_si_typed code __LINE__ Tast_pattern.(tstr_zanuda_attr __) (fun s -> print_endline s);
+  [%expect {| asdf |}]
 ;;

@@ -271,8 +271,11 @@ val attribute
   -> (Parsetree.payload, 'b, 'c) t
   -> (attribute, 'a, 'c) t
 
+val payload_stru : (Parsetree.structure, 'a, 'b) t -> (Parsetree.payload, 'a, 'b) t
+val pstr_eval : (Parsetree.expression, 'a, 'b) t -> (Parsetree.structure_item, 'a, 'b) t
 val tstr_docattr : (string, 'a, 'b) t -> (structure_item, 'a, 'b) t
 val tsig_docattr : (string, 'a, 'b) t -> (signature_item, 'a, 'b) t
+val tstr_zanuda_attr : (string, 'a, 'b) t -> (structure_item, 'a, 'b) t
 
 type context
 
