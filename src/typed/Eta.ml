@@ -1,10 +1,6 @@
-(** Detection of possible eta-conversion.
-
-    Initial implementation was contrivbuted by Github user jegorpopow *)
-
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu *)
+(** Copyright 2021-2026, Kakadu *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -41,7 +37,6 @@ let describe_as_json () =
 let expr2string e0 =
   let open Parsetree in
   let e = My_untype.untype_expression e0 in
-  let open Ast_helper in
   Stdlib.Format.asprintf
     "let (_: %a) = %a"
     Printtyp.type_expr
@@ -139,14 +134,15 @@ let run _ fallback =
   { fallback with
     expr =
       (fun self expr ->
-        let open Typedtree in
-        Tast_pattern.parse
-          (pat expr.exp_loc)
-          expr.exp_loc
-          ~on_error:(fun _desc () -> ())
-          expr
-          (check expr)
-          ();
+        if Config.is_lint_enabled lint_id
+        then
+          Tast_pattern.parse
+            (pat expr.exp_loc)
+            expr.exp_loc
+            ~on_error:(fun _desc () -> ())
+            expr
+            (check expr)
+            ();
         fallback.expr self expr)
   }
 ;;

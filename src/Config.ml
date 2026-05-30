@@ -102,16 +102,13 @@ let recover_filepath filepath =
   filepath
 ;;
 
+(** Is lint enabled globally, don't take to account local decorations *)
 let is_enabled () =
   let hash = enabled_lints () in
   fun (module M : LINT.GENERAL) ->
-    let ans =
-      match M.level with
-      | LINT.Allow when opts.skip_level_allow -> false
-      | _ -> Base.Hash_set.mem hash M.lint_id
-    in
-    (* Format.printf "is_enabled of %s = %b\n%!" M.lint_id ans; *)
-    ans
+    match M.level with
+    | LINT.Allow when opts.skip_level_allow -> false
+    | _ -> Base.Hash_set.mem hash M.lint_id
 ;;
 
 let parse_args () =
@@ -176,3 +173,29 @@ let parse_args () =
     set_in_file
     "Use -dir [PATH] to check dune-based project"
 ;;
+
+include (
+struct
+  let hash : (string, unit) Hashtbl.t = Hashtbl.create 24
+
+  let enable s =
+    (* Format.printf "enabling lint '%s'\n%!" s; *)
+    Hashtbl.remove hash s
+  ;;
+
+  let disable s =
+    (* Format.printf "disabling lint '%s'\n%!" s; *)
+    Hashtbl.add hash s ()
+  ;;
+
+  let is_lint_enabled s =
+    match Hashtbl.find hash s with
+    | exception Not_found -> true
+    | _ -> false
+  ;;
+end :
+sig
+  val is_lint_enabled : string -> bool
+  val enable : string -> unit
+  val disable : string -> unit
+end)
