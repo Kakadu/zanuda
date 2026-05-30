@@ -1,0 +1,9 @@
+(library
+ (name test_Parsetree)
+ (wrapped false)
+ (modules Main )
+ ;(flags (:standard -dtypedtree))
+ (modes byte))
+
+(cram
+ (deps %{bin:zanuda.exe}))
