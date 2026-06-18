@@ -1,5 +1,6 @@
   $ dune build
   $ ../zanuda.exe -no-top_file_license -dir . -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
+  Bad lint specification: 'Strings should start either from plus or from dash'
   File "Main.ml", line 1, characters 19-41:
   1 | let () = List.iter (fun x -> print_int x) [1; 2; 3]
                          ^^^^^^^^^^^^^^^^^^^^^^
