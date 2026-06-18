@@ -5,7 +5,8 @@
 ### Changed
 
 - #78: Fix false positives while detecting used variables that start from `_`
-- #80: Disable fixes collection by default
+- #80: Disable fixes collection by default.
+- #85: Implement SARIF output format. It is needed for SourceCraft integration.
 - #87: Allow enabling and disabling lints from the source files.
     For example, `[@@@zanuda "-eta_reduction,+wrong_ignoring"]` disable one lint and enables another until a module is finished.
 
