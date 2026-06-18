@@ -1,5 +1,3 @@
-(**  *)
-
 [@@@ocaml.text "/*"]
 
 (** Copyright 2021-2026, Kakadu *)
@@ -12,18 +10,6 @@ open Zanuda_core
 open Zanuda_core.Utils
 open Tast_pattern
 
-let log ppf =
-  Format.kasprintf
-    (fun s ->
-      print_endline s;
-      flush stdout)
-    ppf
-;;
-
-(* let is_good_attr_name attr =
-  log "attr.txt = %s" attr.Location.txt;
-  String.equal attr.Location.txt "zanuda.ignore"
-;; *)
 type on_off =
   | On
   | Off
@@ -32,15 +18,14 @@ type stack_item = (string, on_off) Hashtbl.t
 
 let stack : stack_item Stack.t = Stack.create ()
 
-let push_stack () =
-  (* log "push stack"; *)
-  Stack.push (Hashtbl.create 52) stack
-;;
+[@@@coverage off]
 
-let pop_stack () =
-  (* log "pop stack"; *)
-  let _ = Stack.pop stack in
-  ()
+let log ppf =
+  Format.kasprintf
+    (fun s ->
+      print_endline s;
+      flush stdout)
+    ppf
 ;;
 
 let trace_stack_top () =
@@ -57,6 +42,19 @@ let trace_stack_top () =
            | s, On -> fprintf ppf "+%s" s
            | s, Off -> fprintf ppf "-%s" s))
       xs
+;;
+
+[@@@coverage on]
+
+let push_stack () =
+  (* log "push stack"; *)
+  Stack.push (Hashtbl.create 52) stack
+;;
+
+let pop_stack () =
+  (* log "pop stack"; *)
+  let _ = Stack.pop stack in
+  ()
 ;;
 
 (** Not reentrant *)

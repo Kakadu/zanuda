@@ -14,3 +14,5 @@ module X = struct
 end
 
 let () = (fun x -> print_string x) "Eta-reduction reported here too"
+
+[@@@zanuda "Strings should start either from plus or from dash"]
