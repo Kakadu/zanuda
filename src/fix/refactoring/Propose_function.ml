@@ -42,7 +42,7 @@ let register_fix ~loc scru_pat_loc cases =
       get_match_constr_payload loc cases;
       get_propose_function_payload scru_pat_loc
     with
-    | Fix_error (loc, msg) ->
+    | Fix_error (loc, _msg) ->
       Format.eprintf "Error at %s %d\n%!" __FILE__ __LINE__;
       Format.eprintf "While analyzing source at %a\n%!" Location.print_loc loc)
 ;;
