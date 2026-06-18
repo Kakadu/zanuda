@@ -6,6 +6,8 @@
 
 - #78: Fix false positives while detecting used variables that start from `_`
 - #80: Disable fixes collection by default
+- #87: Allow enabling and disabling lints from the source files.
+    For example, `[@@@zanuda "-eta_reduction,+wrong_ignoring"]` disable one lint and enables another until a module is finished.
 
 ## 2.0.0 (18-09-2025)
 
