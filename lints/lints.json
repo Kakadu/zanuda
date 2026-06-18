@@ -242,6 +242,28 @@
     }
   },
   {
+    "id": "on_offer",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
+    "id": "on_offer",
+    "group": "style",
+    "level": "warn",
+    "impl": "typed",
+    "docs": "",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "physical_equality",
     "group": "correctness",
     "level": "deny",
