@@ -490,6 +490,8 @@ let tpat_constructor (T fname) (T fargs) =
       | _ -> fail loc "tpat_constructor")
 ;;
 
+[%%if ocaml_version <= (5, 3, 0)]
+
 let tpat_tuple (T fargs) =
   T
     (fun ctx loc x k ->
@@ -499,6 +501,20 @@ let tpat_tuple (T fargs) =
         k |> fargs ctx loc pats
       | _ -> fail loc "tpat_tuple")
 ;;
+
+[%%else]
+
+let tpat_tuple (T fargs) =
+  T
+    (fun ctx loc x k ->
+      match x.pat_desc with
+      | Tpat_tuple pats ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fargs ctx loc (List.map snd pats)
+      | _ -> fail loc "tpat_tuple")
+;;
+
+[%%endif]
 
 let tpat_value (T fpat) =
   T
