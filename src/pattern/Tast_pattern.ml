@@ -978,6 +978,8 @@ let texp_field (T fexpr) (T fdesc) =
       | _ -> fail loc "texp_field")
 ;;
 
+[%%if ocaml_version <= (5, 3, 0)]
+
 let label_desc (T fname) =
   T
     (fun ctx loc e k ->
@@ -986,6 +988,19 @@ let label_desc (T fname) =
         ctx.matched <- ctx.matched + 1;
         k |> fname ctx loc lbl_name)
 ;;
+
+[%%else]
+
+let label_desc (T fname) =
+  T
+    (fun ctx loc e k ->
+      match e with
+      | { Data_types.lbl_name; _ } ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fname ctx loc lbl_name)
+;;
+
+[%%endif]
 
 let rld_kept =
   T
