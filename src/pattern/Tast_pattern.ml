@@ -302,6 +302,27 @@ let elongident (lident : Longident.t) =
       else fail loc "elongident")
 ;;
 
+[%%if ocaml_version < (5, 3, 0)]
+
+let ldot_wrapper = Fun.id
+
+[%%endif]
+[%%if ocaml_version >= (5, 5, 0)]
+
+let ldot_wrapper { txt; _ } = txt
+
+[%%endif]
+
+let ldot (T fl) (T fname) =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Longident.Ldot (ident, name) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fl ctx loc (ldot_wrapper ident) |> fname ctx loc (ldot_wrapper name)
+      | _ -> fail loc "ldot")
+;;
+
 let path_pident (T fident) =
   T
     (fun ctx loc x k ->

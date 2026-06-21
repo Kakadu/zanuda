@@ -44,7 +44,7 @@ let run _ fallback =
   let pat =
     let open Tast_pattern in
     texp_construct
-      (elongident Longident.(Ldot (Lident "CamlinternalFormatBasics", "Format")))
+      (ldot (lident (string "CamlinternalFormatBasics")) (string "Format"))
       drop
       (drop ^:: estring ^:: nil)
   in
