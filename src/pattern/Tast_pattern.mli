@@ -86,8 +86,9 @@ open Typedtree
 
 val int : int -> (int, 'a, 'a) t
 val string : string -> (string, 'a, 'a) t
-val lident : (string, 'a, 'b) t -> (Longident.t, 'a, 'b) t
 val elongident : Longident.t -> (Longident.t, 'a, 'a) t
+val lident : (string, 'a, 'b) t -> (Longident.t, 'a, 'b) t
+val ldot : (Longident.t, 'a, 'b) t -> (string, 'b, 'c) t -> (Longident.t, 'a, 'c) t
 val path : string list -> (Path.t, 'a, 'a) t
 val path_pident : (Ident.t, 'a, 'b) t -> (Path.t, 'a, 'b) t
 val eint : (int, 'a, 'b) t -> (expression, 'a, 'b) t
