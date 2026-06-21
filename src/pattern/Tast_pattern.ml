@@ -1116,8 +1116,10 @@ let rec typ_constr (T fpath) (T fargs) =
     | Tconstr (path, args, _) ->
       ctx.matched <- ctx.matched + 1;
       k |> fpath ctx loc path |> fargs ctx loc args
-    | Tlink arg -> helper ctx loc arg k
-    | _ -> fail loc "typ_constr"
+    | Tpoly (arg, []) | Tlink arg -> helper ctx loc arg k
+    | _ ->
+      (* let msg = Format.asprintf "typ_constr: %a " Printtyp.type_expr x in *)
+      fail loc "typ_constr"
   in
   T helper
 ;;

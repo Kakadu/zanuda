@@ -67,11 +67,12 @@ let run_si code line pat sk =
   Tast_pattern.parse pat Location.none expr sk ~on_error:(Printf.printf "ERROR: %s\n")
 ;;
 
-let run_string_typed code line pat sk =
+let run_string_typed ?(verbose = false) code line pat sk =
   let filename = Printf.sprintf "tmp%d.ml" line in
   Out_channel.with_open_text filename (fun ch -> output_string ch code);
   let _, ttree = translate filename in
   let expr = extract_first_typed ttree in
+  if verbose then Format.printf "@[%a@]\n" Printtyped.implementation ttree;
   Tast_pattern.parse pat Location.none expr sk ~on_error:(Printf.printf "ERROR: %s\n")
 ;;
 
@@ -179,4 +180,25 @@ let%expect_test "Parse typed zanuda attribute" =
   let code = {| [@@@zanuda "asdf"] |} in
   run_si_typed code __LINE__ Tast_pattern.(tstr_zanuda_attr __) (fun s -> print_endline s);
   [%expect {| asdf |}]
+;;
+
+let%expect_test "List.fold circumflex" =
+  let code = {| let foo  = List.fold_left (^)  |} in
+  run_string_typed
+    (* ~verbose:true *)
+    code
+    __LINE__
+    Tast_pattern.(
+      let list_fold = texp_ident_typ (path [ "Stdlib"; "List"; "fold_left" ]) drop in
+      let concat_op =
+        let typ_str =
+          typ_constr (path [ "Stdlib"; "string" ] ||| path [ "string" ]) nil
+        in
+        texp_ident_typ
+          (path [ "Stdlib"; "^" ])
+          (typ_arrow typ_str (typ_arrow typ_str typ_str))
+      in
+      texp_apply list_fold ((nolabel ** arg concat_op) ^:: __))
+    (fun _ -> print_endline "OK");
+  [%expect "OK"]
 ;;
