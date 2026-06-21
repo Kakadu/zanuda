@@ -96,7 +96,7 @@ let run _ fallback =
     |> map0 ~f:MapMap
     ||| (texp_apply_nolabelled list_filter (drop ^:: texp_apply list_map drop ^:: nil)
          |> map0 ~f:FilterMap)
-    ||| (texp_apply list_concat ((nolabel ** some (texp_apply list_map drop)) ^:: nil)
+    ||| (texp_apply list_concat ((nolabel ** arg (texp_apply list_map drop)) ^:: nil)
          |> map0 ~f:ConcatMap)
   in
   let open Tast_iterator in

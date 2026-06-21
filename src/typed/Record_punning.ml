@@ -54,7 +54,7 @@ let pp_texpr ppf expr =
 
 module State = struct
   type t =
-    { st_kept : Types.label_description list
+    { st_kept : Tast_pattern.label_description list
     ; st_over_self : (string * Path.t) list (* label_name * record_ident *)
     ; st_over_other : (string * Typedtree.expression) list
     }
@@ -115,7 +115,7 @@ module State = struct
       "{ kept=[%a]; over_self=[%a]; over_other=[%a] }%!"
       (pp_print_list
          ~pp_sep:(fun ppf () -> fprintf ppf " ")
-         (fun ppf ld -> fprintf ppf "%s" ld.Types.lbl_name))
+         (fun ppf ld -> fprintf ppf "%s" (Tast_pattern.label_name ld)))
       st_kept
       (pp_print_list
          ~pp_sep:(fun ppf () -> fprintf ppf " ")
@@ -156,7 +156,8 @@ let run _ fallback =
                                  (lident __)
                                  (as__ (texp_field (texp_ident __) __))
                             |> map5 ~f:(fun _ field_lhs expr_rhs stru field_rhs ->
-                              if String.equal field_lhs field_rhs.Types.lbl_name
+                              if
+                                String.equal field_lhs (Tast_pattern.label_name field_rhs)
                               then State.add_over_self acc field_rhs.lbl_name stru
                               else State.add_over_other acc field_lhs expr_rhs))
                        ||| (label_desc __ ** rld_overriden (lident __) __

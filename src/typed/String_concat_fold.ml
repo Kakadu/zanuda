@@ -71,8 +71,8 @@ let run _ fallback =
         (path [ "Stdlib"; "^" ] ||| path [ "Stdlib!"; "^" ])
         (typ_arrow typ_str (typ_arrow typ_str typ_str))
     in
-    texp_apply list_fold ((nolabel ** some concat_op) ^:: drop)
-    ||| texp_apply list_fold_labelled ((labelled (string "f") ** some concat_op) ^:: drop)
+    texp_apply list_fold ((nolabel ** arg concat_op) ^:: drop)
+    ||| texp_apply list_fold_labelled ((labelled (string "f") ** arg concat_op) ^:: drop)
   in
   let open Tast_iterator in
   { fallback with

@@ -41,7 +41,7 @@ let check_bool args vbool =
     let _, v' = s in
     let open Tast_pattern in
     (match v, v' with
-     | Some e, Some e' ->
+     | Tast_pattern.Arg e, Arg e' ->
        parse
          ebool
          e.exp_loc
