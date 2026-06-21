@@ -23,6 +23,14 @@ let untype_expression = default_mapper.expr default_mapper
 
 [%%endif]
 
+[%%if ocaml_version <= (5, 3, 0)]
+let get_cd_name cd = cd.Types.cstr_name
+[%%endif]
+
+[%%if ocaml_version >= (5, 5, 0)]
+let get_cd_name cd = cd.Data_types.cstr_name
+[%%endif]
+
 let default_mapper =
   { Untypeast.default_mapper with
     expr =
@@ -35,7 +43,7 @@ let default_mapper =
               ; ({ exp_desc = Texp_constant (Asttypes.Const_string (_str_fmt, _, None)) }
                  as fmt_str_expr)
               ] )
-          when String.equal cd.Types.cstr_name "Format" ->
+          when String.equal (get_cd_name cd) "Format" ->
           default_mapper.expr self fmt_str_expr
         | _ -> default_mapper.expr self e)
   }
