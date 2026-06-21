@@ -28,7 +28,9 @@ let translate filename =
     parsetree, typedtree
   with
   | Typetexp.Error (_loc, env, e) as exc ->
-    Typetexp.report_error env Format.std_formatter e;
+    let _ = env in
+    let _ = e in
+    (* Typetexp.Error.log_or_raise env Format.std_formatter e; *)
     Format.printf "\n%!";
     raise exc
   | x -> raise x
