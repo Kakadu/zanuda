@@ -21,18 +21,19 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+        containers: [ 'zanuda53', 'zanuda55' ]
 
     runs-on: ${{ matrix.os }}
     container:
-      image: kakadu18/ocaml:zanuda53
+      image: kakadu18/ocaml:${{ matrix.containers }}
 
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.containers }}
       cancel-in-progress: true
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
@@ -44,6 +45,7 @@ jobs:
       - name: Update opam repo
         run: |
           opam remote -vvvv
+          opam repo set-url default https://opam.ocaml.org
           opam update default
 
       # checking out the code seems to be important because local switch is used
@@ -51,7 +53,7 @@ jobs:
         run: |
           opam pin add ./ -n
           opam install . --deps-only --with-test --with-doc
-        #opam depext zanuda reviewer -y
+
 
       - name: Building...
         run: opam exec -- dune build --profile=release
