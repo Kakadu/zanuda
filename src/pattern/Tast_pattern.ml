@@ -653,6 +653,24 @@ let texp_apply (T f0) (T args0) =
 
 let texp_apply_nolabelled (T f0) (T args0) =
   let exception EarlyExit in
+  let module M = struct
+    [%%if ocaml_version <= (5, 3, 0)]
+
+    let extractor = function
+      | Asttypes.Labelled _, _ | Asttypes.Optional _, _ | _, None -> raise EarlyExit
+      | _, Some x -> x
+    ;;
+
+    [%%else]
+
+    let extractor = function
+      | Asttypes.Labelled _, _ | Asttypes.Optional _, _ | _, Omitted _ -> raise EarlyExit
+      | _, Arg x -> x
+    ;;
+
+    [%%endif]
+  end
+  in
   T
     (fun ctx loc x k ->
       match x.exp_desc with
@@ -660,17 +678,55 @@ let texp_apply_nolabelled (T f0) (T args0) =
         ctx.matched <- ctx.matched + 1;
         let k = f0 ctx loc f k in
         (try
-           let args =
-             ListLabels.map args ~f:(function
-               | Asttypes.Labelled _, _ | Asttypes.Optional _, _ | _, None ->
-                 raise EarlyExit
-               | _, Some x -> x)
-           in
+           let args = ListLabels.map args ~f:M.extractor in
            args0 ctx loc args k
          with
-         | EarlyExit -> fail loc "texp_apply: None among the arguments ")
+         | EarlyExit -> fail loc "texp_apply: None among the arguments")
       | _ -> fail loc "texp_apply")
 ;;
+
+[%%if ocaml_version <= (5, 3, 0)]
+
+type constructor_description = Types.constructor_description
+type label_description = Types.label_description
+
+let label_name l = l.Types.lbl_name
+
+type ('a, 'b) arg_or_omitted =
+  | Arg of 'a
+  | Omitted of 'b
+
+type apply_arg = (expression, unit) arg_or_omitted
+
+let arg x = some x
+
+[%%endif]
+[%%if ocaml_version >= (5, 5, 0)]
+
+type constructor_description = Data_types.constructor_description
+type label_description = Data_types.label_description
+
+let label_name l = l.Data_types.lbl_name
+
+type ('a, 'b) arg_or_omitted = ('a, 'b) Typedtree.arg_or_omitted =
+  | Arg of 'a
+  | Omitted of 'b
+[@@ocaml.warning "-unused-type-declaration"]
+
+type apply_arg = (expression, unit) arg_or_omitted
+[@@ocaml.warning "-unused-type-declaration"]
+
+let arg (T fe) : (apply_arg, _, _) t =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Arg a ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fe ctx loc a
+      | _ -> fail loc (sprintf "arg"))
+;;
+
+[%%endif]
 
 let texp_construct (T fpath) (T fcd) (T fargs) =
   T
@@ -715,8 +771,8 @@ let labelled (T fstr) =
       | _ -> fail loc "labelled")
 ;;
 
-let texp_apply1 f x = texp_apply f ((nolabel ** some x) ^:: nil)
-let texp_apply2 f x y = texp_apply f ((nolabel ** some x) ^:: (nolabel ** some y) ^:: nil)
+let texp_apply1 f x = texp_apply f ((nolabel ** arg x) ^:: nil)
+let texp_apply2 f x y = texp_apply f ((nolabel ** arg x) ^:: (nolabel ** arg y) ^:: nil)
 
 [%%if ocaml_version < (4, 11, 2)]
 

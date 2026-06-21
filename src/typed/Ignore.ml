@@ -56,7 +56,7 @@ let run _ fallback =
     (* TODO: check that 'asdf |> ignore' is reported properly *)
     texp_apply
       (texp_ident (path [ "Stdlib"; "ignore" ]) ||| texp_ident (path [ "Base"; "ignore" ]))
-      ((nolabel ** some __) ^:: nil)
+      ((nolabel ** arg __) ^:: nil)
   in
   let open Tast_iterator in
   { fallback with
