@@ -40,8 +40,8 @@ let check_bool args vbool =
     let _, v = f in
     let _, v' = s in
     let open Tast_pattern in
-    (match v, v' with
-     | Tast_pattern.Arg e, Arg e' ->
+    (match Tast_pattern.option_of_apply_arg v, Tast_pattern.option_of_apply_arg v' with
+     | Some e, Some e' ->
        parse
          ebool
          e.exp_loc

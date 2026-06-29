@@ -302,7 +302,7 @@ let elongident (lident : Longident.t) =
       else fail loc "elongident")
 ;;
 
-[%%if ocaml_version < (5, 3, 0)]
+[%%if ocaml_version < (5, 4, 0)]
 
 let ldot_wrapper = Fun.id
 
@@ -692,13 +692,20 @@ type label_description = Types.label_description
 
 let label_name l = l.Types.lbl_name
 
-type ('a, 'b) arg_or_omitted =
-  | Arg of 'a
-  | Omitted of 'b
-
+type ('a, 'b) arg_or_omitted = 'a option
 type apply_arg = (expression, unit) arg_or_omitted
 
-let arg x = some x
+let option_of_apply_arg = Fun.id
+
+let arg (T fe) : (apply_arg, _, _) t =
+  T
+    (fun ctx loc x k ->
+      match x with
+      | Some a ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fe ctx loc a
+      | None -> fail loc (sprintf "arg"))
+;;
 
 [%%endif]
 [%%if ocaml_version >= (5, 5, 0)]
@@ -715,6 +722,11 @@ type ('a, 'b) arg_or_omitted = ('a, 'b) Typedtree.arg_or_omitted =
 
 type apply_arg = (expression, unit) arg_or_omitted
 [@@ocaml.warning "-unused-type-declaration"]
+
+let option_of_apply_arg = function
+  | Arg x -> Some x
+  | Omitted _ -> None
+;;
 
 let arg (T fe) : (apply_arg, _, _) t =
   T
