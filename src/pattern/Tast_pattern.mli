@@ -117,12 +117,10 @@ type comp_pat = computation pattern_desc pattern_data
 
 type constructor_description = Types.constructor_description
 type label_description = Types.label_description
-
-type ('a, 'b) arg_or_omitted =
-  | Arg of 'a
-  | Omitted of 'b
-
+type ('a, 'b) arg_or_omitted = 'a option
 type apply_arg = (expression, unit) arg_or_omitted
+
+val option_of_apply_arg : ('a, 'b) arg_or_omitted -> 'a option
 
 [%%endif]
 [%%if ocaml_version >= (5, 5, 0)]
@@ -135,6 +133,8 @@ type ('a, 'b) arg_or_omitted = ('a, 'b) Typedtree.arg_or_omitted =
   | Omitted of 'b
 
 type apply_arg = (expression, unit) arg_or_omitted
+
+val option_of_apply_arg : ('a, 'b) arg_or_omitted -> 'a option
 
 [%%endif]
 
