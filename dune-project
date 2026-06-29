@@ -31,7 +31,10 @@
      (< 5.0.0))
     (and
      (>= 5.3.0)
-     (< 5.4.0))))
+     (< 5.4.0))
+    (and
+     (>= 5.5.0)
+     (< 5.6.0))))
   (yojson
    (>= 2.0.0))
   ; (ppxlib
@@ -43,7 +46,7 @@
     (>= 0.15.0)
     (<= 0.16.0)))
   sexplib
-  bisect_ppx
+  (bisect_ppx :with-dev-setup)
   dune-build-info
   ppx_assert
   ppx_expect_nobase
