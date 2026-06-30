@@ -91,9 +91,8 @@
     (>= 0.15.0)
     (<= 0.16.0)))
   ppx_inline_test
-  ppx_show
   ppx_expect
-  bisect_ppx
+  (bisect_ppx :with-dev-setup)
   (ocamlformat
    (and
     (= 0.27.0)
