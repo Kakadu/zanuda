@@ -33,6 +33,17 @@
     }
   },
   {
+    "id": "dont_disable_all_warnings",
+    "group": "correctness",
+    "level": "deny",
+    "impl": "typed",
+    "docs": "### What it does\nWarns on use of `[@@@warning \"-A\"]`.\n\n### Why is is important?\nDisabling **all** warnings is a bad idea.",
+    "applicability": {
+      "is_multi_part_suggestion": false,
+      "applicability": "Unresolved"
+    }
+  },
+  {
     "id": "eta_reduction",
     "group": "style",
     "level": "warn",
