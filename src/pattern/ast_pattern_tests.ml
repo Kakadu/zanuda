@@ -27,12 +27,14 @@ let translate filename =
     in
     parsetree, typedtree
   with
-  | Typetexp.Error (_loc, env, e) as exc ->
+  | Typecore.Error (_loc, env, e) as exc ->
     let _ = env in
     let _ = e in
+    Location.report_exception Format.std_formatter exc;
     (* Typetexp.Error.log_or_raise env Format.std_formatter e; *)
     Format.printf "\n%!";
-    raise exc
+    raise_notrace
+      (Failure (Printf.sprintf "Typecheck error at %s line %d" __FILE__ __LINE__))
   | x -> raise x
 ;;
 
