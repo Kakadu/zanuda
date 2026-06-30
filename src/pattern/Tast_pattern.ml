@@ -511,7 +511,7 @@ let tpat_constructor (T fname) (T fargs) =
       | _ -> fail loc "tpat_constructor")
 ;;
 
-[%%if ocaml_version <= (5, 3, 0)]
+[%%if ocaml_version < (5, 4, 0)]
 
 let tpat_tuple (T fargs) =
   T
@@ -654,7 +654,7 @@ let texp_apply (T f0) (T args0) =
 let texp_apply_nolabelled (T f0) (T args0) =
   let exception EarlyExit in
   let module M = struct
-    [%%if ocaml_version <= (5, 3, 0)]
+    [%%if ocaml_version < (5, 4, 0)]
 
     let extractor = function
       | Asttypes.Labelled _, _ | Asttypes.Optional _, _ | _, None -> raise EarlyExit
@@ -685,7 +685,7 @@ let texp_apply_nolabelled (T f0) (T args0) =
       | _ -> fail loc "texp_apply")
 ;;
 
-[%%if ocaml_version <= (5, 3, 0)]
+[%%if ocaml_version < (5, 4, 0)]
 
 type constructor_description = Types.constructor_description
 type label_description = Types.label_description
@@ -1046,7 +1046,7 @@ let texp_field (T fexpr) (T fdesc) =
       | _ -> fail loc "texp_field")
 ;;
 
-[%%if ocaml_version <= (5, 3, 0)]
+[%%if ocaml_version < (5, 4, 0)]
 
 let label_desc (T fname) =
   T
@@ -1097,28 +1097,6 @@ let value_binding (T fpat) (T fexpr) =
       k |> fpat ctx loc vb_pat |> fexpr ctx loc vb_expr)
 ;;
 
-(*   let hack0 (T path0) =
-     T
-     (fun ctx loc x k ->
-     match x.Types.val_type.Types.desc with
-     | Tconstr (path, [], _) ->
-     ctx.matched <- ctx.matched + 1;
-     path0 ctx loc path k
-     | _ -> fail loc "hack0")
-     ;;
-
-     let hack1 ?(on_vd = drop) (T path0) =
-     T
-     (fun ctx loc x k ->
-     match x.exp_desc with
-     | Texp_ident (path, _, vd) ->
-     ctx.matched <- ctx.matched + 1;
-     let (T fvd) = on_vd in
-     k |> path0 ctx loc path |> fvd ctx loc vd
-     | _ -> fail loc "texp_ident")
-     ;;
-
-     let __ path = hack1 __ path *)
 let rec core_typ (T ftexpr) = T (fun ctx loc x k -> ftexpr ctx loc x.ctyp_type k)
 
 let rec typ_constr (T fpath) (T fargs) =

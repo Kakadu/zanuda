@@ -22,13 +22,15 @@ include Untypeast
 let untype_expression = default_mapper.expr default_mapper
 
 [%%endif]
+[%%if ocaml_version < (5, 4, 0)]
 
-[%%if ocaml_version <= (5, 3, 0)]
 let get_cd_name cd = cd.Types.cstr_name
-[%%endif]
 
+[%%endif]
 [%%if ocaml_version >= (5, 5, 0)]
+
 let get_cd_name cd = cd.Data_types.cstr_name
+
 [%%endif]
 
 let default_mapper =

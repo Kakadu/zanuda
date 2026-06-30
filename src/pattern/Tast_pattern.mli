@@ -113,7 +113,7 @@ type value_pat = value pattern_desc pattern_data
 type comp_pat = computation pattern_desc pattern_data
 
 [%%endif]
-[%%if ocaml_version <= (5, 3, 0)]
+[%%if ocaml_version < (5, 4, 0)]
 
 type constructor_description = Types.constructor_description
 type label_description = Types.label_description
