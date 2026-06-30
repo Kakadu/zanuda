@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, .... *)
+(** Copyright 2021-2026, Kakadu *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -73,37 +73,35 @@ let run _ fallback =
       (fun self expr ->
         let open Typedtree in
         let loc = expr.exp_loc in
-        Tast_pattern.parse
-          (pat ())
-          loc
-          ~on_error:(fun _desc () -> ())
-          expr
-          (fun (info, ((id1, rhs1), (id2, rhs2))) () ->
-            let cases_shape k =
-              match Longident.flatten id1, Longident.flatten id2 with
-              | [ "true" ], [ "false" ] ->
-                k True_false (fun scru ->
-                  { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) })
-              | [ "false" ], [ "true" ] ->
-                k False_true (fun scru ->
-                  { expr with exp_desc = Texp_ifthenelse (scru, rhs2, Some rhs1) })
-              | _ -> ()
-            in
-            cases_shape (fun _shape make_expr ->
-              match info with
-              | `Match scru ->
-                let filename = loc.Location.loc_start.Lexing.pos_fname in
-                Collected_lints.add ~loc (report filename ~loc (make_expr scru))
-              | `Function (_, (_id, _idloc)) ->
-                (* Format.printf "id = %a\n%!" Ident.print id;
-                   Format.printf "idloc = %a\n%!" Location.print_loc idloc;
-                   if Utils.no_ident id (fun it -> it.expr it expr)
-                   then
-                   Collected_lints.add
-                   ~loc
-                   (report ~filename ~loc expr); *)
-                ()))
-          ();
+        let handler (info, ((id1, rhs1), (id2, rhs2))) () =
+          let cases_shape k =
+            match Longident.flatten id1, Longident.flatten id2 with
+            | [ "true" ], [ "false" ] ->
+              k True_false (fun scru ->
+                { expr with exp_desc = Texp_ifthenelse (scru, rhs1, Some rhs2) })
+            | [ "false" ], [ "true" ] ->
+              k False_true (fun scru ->
+                { expr with exp_desc = Texp_ifthenelse (scru, rhs2, Some rhs1) })
+            | _ -> ()
+          in
+          cases_shape (fun _shape make_expr ->
+            match info with
+            | `Match scru ->
+              let filename = loc.Location.loc_start.Lexing.pos_fname in
+              Collected_lints.add ~loc (report filename ~loc (make_expr scru))
+            | `Function (_, (_id, _idloc)) ->
+              (* Format.printf "id = %a\n%!" Ident.print id;
+               Format.printf "idloc = %a\n%!" Location.print_loc idloc;
+               if Utils.no_ident id (fun it -> it.expr it expr)
+               then
+               Collected_lints.add
+               ~loc
+               (report ~filename ~loc expr); *)
+              ())
+        in
+        if Config.is_lint_enabled lint_id
+        then
+          Tast_pattern.parse (pat ()) loc ~on_error:(fun _desc () -> ()) expr handler ();
         fallback.expr self expr)
   }
 ;;

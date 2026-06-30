@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -128,24 +128,13 @@ let run _ fallback =
   { fallback with
     expr =
       (fun self expr ->
-        let open Typedtree in
         let loc = expr.exp_loc in
-        Tast_pattern.parse
-          pat
-          loc
-          expr
-          (fun e1 e2 () ->
-            (* let __ _ =
-               Format.printf
-               "List_length DEBUG: '%a' and '%a'\n%!"
-               MyPrinttyped.expr
-               e1
-               MyPrinttyped.expr
-               e2
-               in *)
-            let filename = loc.Location.loc_start.Lexing.pos_fname in
-            Collected_lints.add ~loc (report filename ~loc (e1, e2)))
-          ~on_error:(fun _desc () -> fallback.expr self expr)
-          ())
+        let handler e1 e2 () =
+          let filename = loc.Location.loc_start.Lexing.pos_fname in
+          Collected_lints.add ~loc (report filename ~loc (e1, e2))
+        in
+        if Config.is_lint_enabled lint_id
+        then Tast_pattern.parse pat loc expr handler ~on_error:(fun _desc () -> ()) ();
+        fallback.expr self expr)
   }
 ;;

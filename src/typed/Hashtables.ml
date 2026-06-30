@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -61,7 +61,6 @@ let msg ppf () =
      required. In all places where it is needed indeed, describe in a comment why it is \
      needed there.%!"
 ;;
-
 
 let report =
   Utils.make_reporter
@@ -131,16 +130,14 @@ let run _ fallback =
               | _ -> ())))
   ; expr =
       (fun self expr ->
-        let loc = expr.Typedtree.exp_loc in
-        Tast_pattern.parse
-          pat_expr
-          loc
-          ~on_error:(fun _desc () -> ())
-          expr
-          (fun () ->
+        if Config.is_lint_enabled lint_id
+        then (
+          let loc = expr.Typedtree.exp_loc in
+          let handler () =
             let filename = loc.Location.loc_start.Lexing.pos_fname in
-            Collected_lints.add ~loc (report ~filename ~loc ()))
-          ();
+            Collected_lints.add ~loc (report ~filename ~loc ())
+          in
+          Tast_pattern.parse pat_expr loc ~on_error:(fun _desc () -> ()) expr handler ());
         fallback.expr self expr)
   }
 ;;

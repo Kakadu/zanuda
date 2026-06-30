@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -45,7 +45,7 @@ let run _ fallback =
     extension =
       (fun self (({ txt }, payload) as ext) ->
         fallback.extension self ext;
-        if String.equal txt "expect_test"
+        if Config.is_lint_enabled lint_id && String.equal txt "expect_test"
         then (
           match payload with
           | PStr

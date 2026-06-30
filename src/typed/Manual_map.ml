@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -134,14 +134,18 @@ let run _ (fallback : Tast_iterator.iterator) =
     structure_item =
       (fun self si ->
         fallback.structure_item self si;
-        match si.str_desc with
-        | Tstr_value (Asttypes.Recursive, vbl) -> List.iter parse vbl
-        | _ -> ())
+        if Config.is_lint_enabled lint_id
+        then (
+          match si.str_desc with
+          | Tstr_value (Asttypes.Recursive, vbl) -> List.iter parse vbl
+          | _ -> ()))
   ; expr =
       (fun self e ->
         fallback.expr self e;
-        match e.exp_desc with
-        | Texp_let (Asttypes.Recursive, vbl, _) -> List.iter parse vbl
-        | _ -> ())
+        if Config.is_lint_enabled lint_id
+        then (
+          match e.exp_desc with
+          | Texp_let (Asttypes.Recursive, vbl, _) -> List.iter parse vbl
+          | _ -> ()))
   }
 ;;

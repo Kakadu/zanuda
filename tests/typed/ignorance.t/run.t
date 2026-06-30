@@ -6,10 +6,6 @@
                          ^^^^^^^^^^^^^^^^^^^^^^
   Alert zanuda-linter: Eta reduction proposed. It's recommended to rewrite 
                        'fun x -> print_int x' as 'print_int'
-  File "Main.ml", line 9, characters 13-45:
-  9 |   let f () = ignore (List.map string_of_bool)
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  Alert zanuda-linter: Unsafe ignore. It's recommended to rewrite it as 'let (_: bool list -> string list) = List.map string_of_bool'
   File "Main.ml", line 12, characters 11-36:
   12 |   let () = (fun x -> print_string x) "Eta-reduction reported again"
                   ^^^^^^^^^^^^^^^^^^^^^^^^^

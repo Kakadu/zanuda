@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -48,7 +48,7 @@ let run _ (fallback : Ast_iterator.iterator) =
         let open Parsetree in
         let tname = tdecl.ptype_name.txt in
         let loc = tdecl.ptype_loc in
-        if not (is_good_name tname)
+        if Config.is_lint_enabled lint_id && not (is_good_name tname)
         then (
           let filename = loc.Location.loc_start.Lexing.pos_fname in
           Collected_lints.add ~loc (report ~loc ~filename tname));

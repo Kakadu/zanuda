@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -139,46 +139,49 @@ let run _ fallback =
            then (
            let u = Untypeast.(default_mapper.expr default_mapper expr) in
            Format.printf "%a\n%a\n%!" Pprintast.expression u (Printast.expression 0) u); *)
-        Tast_pattern.(parse (texp_record none __))
-          loc
-          ~on_error:(fun _desc () -> ())
-          expr
-          (fun arr () ->
-            try
-              let ans =
-                Array.fold arr ~init:State.empty ~f:(fun acc (lab_desc, lab_def) ->
-                  Tast_pattern.(
-                    parse
-                      (__ ** rld_kept
-                       |> map1 ~f:(State.add_kept acc)
-                       ||| (label_desc __
-                            ** rld_overriden
-                                 (lident __)
-                                 (as__ (texp_field (texp_ident __) __))
-                            |> map5 ~f:(fun _ field_lhs expr_rhs stru field_rhs ->
-                              if
-                                String.equal field_lhs (Tast_pattern.label_name field_rhs)
-                              then State.add_over_self acc field_rhs.lbl_name stru
-                              else State.add_over_other acc field_lhs expr_rhs))
-                       ||| (label_desc __ ** rld_overriden (lident __) __
-                            |> map3 ~f:(fun _ (field_lhs : string) field_rhs ->
-                              State.add_over_other acc field_lhs field_rhs))))
-                    loc
-                    ~on_error:(fun _ () -> acc)
-                    (lab_desc, lab_def)
-                    (fun st () -> st)
-                    ())
-              in
-              (* Format.printf "State: %a\n%!" State.pp ans; *)
-              match State.get_result ans with
-              | None -> ()
-              | Some expr ->
-                let filename = loc.Location.loc_start.Lexing.pos_fname in
-                Collected_lints.add ~loc (report ~filename ~loc expr);
-                Refactoring.Record_punning.apply_fix loc expr
-            with
-            | NotApplicable -> ())
-          ();
+        let handler arr () =
+          try
+            let ans =
+              Array.fold arr ~init:State.empty ~f:(fun acc (lab_desc, lab_def) ->
+                Tast_pattern.(
+                  parse
+                    (__ ** rld_kept
+                     |> map1 ~f:(State.add_kept acc)
+                     ||| (label_desc __
+                          ** rld_overriden
+                               (lident __)
+                               (as__ (texp_field (texp_ident __) __))
+                          |> map5 ~f:(fun _ field_lhs expr_rhs stru field_rhs ->
+                            if String.equal field_lhs (Tast_pattern.label_name field_rhs)
+                            then State.add_over_self acc field_rhs.lbl_name stru
+                            else State.add_over_other acc field_lhs expr_rhs))
+                     ||| (label_desc __ ** rld_overriden (lident __) __
+                          |> map3 ~f:(fun _ (field_lhs : string) field_rhs ->
+                            State.add_over_other acc field_lhs field_rhs))))
+                  loc
+                  ~on_error:(fun _ () -> acc)
+                  (lab_desc, lab_def)
+                  (fun st () -> st)
+                  ())
+            in
+            (* Format.printf "State: %a\n%!" State.pp ans; *)
+            match State.get_result ans with
+            | None -> ()
+            | Some expr ->
+              let filename = loc.Location.loc_start.Lexing.pos_fname in
+              Collected_lints.add ~loc (report ~filename ~loc expr);
+              Refactoring.Record_punning.apply_fix loc expr
+          with
+          | NotApplicable -> ()
+        in
+        if Config.is_lint_enabled lint_id
+        then
+          Tast_pattern.(parse (texp_record none __))
+            loc
+            ~on_error:(fun _desc () -> ())
+            expr
+            handler
+            ();
         fallback.expr self expr)
   }
 ;;
