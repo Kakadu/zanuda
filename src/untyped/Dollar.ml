@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -40,7 +40,8 @@ let run _ fallback =
   { fallback with
     expr =
       (fun self e ->
-        let () =
+        if Config.is_lint_enabled lint_id
+        then (
           match e.pexp_desc with
           | Parsetree.Pexp_apply
               ( { pexp_desc = Pexp_ident { txt = Lident "@@" } }
@@ -64,8 +65,7 @@ let run _ fallback =
             let loc = e.pexp_loc in
             let filename = loc.Location.loc_start.Lexing.pos_fname in
             Collected_lints.add ~loc (report ~loc ~filename ())
-          | _ -> ()
-        in
+          | _ -> ());
         fallback.expr self e)
   }
 ;;

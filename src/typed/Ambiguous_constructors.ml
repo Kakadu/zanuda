@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -87,7 +87,10 @@ let run _ fallback =
               ~on_error:(fun _ -> false)
         in
         let names = get_bad_names tdecl in
-        if (not is_stdlib_alias) && not (List.is_empty names)
+        if
+          Config.is_lint_enabled lint_id
+          && (not is_stdlib_alias)
+          && not (List.is_empty names)
         then (
           let filename = loc.Location.loc_start.Lexing.pos_fname in
           Collected_lints.add ~loc (report ~loc ~filename names));

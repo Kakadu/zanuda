@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -89,15 +89,15 @@ let run _ fallback =
   { fallback with
     expr =
       (fun self e ->
-        let () =
-          Tast_pattern.(
-            parse
-              (texp_function_cases drop __)
-              ~on_error:(fun _ -> ())
-              e.Typedtree.exp_loc
-              e
-              (List.iter oncase))
-        in
+        (if Config.is_lint_enabled lint_id
+         then
+           Tast_pattern.(
+             parse
+               (texp_function_cases drop __)
+               ~on_error:(fun _ -> ())
+               e.Typedtree.exp_loc
+               e
+               (List.iter oncase)));
         fallback.expr self e)
   }
 ;;

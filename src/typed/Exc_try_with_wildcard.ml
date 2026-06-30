@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -46,18 +46,16 @@ let run _ fallback =
         let open Typedtree in
         let loc = expr.exp_loc in
         (* TODO: support exceptions during matching *)
-        Tast_pattern.parse
-          pat
-          loc
-          ~on_error:(fun _desc () -> ())
-          expr
-          (fun { loc } () ->
+        if Config.is_lint_enabled lint_id
+        then (
+          let handler { Location.loc } () =
             (* Reported location is a location of whole match and not of pattern
-               TODO: understand how to fix it *)
+             TODO: understand how to fix it *)
             (* Format.printf "%a\n%!" Location.print_loc loc; *)
             let filename = loc.Location.loc_start.Lexing.pos_fname in
-            Collected_lints.add ~loc (report ~filename ~loc ()))
-          ();
+            Collected_lints.add ~loc (report ~filename ~loc ())
+          in
+          Tast_pattern.parse pat loc ~on_error:(fun _desc () -> ()) expr handler ());
         fallback.expr self expr)
   }
 ;;

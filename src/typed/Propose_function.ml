@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -67,26 +67,24 @@ let run _ fallback =
       (fun self expr ->
         let open Typedtree in
         let loc = expr.exp_loc in
-        Tast_pattern.parse
-          (pat ())
-          loc
-          ~on_error:(fun _desc () -> ())
-          expr
-          (fun (scru_ident, scru_loc) match_expr _scru_loc scru_pat cases () ->
-            match scru_pat with
-            | Path.Pident id ->
-              if
-                String.equal (Ident.name scru_ident) (Ident.name id)
-                && List.for_all cases ~f:(no_ident scru_ident)
-              then (
-                let filename = loc.Location.loc_start.Lexing.pos_fname in
-                Collected_lints.add ~loc (report ~filename ~loc ());
-                Refactoring.Propose_function.register_fix
-                  ~loc:match_expr.exp_loc
-                  scru_loc
-                  cases)
-            | _ -> ())
-          ();
+        let handler (scru_ident, scru_loc) match_expr _scru_loc scru_pat cases () =
+          match scru_pat with
+          | Path.Pident id ->
+            if
+              String.equal (Ident.name scru_ident) (Ident.name id)
+              && List.for_all cases ~f:(no_ident scru_ident)
+            then (
+              let filename = loc.Location.loc_start.Lexing.pos_fname in
+              Collected_lints.add ~loc (report ~filename ~loc ());
+              Refactoring.Propose_function.register_fix
+                ~loc:match_expr.exp_loc
+                scru_loc
+                cases)
+          | _ -> ()
+        in
+        if Config.is_lint_enabled lint_id
+        then
+          Tast_pattern.parse (pat ()) loc ~on_error:(fun _desc () -> ()) expr handler ();
         fallback.expr self expr)
   }
 ;;

@@ -97,10 +97,18 @@ let on_spell payload =
 module First = struct
   type input = Tast_iterator.iterator
 
-  let lint_id = "on_offer"
+  let lint_id = "on_offer_prologue"
   let level = LINT.Warn
-  let lint_source = LINT.FPCourse
-  let documentation = {||} |> String.trim
+  let lint_source = LINT.Other
+
+  let documentation =
+    String.trim
+      {|
+  This Technical lint helper manages state that allows to disable and enable lints in the module scope.
+  |}
+  ;;
+
+  (* TODO: level and source should not be defined for technical lints, but it should be fixes later. *)
 
   let describe_as_json () =
     describe_as_clippy_json lint_id ~group:LINT.Style ~level ~docs:documentation
@@ -132,15 +140,10 @@ end
 module Last = struct
   type input = Tast_iterator.iterator
 
-  let lint_id = "on_offer"
+  let lint_id = "on_offer_epilogue"
   let level = LINT.Warn
   let lint_source = LINT.FPCourse
-
-  let documentation =
-    {|
-|}
-    |> String.trim
-  ;;
+  let documentation = First.documentation
 
   let describe_as_json () =
     describe_as_clippy_json lint_id ~group:LINT.Style ~level ~docs:documentation

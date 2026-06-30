@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -51,13 +51,15 @@ let run info (fallback : Tast_iterator.iterator) =
           fallback.type_kind self cd;
           match cd with
           | Ttype_variant cds ->
-            List.iter
-              (fun cd ->
-                let loc = cd.Typedtree.cd_loc in
-                let filename = loc.Location.loc_start.Lexing.pos_fname in
-                if not (List.exists is_doc_attribute cd.cd_attributes)
-                then Collected_lints.add ~loc (report ~filename cd.cd_name.txt ~loc))
-              cds
+            if Config.is_lint_enabled lint_id
+            then
+              List.iter
+                (fun cd ->
+                  let loc = cd.Typedtree.cd_loc in
+                  let filename = loc.Location.loc_start.Lexing.pos_fname in
+                  if not (List.exists is_doc_attribute cd.cd_attributes)
+                  then Collected_lints.add ~loc (report ~filename cd.cd_name.txt ~loc))
+                cds
           | _ -> ())
     }
   else fallback

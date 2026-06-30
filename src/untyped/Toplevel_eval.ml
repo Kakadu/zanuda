@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -42,7 +42,11 @@ let run info (fallback : Ast_iterator.iterator) =
         match si.pstr_desc with
         | Pstr_eval (_, _) ->
           let loc = si.pstr_loc in
-          Collected_lints.add ~loc (report ~filename:(Utils.source_of_info info) ~loc ())
+          if Config.is_lint_enabled lint_id
+          then
+            Collected_lints.add
+              ~loc
+              (report ~filename:(Utils.source_of_info info) ~loc ())
         | _ -> ())
   ; expr =
       (fun self e ->

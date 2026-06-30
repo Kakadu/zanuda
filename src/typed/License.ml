@@ -3,7 +3,7 @@
 
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Dmitrii Kosarev a.k.a. Kakadu *)
+(** Copyright 2021-2026, Dmitrii Kosarev a.k.a. Kakadu *)
 
 (** SPDX-License-Identifier: LGPL-3.0-only *)
 
@@ -194,8 +194,11 @@ let run info fallback =
   { fallback with
     signature =
       (fun _ { sig_items } ->
-        iter_items extract_string_sig (fun l -> l.sig_loc) sig_items)
+        if Config.is_lint_enabled lint_id
+        then iter_items extract_string_sig (fun l -> l.sig_loc) sig_items)
   ; structure =
-      (fun _ { str_items } -> iter_items extract_string (fun l -> l.str_loc) str_items)
+      (fun _ { str_items } ->
+        if Config.is_lint_enabled lint_id
+        then iter_items extract_string (fun l -> l.str_loc) str_items)
   }
 ;;

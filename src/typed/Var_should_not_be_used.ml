@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -170,7 +170,7 @@ let run info (fallback : Tast_iterator.iterator) =
             in
             loop_str tl
         in
-        loop_str x.Typedtree.str_items;
+        if Config.is_lint_enabled lint_id then loop_str x.Typedtree.str_items;
         fallback.structure self x)
   }
 ;;

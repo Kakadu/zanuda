@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -109,15 +109,13 @@ let run _ fallback =
            then (
            let u = Untypeast.(default_mapper.expr default_mapper expr) in
            Format.printf "%a\n%a\n%!" Pprintast.expression u (Printast.expression 0) u); *)
-        Tast_pattern.parse
-          pat
-          loc
-          ~on_error:(fun _desc () -> ())
-          expr
-          (fun detected () ->
+        if Config.is_lint_enabled lint_id
+        then (
+          let handler detected () =
             let filename = loc.Location.loc_start.Lexing.pos_fname in
-            Collected_lints.add ~loc (report filename ~loc detected))
-          ();
+            Collected_lints.add ~loc (report filename ~loc detected)
+          in
+          Tast_pattern.parse pat loc ~on_error:(fun _desc () -> ()) expr handler ());
         fallback.expr self expr)
   }
 ;;

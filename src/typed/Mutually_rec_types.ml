@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -132,7 +132,8 @@ let run _ fallback =
            Some x
            | (exception Not_found) | (exception Not_found_s _) -> None))
            in *)
-        if Array.length comps > 1
+
+        if Config.is_lint_enabled lint_id && Array.length comps > 1
         then (
           let first_dec = List.hd_exn decls in
           let first_loc = first_dec.typ_loc in
