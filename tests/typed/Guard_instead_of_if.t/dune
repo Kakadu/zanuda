@@ -7,12 +7,7 @@
   (:standard
    ;-dsource
    ;
-   ))
- ;  (preprocess
- ;   (pps
- ;    ;ppx_show
- ;    ))
- )
+   )))
 
 (cram
  (deps %{bin:zanuda.exe}))
