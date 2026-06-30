@@ -9,6 +9,9 @@ on:
       - '*.md'
     branches:
       - 'master'
+  schedule:
+    # Runs at 09:00 UTC every Monday
+    - cron: '0 9 * * 1'
 
 env:
   OPAMROOT: /home/opam/.opam
