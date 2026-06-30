@@ -1,6 +1,6 @@
 [@@@ocaml.text "/*"]
 
-(** Copyright 2021-2025, Kakadu. *)
+(** Copyright 2021-2026, Kakadu. *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -44,26 +44,11 @@ let config = { files_to_skip = [] }
 let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 let msg ppf () = Format.fprintf ppf "Disabling *all* warnings is usually a bad idea.%!"
 
-let report ~filename ~loc =
-  let module M = struct
-    let txt ppf () =
-      if not (List.mem filename config.files_to_skip)
-      then Utils.Report.txt ~filename ~loc ppf msg ()
-    ;;
-
-    let rdjsonl ppf () =
-      if not (List.mem filename config.files_to_skip)
-      then
-        RDJsonl.pp
-          ppf
-          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          ~line:loc.loc_start.pos_lnum
-          (fun _ _ -> ())
-          ()
-    ;;
-  end
-  in
-  (module M : LINT.REPORTER)
+let report =
+  Utils.make_reporter
+    ~is_good:(fun filename -> not (List.mem filename config.files_to_skip))
+    lint_id
+    msg
 ;;
 
 let pat =
@@ -81,16 +66,15 @@ let run _ fallback =
       (fun self si ->
         let loc = si.str_loc in
         let () =
-          Tast_pattern.parse
-            pat
-            loc
-            ~on_error:(fun _ -> ())
-            si
-            (function
+          if Config.is_lint_enabled lint_id
+          then (
+            let handler = function
               | "-A" ->
                 let filename = loc.Location.loc_start.Lexing.pos_fname in
-                Collected_lints.add ~loc (report ~loc ~filename)
-              | _ -> ())
+                Collected_lints.add ~loc (report ~loc ~filename ())
+              | _ -> ()
+            in
+            Tast_pattern.parse pat loc ~on_error:(fun _ -> ()) si handler)
         in
         fallback.structure_item self si)
   }
