@@ -8,17 +8,15 @@
  (public_name zanuda.tast_pattern)
  (modules Tast_pattern My_printtyped My_untype)
  (wrapped false)
- (libraries ppxlib)
+ (libraries compiler-libs.common)
  (preprocess
   (pps
    ppx_optcomp
-   ppx_assert
    ppx_inline_test_nobase
    ;
    ))
  (instrumentation
-  (backend bisect_ppx))
- (inline_tests))
+  (backend bisect_ppx)))
 
 (library
  (name ast_pattern_tests)

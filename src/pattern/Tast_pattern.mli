@@ -44,7 +44,8 @@ val pair : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
 val ( ** ) : ('a, 'b, 'c) t -> ('d, 'c, 'e) t -> ('a * 'd, 'b, 'e) t
 val ( ||| ) : ('a, 'b, 'c) t -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
 val conde : ('a, 'b, 'c) t list -> ('a, 'b, 'c) t
-val loc : ('a, 'b, 'c) t -> ('a Location.loc, 'b, 'c) t
+
+(* val loc : ('a, 'b, 'c) t -> ('a Location.loc, 'b, 'c) t *)
 val ( >>| ) : ('a, 'b, 'c) t -> ('d -> 'b) -> ('a, 'd, 'c) t
 val list : ('a, 'b -> 'b, 'c) t -> ('a list, 'c list -> 'd, 'd) t
 

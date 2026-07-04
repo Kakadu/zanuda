@@ -201,3 +201,113 @@ let%expect_test "List.fold circumflex" =
     (fun _ -> print_endline "OK");
   [%expect "OK"]
 ;;
+
+open Tast_pattern
+
+let path_of_list = function
+  | [] -> failwith "Bad argument: path_of_list"
+  | s :: tl ->
+    ListLabels.fold_left
+      tl
+      ~init:(Path.Pident (Ident.create_local s))
+      ~f:(fun acc x -> Path.Pdot (acc, x))
+;;
+
+let%test_module "Pasing List.length" =
+  (module struct
+    [@@@coverage off]
+
+    let names = [ "Stdlib!"; "List"; "length" ]
+
+    [%%if ocaml_version < (5, 0, 0)]
+
+    let pp_path = Path.print
+
+    [%%else]
+
+    let pp_path = Format_doc.compat Path.print
+
+    [%%endif]
+
+    let%test "Check List.length has the path we expect" =
+      (* Previously we used here ppx_assert that can print the values that are not equal,
+      but for the sake of reducting deps count it is removed *)
+      let old = !Clflags.unique_ids in
+      Clflags.unique_ids := false;
+      let ans =
+        String.equal
+          "Stdlib!.List.length"
+          (Format.asprintf "%a" pp_path (path_of_list names))
+      in
+      Clflags.unique_ids := old;
+      ans
+    ;;
+
+    let%test "parse List.length" =
+      let noloc =
+        Warnings.
+          { loc_start = Lexing.dummy_pos; loc_end = Lexing.dummy_pos; loc_ghost = true }
+      in
+      parse (path names) noloc ~on_error:(fun _ -> false) (path_of_list names) true
+    ;;
+  end)
+;;
+
+let%test_module "Fake tests, only to increase coverage" =
+  (module struct
+    [@@@coverage off]
+
+    let noloc =
+      Warnings.
+        { loc_start = Lexing.dummy_pos; loc_end = Lexing.dummy_pos; loc_ghost = true }
+    ;;
+
+    let%test _ =
+      match path_of_list [] with
+      | exception Failure _ -> true
+      | _ -> false
+    ;;
+
+    let mk p ?(inv = false) what =
+      let on_error, rez = if inv then Fun.const true, false else Fun.const false, true in
+      parse p noloc ~on_error what rez
+    ;;
+
+    let%test _ =
+      Bool.equal
+        true
+        (mk
+           ~inv:true
+           (path_pident drop)
+           Path.(Pdot (Pident (Ident.create_local "List"), "map")))
+    ;;
+
+    let%test _ = mk (path_pident drop) Path.(Pident (Ident.create_local "compare"))
+    let%test _ = mk ~inv:true (labelled drop) Asttypes.Nolabel
+
+    let%test _ =
+      mk
+        (econst drop)
+        { Typedtree.exp_desc = Texp_constant (Asttypes.Const_string ("", noloc, None))
+        ; exp_extra = []
+        ; exp_type = Predef.type_string
+        ; exp_loc = noloc
+        ; exp_env = Env.empty
+        ; exp_attributes = []
+        }
+    ;;
+
+    let%test _ =
+      let _42 =
+        { Typedtree.exp_desc = Texp_constant (Asttypes.Const_int 42)
+        ; exp_extra = []
+        ; exp_type = Predef.type_int
+        ; exp_loc = noloc
+        ; exp_env = Env.empty
+        ; exp_attributes = []
+        }
+      in
+      mk (econst drop) _42
+    ;;
+  end)
+;;
