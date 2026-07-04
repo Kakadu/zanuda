@@ -25,15 +25,7 @@
  (modules_without_implementation LINT)
  (flags
   (:standard -w -no-cmx-file))
- (libraries
-  base
-  compiler-libs.common
-  dune-build-info
-  findlib.dynload
-  sexplib
-  unix
-  yojson
-  Tast_pattern)
+ (libraries base compiler-libs.common sexplib unix yojson Tast_pattern)
  (preprocess
   (pps
    ppx_optcomp
@@ -51,9 +43,11 @@
  (modules main)
  (libraries
   base
-  yojson
-  ppxlib
+  dune-build-info
   compiler-libs.common
+  findlib.dynload
+  ppxlib
+  yojson
   Tast_pattern
   zanuda_core
   TypedLints

@@ -7,6 +7,8 @@ homepage: "https://github.com/Kakadu/zanuda"
 bug-reports: "https://github.com/Kakadu/zanuda/issues"
 depends: [
   "dune" {>= "3.4"}
+  "zanuda"
+  "dune-build-info"
   "odoc" {with-doc}
 ]
 build: [
