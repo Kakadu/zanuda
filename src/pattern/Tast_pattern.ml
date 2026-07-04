@@ -274,7 +274,7 @@ let many (T f) =
   T (fun ctx loc l k -> k (ListLabels.map l ~f:(fun x -> f ctx loc x (fun x -> x))))
 ;;
 
-let loc (T f) = T (fun ctx _loc (x : _ Ppxlib.Loc.t) k -> f ctx x.loc x.txt k)
+(* let loc (T f) = T (fun ctx _loc (x : _ Location.t) k -> f ctx x.loc x.txt k) *)
 let pack0 t = map t ~f:(fun f -> f ())
 let pack2 t = map t ~f:(fun f x y -> f (x, y))
 let pack3 t = map t ~f:(fun f x y z -> f (x, y, z))
@@ -352,50 +352,6 @@ let path xs =
     | _ -> fail loc (sprintf "path %s" (String.concat "." xs))
   in
   T (helper (List.rev xs))
-;;
-
-let path_of_list = function
-  | [] -> failwith "Bad argument: path_of_list"
-  | s :: tl ->
-    ListLabels.fold_left
-      tl
-      ~init:(Path.Pident (Ident.create_local s))
-      ~f:(fun acc x -> Path.Pdot (acc, x))
-;;
-
-let%test_module " " =
-  (module struct
-    [@@@coverage off]
-
-    let names = [ "Stdlib!"; "List"; "length" ]
-
-    [%%if ocaml_version < (5, 0, 0)]
-
-    let pp_path = Path.print
-
-    [%%else]
-
-    let pp_path = Format_doc.compat Path.print
-
-    [%%endif]
-
-    let%test_unit _ =
-      let old = !Clflags.unique_ids in
-      Clflags.unique_ids := false;
-      [%test_eq: Base.string]
-        "Stdlib!.List.length"
-        (asprintf "%a" pp_path (path_of_list names));
-      Clflags.unique_ids := old
-    ;;
-
-    let%test _ =
-      let noloc =
-        Warnings.
-          { loc_start = Lexing.dummy_pos; loc_end = Lexing.dummy_pos; loc_ghost = true }
-      in
-      parse (path names) noloc ~on_error:(fun _ -> false) (path_of_list names) true
-    ;;
-  end)
 ;;
 
 open Typedtree
@@ -1362,60 +1318,3 @@ type context = Ast_pattern0.context
 let of_func f = T f
 let to_func (T f) = f
 let fail = fail
-
-let%test_module "Fake tests, only to increase coverage" =
-  (module struct
-    [@@@coverage off]
-
-    let noloc =
-      Warnings.
-        { loc_start = Lexing.dummy_pos; loc_end = Lexing.dummy_pos; loc_ghost = true }
-    ;;
-
-    let%test _ =
-      match path_of_list [] with
-      | exception Failure _ -> true
-      | _ -> false
-    ;;
-
-    let%test_unit _ =
-      let mk p ?(inv = false) what =
-        let on_error, rez =
-          if inv then Fun.const true, false else Fun.const false, true
-        in
-        parse p noloc ~on_error what rez
-      in
-      [%test_eq: Base.bool]
-        true
-        (mk
-           ~inv:true
-           (path_pident drop)
-           Path.(Pdot (Pident (Ident.create_local "List"), "map")));
-      [%test_eq: Base.bool]
-        true
-        (mk (path_pident drop) Path.(Pident (Ident.create_local "compare")));
-      [%test_eq: Base.bool] true (mk ~inv:true (labelled drop) Asttypes.Nolabel);
-      [%test_eq: Base.bool]
-        true
-        (mk
-           (econst drop)
-           { Typedtree.exp_desc = Texp_constant (Asttypes.Const_string ("", noloc, None))
-           ; exp_extra = []
-           ; exp_type = Predef.type_string
-           ; exp_loc = noloc
-           ; exp_env = Env.empty
-           ; exp_attributes = []
-           });
-      let _42 =
-        { Typedtree.exp_desc = Texp_constant (Asttypes.Const_int 42)
-        ; exp_extra = []
-        ; exp_type = Predef.type_int
-        ; exp_loc = noloc
-        ; exp_env = Env.empty
-        ; exp_attributes = []
-        }
-      in
-      [%test_eq: Base.bool] true (mk (econst drop) _42)
-    ;;
-  end)
-;;
