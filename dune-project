@@ -97,3 +97,7 @@
    (and
     (= 0.27.0)
     :with-dev-setup))))
+
+(package
+ (name demo-zanuda-plugin)
+ (depends zanuda dune-build-info))

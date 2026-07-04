@@ -16,8 +16,8 @@ promote:
 	dune test --auto-promote
 
 install:
-	dune build @install -p reviewer,zanuda
-	dune install reviewer zanuda
+	dune build @install -p reviewer,zanuda,demo-zanuda-plugin
+	dune install reviewer zanuda demo-zanuda-plugin
 
 uninstall:
 	dune build @install
@@ -37,7 +37,7 @@ ODIG_SWITCHES += --no-tag-index
 ODIG_SWITCHES += --no-pkg-deps
 .PHONY: odig
 odig:
-	odig odoc $(ODIG_SWITCHES) zanuda reviewer
+	odig odoc $(ODIG_SWITCHES) zanuda demo-zanuda-plugin reviewer
 	@echo 'To look at the doc run: xdg-open $$(odig cache path)/html/index.html'
 
 TEST_COV_D = /tmp/zanudacov

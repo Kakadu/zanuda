@@ -32,6 +32,7 @@ type t =
   ; all_lints : string Base.Hash_set.t
   ; mutable skip_level_allow : bool
   ; mutable check_filesystem : bool
+  ; mutable plugin_name_suffix : string option
   }
 
 let opts =
@@ -49,6 +50,7 @@ let opts =
   ; all_lints = Base.Hash_set.create (module Base.String)
   ; skip_level_allow = true
   ; check_filesystem = true
+  ; plugin_name_suffix = None
   }
 ;;
 
@@ -87,6 +89,8 @@ let verbose () = opts.verbose
 let gen_replacements () = opts.gen_replacements
 let set_verbose () = opts.verbose <- true
 let set_skip_level_allow b = opts.skip_level_allow <- b
+let set_plugin_name_suffix s = opts.plugin_name_suffix <- Some s
+let plugin_name_suffix () = opts.plugin_name_suffix
 
 let recover_filepath filepath =
   let filepath =
@@ -139,6 +143,9 @@ let parse_args () =
     ; ( "-skip-level-allow"
       , Arg.Bool set_skip_level_allow
       , "[bool] Skip lints with level = Allow" )
+    ; ( "-with-plugins"
+      , Arg.String set_plugin_name_suffix
+      , "PREFIX Try to load plugins whos name ends with PREFIX" )
     ; "-v", Arg.Unit set_verbose, "More verbose output"
     ; ( "-version"
       , Arg.Unit

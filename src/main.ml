@@ -6,7 +6,6 @@
 
 [@@@ocaml.text "/*"]
 
-open Base
 open Zanuda_core
 open Utils
 
@@ -59,21 +58,23 @@ let typed_linters =
   ]
 ;;
 
+module Hash_set = Base.Hash_set
+
 (* prepare for disabling some lints *)
 let () =
   let enabled = Config.enabled_lints () in
   let all = Config.all_lints () in
-  assert (Hash_set.length enabled = 0);
-  assert (Hash_set.length all = 0);
-  List.iter untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
+  assert (Base.Hash_set.length enabled = 0);
+  assert (Base.Hash_set.length all = 0);
+  ListLabels.iter untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
     Hash_set.add all L.lint_id;
     if not (String.equal L.lint_id UntypedLints.Toplevel_eval.lint_id)
     then Hash_set.add enabled L.lint_id);
-  List.iter typed_linters ~f:(fun (module L : LINT.TYPED) ->
+  ListLabels.iter typed_linters ~f:(fun (module L : LINT.TYPED) ->
     (* Format.printf "   ENABLE %s\n%!" L.lint_id; *)
     Hash_set.add all L.lint_id;
     Hash_set.add enabled L.lint_id);
-  List.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
+  ListLabels.iter per_file_linters ~f:(fun (module L : LINT.TYPED) ->
     Hash_set.add all L.lint_id;
     Hash_set.add enabled L.lint_id);
   ()
@@ -82,7 +83,7 @@ let () =
 (* TODO(Kakadu): Functions below are a little bit copy-pasty. Rework them *)
 let process_per_file_linters_str info parsetree =
   let is_enabled = Config.is_enabled () in
-  List.iter per_file_linters ~f:(fun ((module L : LINT.TYPED) as lint) ->
+  ListLabels.iter per_file_linters ~f:(fun ((module L : LINT.TYPED) as lint) ->
     if is_enabled (lint :> (module LINT.GENERAL))
     then
       let open Tast_iterator in
@@ -91,7 +92,7 @@ let process_per_file_linters_str info parsetree =
 
 let process_per_file_linters_sig info parsetree =
   let is_enabled = Config.is_enabled () in
-  List.iter per_file_linters ~f:(fun ((module L : LINT.TYPED) as lint) ->
+  ListLabels.iter per_file_linters ~f:(fun ((module L : LINT.TYPED) as lint) ->
     if is_enabled (lint :> (module LINT.GENERAL))
     then
       let open Tast_iterator in
@@ -99,7 +100,7 @@ let process_per_file_linters_sig info parsetree =
 ;;
 
 let build_iterator ~init ~compose ~f xs =
-  let o = List.fold_left ~f:(fun acc lint -> compose lint acc) ~init xs in
+  let o = ListLabels.fold_left ~f:(fun acc lint -> compose lint acc) ~init xs in
   f o
 ;;
 
@@ -126,6 +127,18 @@ let untyped_on_signature info =
 ;;
 
 let run_typed_lints entry info =
+  let typed_linters =
+    match typed_linters with
+    | h :: tl ->
+      let dyn = Dynamic_plugins.all () in
+      (* Format.printf "There are %d dyn plugins\n%!" (List.length dyn); *)
+      List.iter
+        (fun (module L : LINT.TYPED) ->
+          Base.Hash_set.add Config.(opts.enabled_lints) L.lint_id)
+        dyn;
+      h :: (dyn @ tl)
+    | [] -> exit 1
+  in
   let is_enabled = Config.is_enabled () in
   build_iterator
     ~f:entry
@@ -185,9 +198,9 @@ let process_untyped filename =
       let parsetree = Compile_common.parse_intf info in
       untyped_on_signature info parsetree
     in
-    if String.is_suffix filename ~suffix:".ml"
+    if String.ends_with filename ~suffix:".ml"
     then Utils.(with_info Impl) ~source_file:filename (fun info -> process_structure info)
-    else if String.is_suffix filename ~suffix:".mli"
+    else if String.ends_with filename ~suffix:".mli"
     then Utils.(with_info Intf) ~source_file:filename (fun info -> process_signature info)
     else (
       let () =
@@ -205,17 +218,17 @@ let () =
   if Stdlib.Sys.file_exists config_filename
   then (
     let s = In_channel.with_open_text config_filename In_channel.input_all in
-    String.split s ~on:'\n'
-    |> List.iter ~f:(fun s ->
+    Base.String.split s ~on:'\n'
+    |> List.iter (fun s ->
       let s = Stdlib.String.trim s in
-      if String.is_empty s
+      if String.length s = 0
       then ()
-      else if String.is_prefix s ~prefix:"-no-"
+      else if String.starts_with s ~prefix:"-no-"
       then (
-        let lint_name = String.chop_prefix_exn s ~prefix:"-no-" in
+        let lint_name = Base.String.chop_prefix_exn s ~prefix:"-no-" in
         Config.(Hash_set.remove opts.enabled_lints lint_name))
       else (
-        match String.split ~on:' ' s with
+        match Base.String.split ~on:' ' s with
         | "forward" :: lint_id :: rest
           when String.equal lint_id TypedLints.Hashtables.lint_id ->
           TypedLints.Hashtables.process_switches rest
@@ -229,26 +242,40 @@ let () =
 let () =
   Config.parse_args ();
   let () =
+    match Config.plugin_name_suffix () with
+    | None -> ()
+    | Some suffix ->
+      Findlib.init ();
+      let all_pkgs = Fl_package_base.list_packages () in
+      let plugins = List.filter (String.ends_with ~suffix) all_pkgs in
+      Format.printf
+        "Loading plugins: [ %a ]\n%!"
+        (Format.pp_print_list Format.pp_print_string)
+        plugins;
+      Fl_dynload.load_packages plugins
+  in
+  let () =
     match Config.mode () with
     | Config.Unspecified -> ()
     | Dump_text ->
       let f (module L : LINT.GENERAL) =
         Format.printf "\n\n## Lint '%s'\n\n%s\n" L.lint_id L.documentation
       in
-      List.iter ~f (untyped_linters :> (module LINT.GENERAL) list);
-      List.iter ~f (typed_linters :> (module LINT.GENERAL) list);
+      List.iter f (untyped_linters :> (module LINT.GENERAL) list);
+      List.iter f (typed_linters :> (module LINT.GENERAL) list);
       exit 0
     | Dump_json filename ->
       let info =
         List.concat
-          [ List.map untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
+          [ ListLabels.map untyped_linters ~f:(fun (module L : LINT.UNTYPED) ->
               L.lint_id, L.describe_as_json ())
-          ; List.map (per_file_linters @ typed_linters) ~f:(fun (module L : LINT.TYPED) ->
-              L.lint_id, L.describe_as_json ())
+          ; ListLabels.map
+              (per_file_linters @ typed_linters)
+              ~f:(fun (module L : LINT.TYPED) -> L.lint_id, L.describe_as_json ())
           ; [ Lint_filesystem.lint_id, Lint_filesystem.describe_as_json () ]
           ]
-        |> List.sort ~compare:(fun (a, _) (b, _) -> String.compare a b)
-        |> List.map ~f:snd
+        |> List.sort (fun (a, _) (b, _) -> String.compare a b)
+        |> List.map snd
       in
       Out_channel.with_open_text filename (fun ch ->
         Yojson.Safe.pretty_to_channel ~std:true ch (`List info));
