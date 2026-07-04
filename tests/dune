@@ -6,3 +6,10 @@
  (applies_to commandline)
  (deps untyped/zanuda.exe)
  (package zanuda))
+
+(cram
+ (applies_to plugin1)
+ (deps
+  untyped/zanuda.exe
+  (package zanuda)
+  (package demo-zanuda-plugin)))

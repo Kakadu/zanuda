@@ -11,6 +11,7 @@
  (public_name zanuda.core)
  (synopsis "Core library for the linter")
  (modules
+  Dynamic_plugins
   Dune_project
   Collected_lints
   Collected_decls
@@ -27,10 +28,11 @@
  (libraries
   base
   compiler-libs.common
-  sexplib
-  yojson
   dune-build-info
+  findlib.dynload
+  sexplib
   unix
+  yojson
   Tast_pattern)
  (preprocess
   (pps
@@ -61,3 +63,11 @@
  (instrumentation
   (backend bisect_ppx))
  (package zanuda))
+
+(library
+ (name demo_zanuda_plugin)
+ (public_name demo-zanuda-plugin)
+ (modules demo_zanuda_plugin)
+ (libraries zanuda_core)
+ (instrumentation
+  (backend bisect_ppx)))
