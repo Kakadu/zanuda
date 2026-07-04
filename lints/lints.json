@@ -253,22 +253,22 @@
     }
   },
   {
-    "id": "on_offer",
+    "id": "on_offer_epilogue",
     "group": "style",
     "level": "warn",
     "impl": "typed",
-    "docs": "",
+    "docs": "This Technical lint helper manages state that allows to disable and enable lints in the module scope.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
     }
   },
   {
-    "id": "on_offer",
+    "id": "on_offer_prologue",
     "group": "style",
     "level": "warn",
     "impl": "typed",
-    "docs": "",
+    "docs": "This Technical lint helper manages state that allows to disable and enable lints in the module scope.",
     "applicability": {
       "is_multi_part_suggestion": false,
       "applicability": "Unresolved"
