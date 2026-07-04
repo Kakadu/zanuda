@@ -240,6 +240,15 @@ let () =
 ;;
 
 let () =
+  let () =
+    let open Build_info.V1 in
+    let s =
+      Printf.sprintf
+        "version: %s\n"
+        (Option.fold ~none:"n/a" ~some:Version.to_string (version ()))
+    in
+    Config.opts.build_info <- s
+  in
   Config.parse_args ();
   let () =
     match Config.plugin_name_suffix () with

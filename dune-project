@@ -90,6 +90,7 @@
    (and
     (>= 0.15.0)
     (<= 0.16.0)))
+  dune-build-info
   ppx_inline_test
   ppx_expect
   (bisect_ppx :with-dev-setup)

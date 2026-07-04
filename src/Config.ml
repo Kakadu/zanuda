@@ -33,6 +33,7 @@ type t =
   ; mutable skip_level_allow : bool
   ; mutable check_filesystem : bool
   ; mutable plugin_name_suffix : string option
+  ; mutable build_info: string
   }
 
 let opts =
@@ -51,6 +52,7 @@ let opts =
   ; skip_level_allow = true
   ; check_filesystem = true
   ; plugin_name_suffix = None
+  ; build_info = "No loaded yet"
   }
 ;;
 
@@ -150,10 +152,9 @@ let parse_args () =
     ; ( "-version"
       , Arg.Unit
           (fun () ->
-            let open Build_info.V1 in
             Printf.printf
-              "version: %s\n"
-              (Option.fold ~none:"n/a" ~some:Version.to_string (version ())))
+              "version: %s\n" opts.build_info
+            )
       , " Print version" )
     ; ( "-diffs-with-fixes"
       , Arg.Unit (fun () -> opts.gen_replacements <- true)

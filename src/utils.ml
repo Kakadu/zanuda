@@ -513,6 +513,7 @@ module Report = struct
 end
 
 let make_reporter ?(is_good = fun _ -> true) lint_id msg ~loc ~filename info =
+  (* TODO: make filename optional and reconstruct it from [loc] *)
   let module M = struct
     let txt ppf () = if is_good filename then Report.txt ~loc ~filename ppf msg info
     let is_valid () = is_good filename
