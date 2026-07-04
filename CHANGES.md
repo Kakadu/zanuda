@@ -4,11 +4,15 @@
 
 ### Changed
 
+- #90: OCaml 5.5 support added. Before: 4.12 and 5.3 only.
 - #78: Fix false positives while detecting used variables that start from `_`
 - #80: Disable fixes collection by default.
+- #82: Detect `[@@@ocaml.warning "-A"]`. Was mentioned somewhere in ocaml.discuss.org.
 - #85: Implement SARIF output format. It is needed for SourceCraft integration.
-- #87: Allow enabling and disabling lints from the source files.
+- #87, #91: Allow enabling and disabling lints from the source files.
     For example, `[@@@zanuda "-eta_reduction,+wrong_ignoring"]` disable one lint and enables another until a module is finished.
+- #92: Loading dynamic plugins with lints. It is currently experimental demo for now, but maybe somebody will be interested. At least extensibility was mentioned as one of the critera in the [survey](https://sim642.eu/blog/2024/05/01/ocaml-linting/).
+
 
 ## 2.0.0 (18-09-2025)
 

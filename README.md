@@ -25,6 +25,7 @@ This linter is inspired by:
 * My experience in teaching OCaml at my local university.
 
 But I'm aware that there are other linters like [Camelot](https://github.com/upenn-cis1xx/camelot) for OCaml and [Clippy](https://github.com/rust-lang/rust-clippy) Rust.
+Two useful surveys should be mentioned too: [Simmo Saan's 2024](https://sim642.eu/blog/2024/05/01/ocaml-linting) and [fantazio's 2026](https://fantazio.eu/about.html).
 
 ##### Usage
 
