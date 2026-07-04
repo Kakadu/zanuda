@@ -60,7 +60,7 @@ jobs:
           opam exec -- dune test --profile=release
 
       - name: Send coverage report to Coveralls
-        if: (github.event_name != 'pull_request')
+        #if: (github.event_name != 'pull_request')
         run: |
           git config --global --add safe.directory /__w/zanuda/zanuda
           opam exec -- make coverage
