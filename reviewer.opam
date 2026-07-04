@@ -4,7 +4,7 @@ version: "2.0.0"
 synopsis: "Creator of review for GitHub PR"
 description:
   "The tool for creating review in GitHub Pull Requests by zanuda's report"
-maintainer: ["kakadu@pm.me"]
+maintainer: ["kakadu.hafanana@gmail.com"]
 authors: ["Kakadu"]
 license: "LGPL-3.0-only"
 homepage: "https://github.com/Kakadu/zanuda"

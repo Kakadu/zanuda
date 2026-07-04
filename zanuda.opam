@@ -4,7 +4,7 @@ version: "2.0.0"
 synopsis: "Linter for OCaml+dune projects"
 description:
   "Lints for OCaml projects. Primary usage is for teaching/education"
-maintainer: ["kakadu@pm.me"]
+maintainer: ["kakadu.hafanana@gmail.com"]
 authors: ["Kakadu"]
 license: "LGPL-3.0-only"
 tags: ["lint" "test"]
@@ -18,9 +18,7 @@ depends: [
   "yojson" {>= "2.0.0"}
   "angstrom" {>= "0.15.0" & <= "0.16.0"}
   "sexplib"
-  "bisect_ppx" {with-dev-setup}
   "dune-build-info"
-  "ppx_assert"
   "ppx_expect_nobase"
   "ppx_optcomp"
   "base" {with-test}
@@ -30,6 +28,7 @@ depends: [
   "ppx_deriving" {with-test}
   "ppx_blob" {with-test}
   "menhir" {with-test}
+  "bisect_ppx" {with-dev-setup}
   "ocamlformat" {= "0.27.0" & with-dev-setup}
   "odig" {with-doc}
   "odoc" {with-doc}

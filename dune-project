@@ -11,7 +11,7 @@
 
 (authors "Kakadu")
 
-(maintainers "kakadu@pm.me")
+(maintainers "kakadu.hafanana@gmail.com")
 
 (name zanuda)
 
@@ -46,19 +46,17 @@
     (>= 0.15.0)
     (<= 0.16.0)))
   sexplib
-  (bisect_ppx :with-dev-setup)
   dune-build-info
-  ppx_assert
   ppx_expect_nobase
   ppx_optcomp
   (base :with-test)
-  ;(ppx_assert :with-test)
   (ppx_inline_test :with-test)
   (ppx_expect :with-test)
   (ppx_fields_conv :with-test)
   (ppx_deriving :with-test)
   (ppx_blob :with-test) ; currently required for ToplevelEval test
   (menhir :with-test)
+  (bisect_ppx :with-dev-setup)
   (ocamlformat
    (and
     (= 0.27.0)
@@ -101,4 +99,5 @@
 
 (package
  (name demo-zanuda-plugin)
+ (synopsis "A demo for dynamically loadable Zanuda plugin")
  (depends zanuda dune-build-info))
