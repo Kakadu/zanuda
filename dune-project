@@ -49,6 +49,7 @@
   dune-build-info
   ppx_expect_nobase
   ppx_optcomp
+  ppx_sexp_conv
   (base :with-test)
   (ppx_inline_test :with-test)
   (ppx_expect :with-test)
