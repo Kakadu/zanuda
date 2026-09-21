@@ -23,6 +23,7 @@
         "results": [
           {
             "message": { "text": "Type name `exprA` should be in snake case" },
+            "ruleId": "camel_cased_types",
             "locations": [
               {
                 "physicalLocation": {
@@ -36,6 +37,7 @@
             "message": {
               "text": "Constructor 'App' has no documentation attribute"
             },
+            "ruleId": "no_docs_parsetree",
             "locations": [
               {
                 "physicalLocation": {
@@ -49,6 +51,7 @@
             "message": {
               "text": "Constructor 'Abs' has no documentation attribute"
             },
+            "ruleId": "no_docs_parsetree",
             "locations": [
               {
                 "physicalLocation": {

@@ -10,7 +10,7 @@
 
 type json = Yojson.Safe.t
 
-let make_sarif_message ~loc ~filename ~msg arg : json =
+let make_sarif_message ~loc ~filename ~rule_id ~msg arg : json =
   let jmsg = `Assoc [ "text", `String (Format.asprintf "%a" msg arg) ] in
   let jloc : Yojson.Safe.t =
     let physloc : Yojson.Safe.t =
@@ -21,7 +21,7 @@ let make_sarif_message ~loc ~filename ~msg arg : json =
     in
     `Assoc [ "physicalLocation", physloc ]
   in
-  `Assoc [ "message", jmsg; "locations", `List [ jloc ] ]
+  `Assoc [ "message", jmsg; "ruleId", `String rule_id; "locations", `List [ jloc ] ]
 ;;
 
 open Format
@@ -509,7 +509,7 @@ module Report = struct
     RDJsonl.pp ppf ~filename ~line:loc.Location.loc_start.pos_lnum ~code msg msg_arg
   ;;
 
-  let sarif ~loc ~filename ~msg arg = Some (make_sarif_message ~loc ~filename ~msg arg)
+  let sarif ~loc ~filename ~rule_id ~msg arg = Some (make_sarif_message ~loc ~filename ~rule_id ~msg arg)
 end
 
 let make_reporter ?(is_good = fun _ -> true) lint_id msg ~loc ~filename info =
@@ -534,6 +534,7 @@ let make_reporter ?(is_good = fun _ -> true) lint_id msg ~loc ~filename info =
       Report.sarif
         ~loc
         ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
+        ~rule_id:lint_id
         ~msg
         info
     ;;
