@@ -33,7 +33,7 @@ type t =
   ; mutable skip_level_allow : bool
   ; mutable check_filesystem : bool
   ; mutable plugin_name_suffix : string option
-  ; mutable build_info: string
+  ; mutable build_info : string
   }
 
 let opts =
@@ -150,11 +150,7 @@ let parse_args () =
       , "PREFIX Try to load plugins whos name ends with PREFIX" )
     ; "-v", Arg.Unit set_verbose, "More verbose output"
     ; ( "-version"
-      , Arg.Unit
-          (fun () ->
-            Printf.printf
-              "version: %s\n" opts.build_info
-            )
+      , Arg.Unit (fun () -> Printf.printf "version: %s\n" opts.build_info)
       , " Print version" )
     ; ( "-diffs-with-fixes"
       , Arg.Unit (fun () -> opts.gen_replacements <- true)

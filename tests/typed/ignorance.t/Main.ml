@@ -16,3 +16,10 @@ end
 let () = (fun x -> print_string x) "Eta-reduction reported here too"
 
 [@@@zanuda "Strings should start either from plus or from dash"]
+
+include struct
+[@@@zanuda "-mutability_check"]
+
+type _state = { mutable index : int }
+
+end

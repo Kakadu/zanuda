@@ -123,11 +123,13 @@ let run _ fallback =
             ()
             (* TODO(Kakadu): Algebraic constuctors could have mutable record arguments (issue #59) *)
           | `Check_labels labels ->
-            ListLabels.iter labels ~f:(function
-              | { Typedtree.ld_mutable = Mutable; ld_loc = loc; _ } ->
-                let filename = loc.Location.loc_start.Lexing.pos_fname in
-                Collected_lints.add ~loc (report ~filename ~loc ())
-              | _ -> ())))
+            if Config.is_lint_enabled lint_id
+            then
+              ListLabels.iter labels ~f:(function
+                | { Typedtree.ld_mutable = Mutable; ld_loc = loc; _ } ->
+                  let filename = loc.Location.loc_start.Lexing.pos_fname in
+                  Collected_lints.add ~loc (report ~filename ~loc ())
+                | _ -> ())))
   ; expr =
       (fun self expr ->
         if Config.is_lint_enabled lint_id
