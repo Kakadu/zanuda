@@ -509,7 +509,9 @@ module Report = struct
     RDJsonl.pp ppf ~filename ~line:loc.Location.loc_start.pos_lnum ~code msg msg_arg
   ;;
 
-  let sarif ~loc ~filename ~rule_id ~msg arg = Some (make_sarif_message ~loc ~filename ~rule_id ~msg arg)
+  let sarif ~loc ~filename ~rule_id ~msg arg =
+    Some (make_sarif_message ~loc ~filename ~rule_id ~msg arg)
+  ;;
 end
 
 let make_reporter ?(is_good = fun _ -> true) lint_id msg ~loc ~filename info =

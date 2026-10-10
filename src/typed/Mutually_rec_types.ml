@@ -132,7 +132,6 @@ let run _ fallback =
            Some x
            | (exception Not_found) | (exception Not_found_s _) -> None))
            in *)
-
         if Config.is_lint_enabled lint_id && Array.length comps > 1
         then (
           let first_dec = List.hd_exn decls in
