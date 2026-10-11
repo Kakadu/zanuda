@@ -13,9 +13,14 @@ type json = Yojson.Safe.t
 let make_sarif_message ~loc ~filename ~rule_id ~msg arg : json =
   let jmsg = `Assoc [ "text", `String (Format.asprintf "%a" msg arg) ] in
   let jloc : Yojson.Safe.t =
+    let path =
+      match Sys.getenv "ZANUDA_HACK_SARIF_PREFIX" with
+      | s -> s ^ filename
+      | exception Not_found -> filename
+    in
     let physloc : Yojson.Safe.t =
       `Assoc
-        [ "artifactLocation", `Assoc [ "uri", `String filename ]
+        [ "artifactLocation", `Assoc [ "uri", `String path ]
         ; "region", `Assoc [ "startLine", `Int loc.Location.loc_start.Lexing.pos_lnum ]
         ]
     in
