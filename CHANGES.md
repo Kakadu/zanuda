@@ -2,7 +2,12 @@
 
 ### New
 
+- #94: output in SARIF format
+
 ### Changed
+
+
+## 2.1.0 (4-07-2026)
 
 - #90: OCaml 5.5 support added. Before: 4.12 and 5.3 only.
 - #78: Fix false positives while detecting used variables that start from `_`

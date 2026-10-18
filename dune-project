@@ -17,7 +17,7 @@
 
 (package
  (name zanuda)
- (version 2.0.0)
+ (version 2.1.0)
  (synopsis "Linter for OCaml+dune projects")
  (description
   "Lints for OCaml projects. Primary usage is for teaching/education")
