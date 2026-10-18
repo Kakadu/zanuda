@@ -510,7 +510,7 @@ module Report = struct
   ;;
 
   let rdjsonl ~loc ~filename ~code ppf msg msg_arg =
-    let code = code, Some "https://kakadu.github.io/zanuda/" in
+    let code = code, Some (sprintf "https://kakadu.github.io/zanuda/lints/#%s" code) in
     RDJsonl.pp ppf ~filename ~line:loc.Location.loc_start.pos_lnum ~code msg msg_arg
   ;;
 
