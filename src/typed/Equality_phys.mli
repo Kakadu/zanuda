@@ -7,6 +7,3 @@
 [@@@ocaml.text "/*"]
 
 include Zanuda_core.LINT.TYPED
-
-(** Apply .zanuda config switches *)
-val process_switches : string list -> unit

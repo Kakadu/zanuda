@@ -30,21 +30,6 @@ If you do low level performance hacking, this lint could give false positives.
   |> Stdlib.String.trim
 ;;
 
-(* TODO(Kakadu): This is copy-paste from Hashtables.ml *)
-type config = { mutable files_to_skip : string list }
-
-let config = { files_to_skip = [] }
-
-let process_switches = function
-  | [ "ignore"; files ] ->
-    config.files_to_skip <- Stdlib.String.split_on_char ',' files @ config.files_to_skip
-  | other ->
-    Stdlib.Printf.eprintf
-      "Lint %s: Unsuported switches: %s\n"
-      lint_id
-      (String.concat " " other)
-;;
-
 let describe_as_json () = describe_as_clippy_json lint_id ~docs:documentation
 
 let msg ppf () =
@@ -53,12 +38,7 @@ let msg ppf () =
     "Do you really need physical equality? Physical means the equality of pointers.%!"
 ;;
 
-let report =
-  Utils.make_reporter
-    ~is_good:(fun filename -> not (List.mem filename config.files_to_skip))
-    lint_id
-    msg
-;;
+let report = Utils.make_reporter lint_id msg
 
 let run _ fallback =
   let pat =

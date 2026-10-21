@@ -229,12 +229,9 @@ let () =
         Config.(Hash_set.remove opts.enabled_lints lint_name))
       else (
         match Base.String.split ~on:' ' s with
-        | "forward" :: lint_id :: rest
-          when String.equal lint_id TypedLints.Hashtables.lint_id ->
-          TypedLints.Hashtables.process_switches rest
-        | "forward" :: lint_id :: rest
-          when String.equal lint_id TypedLints.Equality_phys.lint_id ->
-          TypedLints.Equality_phys.process_switches rest
+        (* [forward <lint_id> ignore <paths>] is the older spelling. *)
+        | [ "ignore"; lint_id; files ] | [ "forward"; lint_id; "ignore"; files ] ->
+          Config.ignore_files ~lint_id (Stdlib.String.split_on_char ',' files)
         | "ignore" :: [ rest ] -> Collected_lints.process_switches rest
         | _ -> Format.eprintf ".zanuda: Don't know what to do with %S\n%!" s)))
 ;;

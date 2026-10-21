@@ -1,0 +1,5 @@
+(library
+ (name test_ignore_per_lint)
+ (wrapped false)
+ (modes byte)
+ (modules A B C))
