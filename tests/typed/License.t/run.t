@@ -10,9 +10,14 @@
   3 | open Option
       ^^^^^^^^^^^
   Alert zanuda-linter: OCaml files should provide license information in second line (structure item)
+  File "lib/asdf.mli", line 1:
+  Alert zanuda-linter:  First item in file should be a documentation comment with copyright information. For example:
+              (** Copyright 2021-2022, Winnie Pooh et al. *)
   File "lib/empty.mli", line 1:
   Alert zanuda-linter:  First item in file should be a documentation comment with copyright information. For example:
               (** Copyright 2021-2022, Winnie Pooh et al. *)
+  File "lib/empty.mli", line 1:
+  Alert zanuda-linter: OCaml files should provide license information in second line (structure item)
   File "bad.ml", line 1, characters 0-9:
   1 | let _ = 5
       ^^^^^^^^^
