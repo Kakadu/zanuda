@@ -94,6 +94,22 @@ let set_skip_level_allow b = opts.skip_level_allow <- b
 let set_plugin_name_suffix s = opts.plugin_name_suffix <- Some s
 let plugin_name_suffix () = opts.plugin_name_suffix
 
+(** Files where one lint is not reported, from [ignore <lint_id> <paths>] lines
+    of [.zanuda]: lint id -> path relative to the dune root. *)
+let ignored_files : (string, string) Hashtbl.t = Hashtbl.create 16
+
+let ignore_files ~lint_id files =
+  List.iter (fun file -> Hashtbl.add ignored_files lint_id file) files
+;;
+
+let is_file_ignored ~lint_id filename =
+  let filename =
+    Base.String.chop_prefix filename ~prefix:"_build/default/"
+    |> Option.value ~default:filename
+  in
+  List.exists (String.equal filename) (Hashtbl.find_all ignored_files lint_id)
+;;
+
 let recover_filepath filepath =
   let filepath =
     match prefix_to_cut () with

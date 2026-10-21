@@ -34,20 +34,6 @@ Usually, mutability is added for performance reasons. For example,
   |> Stdlib.String.trim
 ;;
 
-type config = { mutable files_to_skip : string list }
-
-let config = { files_to_skip = [] }
-
-let process_switches = function
-  | [ "ignore"; files ] ->
-    config.files_to_skip <- Stdlib.String.split_on_char ',' files @ config.files_to_skip
-  | other ->
-    Stdlib.Printf.eprintf
-      "Lint %s: Unsuported switches: %s\n"
-      lint_id
-      (String.concat " " other)
-;;
-
 let describe_as_json () =
   describe_as_clippy_json ~group:LINT.Style lint_id ~docs:documentation
 ;;
@@ -62,13 +48,7 @@ let msg ppf () =
      needed there.%!"
 ;;
 
-let report =
-  Utils.make_reporter
-    ~is_good:(fun filename ->
-      not (Base.List.mem config.files_to_skip filename ~equal:String.equal))
-    lint_id
-    msg
-;;
+let report = Utils.make_reporter lint_id msg
 
 let run _ fallback =
   let pat_expr =

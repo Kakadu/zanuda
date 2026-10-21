@@ -9,18 +9,6 @@
 open Dune_project
 
 let lint_id = "lint_filesystem"
-
-(* type config = { mutable files_to_skip : string list }
-
-let config = { files_to_skip = [] }
-
-let process_switches = function
-  | [ "ignore"; files ] ->
-    config.files_to_skip <- Stdlib.String.split_on_char ',' files @ config.files_to_skip
-  | other ->
-    Printf.eprintf "Lint %s: Unsuported switches: %s\n" lint_id (String.concat " " other)
-;; *)
-
 let should_be_omitted filename = String.ends_with ~suffix:".ml-gen" filename
 
 let on_module { impl; intf } =
@@ -30,7 +18,7 @@ let on_module { impl; intf } =
   | None, Some _ | Some _, Some _ -> ()
   | Some ml, None ->
     let filename = Config.recover_filepath ml in
-    if should_be_omitted filename
+    if should_be_omitted filename || Config.is_file_ignored ~lint_id ml
     then ()
     else
       Collected_lints.add
