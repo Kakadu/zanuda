@@ -52,16 +52,24 @@ let make_sarif_json results : Utils.json =
 let report () =
   let touch filename = Unix.close (Unix.openfile filename [ Unix.O_CREAT ] 0o640) in
   let iter_lints =
-    let arr = Queue.to_seq found_Lints |> Array.of_seq in
-    let cmp : Location.t * _ -> _ -> _ = fun (a, _) (b, _) -> Stdlib.compare a b in
+    (* A finding repeats when a node is visited twice; different lints at one location
+       are distinct, so the key includes the rendered text. Filtered findings are
+       dropped first, so one cannot hide another at its location. *)
+    let arr =
+      Queue.to_seq found_Lints
+      |> Seq.filter_map (fun ((loc, (module M : LINT.REPORTER)) as lint) ->
+        if M.is_valid () then Some ((loc, Format.asprintf "%a" M.txt ()), lint) else None)
+      |> Array.of_seq
+    in
+    let cmp (a, _) (b, _) = Stdlib.compare a b in
     Array.sort cmp arr;
     fun f ->
       if Array.length arr = 0
       then ()
       else (
-        f arr.(0);
+        f (snd arr.(0));
         for i = 1 to Array.length arr - 1 do
-          if cmp arr.(i) arr.(i - 1) <> 0 then f arr.(i)
+          if cmp arr.(i) arr.(i - 1) <> 0 then f (snd arr.(i))
         done)
   in
   iter_lints (fun (_loc, (module M : LINT.REPORTER)) -> M.txt Format.std_formatter ());
