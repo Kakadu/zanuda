@@ -13,6 +13,7 @@ Sexplib.Sexp.of_string: incomplete S-expression while in state Parsing_toplevel_
 $ dune describe workspace src/
 When we specify '-dir src' --- it works
   $ ../zanuda.exe -no-top_file_license -dir src -ordjsonl /dev/null | sed '/^[[:space:]]*$/d'
+  File '_build/default/src/Asdf.ml' doesn't have corresponding .mli interface
   File '_build/default/src/Generated.ml' doesn't have corresponding .mli interface
   Alert zanuda-linter: Eta reduction proposed. It's recommended to rewrite 
                        'fun a -> print_int a' as 'print_int'

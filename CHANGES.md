@@ -8,6 +8,7 @@
 
 ### Changed
 
+- #96: Different lints reported at the same location are all printed. Before, all but one were dropped, so `lint_filesystem` reported one missing interface per run.
 
 ## 2.1.0 (4-07-2026)
 
