@@ -3,7 +3,8 @@
 ### New
 
 - #94: output in SARIF format
-- `.zanuda`: `ignore <lint_id> <path>[,<path>...]` skips one lint in the listed files, for every lint. `forward <lint_id> ignore <paths>` is still accepted, now for every lint, not only `mutability_check` and `physical_equality`.
+- #95: `.zanuda`: `ignore <lint_id> <path>[,<path>...]` skips one lint in the listed files, for every lint.
+    `forward <lint_id> ignore <paths>` is still accepted, now for every lint, not only `mutability_check` and `physical_equality`.
 
 ### Changed
 
