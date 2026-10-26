@@ -145,9 +145,10 @@ val nolabel : (Asttypes.arg_label, 'a, 'a) t
 val labelled : (string, 'a, 'b) t -> (Asttypes.arg_label, 'a, 'b) t
 val tpat_var : (string, 'a, 'b) t -> (pattern, 'a, 'b) t
 val tpat_id : (Ident.t, 'a, 'b) t -> (pattern, 'a, 'b) t
+val tpat_alias : (pattern, 'a, 'b) t -> (Ident.t, 'b, 'c) t -> (string, 'c, 'd) t -> (pattern, 'a, 'd) t
 
 val tpat_tuple
-  :  (value general_pattern list, 'a, 'b) t
+  :  (value_pat list, 'a, 'b) t
   -> (value pattern_desc pattern_data, 'a, 'b) t
 
 val tpat_constructor
