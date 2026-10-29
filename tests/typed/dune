@@ -3,7 +3,9 @@
  (modules exec1))
 
 (cram
- (deps ./zanuda.exe)
+ (deps
+  ./zanuda.exe
+  (package zanuda))
  (package zanuda))
 
 (rule
