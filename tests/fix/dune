@@ -1,5 +1,7 @@
 (cram
- (deps %{bin:zanuda}))
+ (deps
+  %{bin:zanuda}
+  (package zanuda)))
 
 (cram
  (applies_to FalseProposeFunction)
