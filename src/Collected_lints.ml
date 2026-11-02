@@ -22,14 +22,16 @@ include struct
   let clear () = Queue.clear found_Lints
   let is_empty () = Queue.is_empty found_Lints
 
-  let add ~loc m =
+  (* The only place a finding is filtered: every output reads [found_Lints]. *)
+  let add ~loc ((module M : LINT.REPORTER) as m) =
+    let fname = loc.Warnings.loc_start.Lexing.pos_fname in
     if
-      List.exists
-        (fun prefix ->
-          let fname = loc.Warnings.loc_start.Lexing.pos_fname in
-          String.starts_with ~prefix fname
-          || String.starts_with ~prefix:("_build/default/" ^ prefix) fname)
-        config.files_to_skip
+      Config.is_file_ignored ~lint_id:M.lint_id fname
+      || List.exists
+           (fun prefix ->
+             String.starts_with ~prefix fname
+             || String.starts_with ~prefix:("_build/default/" ^ prefix) fname)
+           config.files_to_skip
     then ()
     else Queue.add (loc, m) found_Lints
   ;;
@@ -53,12 +55,11 @@ let report () =
   let touch filename = Unix.close (Unix.openfile filename [ Unix.O_CREAT ] 0o640) in
   let iter_lints =
     (* A finding repeats when a node is visited twice; different lints at one location
-       are distinct, so the key includes the rendered text. Filtered findings are
-       dropped first, so one cannot hide another at its location. *)
+       are distinct, so the key includes the rendered text. *)
     let arr =
       Queue.to_seq found_Lints
-      |> Seq.filter_map (fun ((loc, (module M : LINT.REPORTER)) as lint) ->
-        if M.is_valid () then Some ((loc, Format.asprintf "%a" M.txt ()), lint) else None)
+      |> Seq.map (fun ((loc, (module M : LINT.REPORTER)) as lint) ->
+        (loc, Format.asprintf "%a" M.txt ()), lint)
       |> Array.of_seq
     in
     let cmp (a, _) (b, _) = Stdlib.compare a b in
@@ -90,7 +91,7 @@ let report () =
               M.txt
               ();
             ()
-          | Some j -> if M.is_valid () then jsons := j :: !jsons);
+          | Some j -> jsons := j :: !jsons);
         make_sarif_json (List.rev !jsons)
       in
       Out_channel.with_open_text filename (fun ch ->
