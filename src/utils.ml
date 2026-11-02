@@ -519,26 +519,20 @@ module Report = struct
   ;;
 end
 
-let make_reporter ?(is_good = fun _ -> true) lint_id msg ~loc ~filename info =
+let make_reporter lint_id msg ~loc ~filename info =
   (* TODO: make filename optional and reconstruct it from [loc] *)
-  let is_good filename =
-    is_good filename
-    && not (Config.is_file_ignored ~lint_id loc.Location.loc_start.Lexing.pos_fname)
-  in
   let module M = struct
-    let txt ppf () = if is_good filename then Report.txt ~loc ~filename ppf msg info
-    let is_valid () = is_good filename
+    let lint_id = lint_id
+    let txt ppf () = Report.txt ~loc ~filename ppf msg info
 
     let rdjsonl ppf () =
-      if is_good filename
-      then
-        Report.rdjsonl
-          ~loc
-          ~code:lint_id
-          ppf
-          ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
-          msg
-          info
+      Report.rdjsonl
+        ~loc
+        ~code:lint_id
+        ppf
+        ~filename:(Config.recover_filepath loc.loc_start.pos_fname)
+        msg
+        info
     ;;
 
     let sarif () =

@@ -88,6 +88,11 @@ end
 module type REPORTER = sig
   (** *)
 
+  (** Id of the lint that found this defect. {!Collected_lints.add} drops the
+      finding if this lint is ignored for the file, so reporters need no
+      filtering of their own. *)
+  val lint_id : string
+
   (** Report lint info as text. Useful to print to terminal. *)
   val txt : Format.formatter -> unit -> unit
 
@@ -100,7 +105,4 @@ module type REPORTER = sig
   val rdjsonl : Format.formatter -> unit -> unit
 
   val sarif : unit -> Yojson.Safe.t option
-
-  (* TODO: maybe this functionality shold be implemented in every lint  *)
-  val is_valid : unit -> bool
 end

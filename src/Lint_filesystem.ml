@@ -18,12 +18,13 @@ let on_module { impl; intf } =
   | None, Some _ | Some _, Some _ -> ()
   | Some ml, None ->
     let filename = Config.recover_filepath ml in
-    if should_be_omitted filename || Config.is_file_ignored ~lint_id ml
+    if should_be_omitted filename
     then ()
     else
       Collected_lints.add
-        ~loc:Location.none
+        ~loc:(Location.in_file ml)
         (module struct
+          let lint_id = lint_id
           let filename = Config.recover_filepath ml
 
           let msg ppf file =
@@ -32,7 +33,6 @@ let on_module { impl; intf } =
 
           let txt ppf () = Format.fprintf ppf "%a\n" msg ml
           let rdjsonl ppf () = Utils.RDJsonl.pp ppf ~filename ~line:1 msg filename
-          let is_valid () = true
 
           let sarif () =
             Utils.Report.sarif ~loc:Location.none ~filename ~rule_id:lint_id ~msg filename

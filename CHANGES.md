@@ -9,6 +9,7 @@
 ### Changed
 
 - #96: Different lints reported at the same location are all printed. Before, all but one were dropped, so `lint_filesystem` reported one missing interface per run.
+- #99: Findings are filtered once, in `Collected_lints.add`, before any output reads them. `LINT.REPORTER` gains `lint_id` and loses `is_valid`; `Utils.make_reporter` loses `?is_good`. A reporter built by `make_reporter` needs no change.
 
 ## 2.1.0 (4-07-2026)
 
