@@ -218,10 +218,11 @@ let () =
   if Stdlib.Sys.file_exists config_filename
   then (
     let s = In_channel.with_open_text config_filename In_channel.input_all in
+    let bad_lines = ref false in
     Base.String.split s ~on:'\n'
     |> List.iter (fun s ->
       let s = Stdlib.String.trim s in
-      if String.length s = 0
+      if String.length s = 0 || s.[0] = '#'
       then ()
       else if String.starts_with s ~prefix:"-no-"
       then (
@@ -233,7 +234,10 @@ let () =
         | [ "ignore"; lint_id; files ] | [ "forward"; lint_id; "ignore"; files ] ->
           Config.ignore_files ~lint_id (Stdlib.String.split_on_char ',' files)
         | "ignore" :: [ rest ] -> Collected_lints.process_switches rest
-        | _ -> Format.eprintf ".zanuda: Don't know what to do with %S\n%!" s)))
+        | _ ->
+          bad_lines := true;
+          Format.eprintf ".zanuda: Don't know what to do with %S\n%!" s));
+    if !bad_lines then exit 1)
 ;;
 
 let () =
