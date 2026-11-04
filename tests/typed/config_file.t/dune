@@ -1,0 +1,5 @@
+(library
+ (name test_config_file)
+ (wrapped false)
+ (modes byte)
+ (modules A))

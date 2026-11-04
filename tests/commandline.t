@@ -11,6 +11,7 @@ Golint format currently is not used
 Testing config file
   $ echo  '-no-no-topelevel-eval\nasdf' > .zanuda
   $ untyped/zanuda.exe -o file.out -v 2> /dev/null
+  [1]
   $ rm -fr .zanuda
 
   $ untyped/zanuda.exe -dump > /dev/null
