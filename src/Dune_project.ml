@@ -22,7 +22,7 @@ type module_ =
   ; cmt : string option
   ; cmti : string option
   }
-[@@deriving sexp]
+[@@deriving sexp] [@@sexp.allow_extra_fields]
 
 let module_ ?cmt ?cmti name = { name; cmt; cmti; impl = None; intf = None }
 
@@ -32,7 +32,7 @@ type executables =
   ; requires : string list
   ; include_dirs : string list
   }
-[@@deriving of_sexp]
+[@@deriving of_sexp] [@@sexp.allow_extra_fields]
 
 module Library = struct
   type t =
@@ -44,7 +44,7 @@ module Library = struct
     ; modules : module_ list
     ; include_dirs : string list
     }
-  [@@deriving of_sexp]
+  [@@deriving of_sexp] [@@sexp.allow_extra_fields]
 end
 
 type t =
