@@ -32,3 +32,12 @@ A line zanuda cannot interpret is an error, so a typo cannot silently leave a li
   $ zanuda
   .zanuda: Don't know what to do with "ignroe physical_equality A.ml"
   [1]
+
+An `ignore <lint_id> <path>` entry that suppressed nothing is reported.
+  $ cat > .zanuda <<EOF
+  > ignore physical_equality A.ml
+  > ignore physical_equality B.ml
+  > ignore eta_reduction A.ml
+  > EOF
+  $ zanuda | grep '^\.zanuda:'
+  .zanuda: ignore physical_equality B.ml matched no finding

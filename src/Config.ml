@@ -102,12 +102,31 @@ let ignore_files ~lint_id files =
   List.iter (fun file -> Hashtbl.add ignored_files lint_id file) files
 ;;
 
+(** Entries of [ignored_files] that suppressed a finding. *)
+let matched_ignores : (string * string, unit) Hashtbl.t = Hashtbl.create 16
+
 let is_file_ignored ~lint_id filename =
   let filename =
     Base.String.chop_prefix filename ~prefix:"_build/default/"
     |> Option.value ~default:filename
   in
-  List.exists (String.equal filename) (Hashtbl.find_all ignored_files lint_id)
+  let matched = List.exists (String.equal filename) (Hashtbl.find_all ignored_files lint_id) in
+  if matched then Hashtbl.replace matched_ignores (lint_id, filename) ();
+  matched
+;;
+
+(** [ignore <lint_id> <path>] entries of an enabled lint that matched no finding. *)
+let unmatched_ignores () =
+  Hashtbl.fold
+    (fun lint_id file acc ->
+      if
+        Base.Hash_set.mem (enabled_lints ()) lint_id
+        && not (Hashtbl.mem matched_ignores (lint_id, file))
+      then (lint_id, file) :: acc
+      else acc)
+    ignored_files
+    []
+  |> List.sort_uniq compare
 ;;
 
 let recover_filepath filepath =
