@@ -301,6 +301,12 @@ let () =
         ~cmti:process_cmti_typedtree
         path;
       Collected_lints.report ();
+      if Config.report_stale_ignores ()
+      then
+        List.iter
+          (fun (lint_id, file) ->
+            Format.eprintf ".zanuda: ignore %s %s matched no finding\n%!" lint_id file)
+          (Config.unmatched_ignores ());
       if Config.gen_replacements () then Replacement.Refill.apply_all ()
     | UnusedDecls path ->
       Load_dune.analyze_dir
