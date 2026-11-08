@@ -1,6 +1,6 @@
 Without a .zanuda file, the physical equality is reported.
   $ dune build @check
-  $ zanuda() { ../zanuda.exe -no-top_file_license -no-eta_reduction -no-check-filesystem -dir . -ordjsonl /dev/null 2>&1; }
+  $ zanuda() { ../zanuda.exe -no-top_file_license -no-eta_reduction -no-check-filesystem -dir . -ordjsonl /dev/null "$@" 2>&1; }
   $ zanuda | grep -c 'physical equality'
   1
 
@@ -31,4 +31,18 @@ A line zanuda cannot interpret is an error, so a typo cannot silently leave a li
   > EOF
   $ zanuda
   .zanuda: Don't know what to do with "ignroe physical_equality A.ml"
+  [1]
+
+With `-report-stale-ignores`, an `ignore <lint_id> <path>` entry that suppressed nothing is reported.
+  $ cat > .zanuda <<EOF
+  > ignore physical_equality A.ml
+  > ignore physical_equality B.ml
+  > ignore eta_reduction A.ml
+  > EOF
+  $ zanuda -report-stale-ignores | grep '^\.zanuda:'
+  .zanuda: ignore physical_equality B.ml matched no finding
+
+Without `-report-stale-ignores` nothing is reported.
+  $ zanuda | grep -c '^\.zanuda:'
+  0
   [1]
