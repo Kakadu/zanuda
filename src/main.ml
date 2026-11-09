@@ -184,6 +184,32 @@ let find_unused_in_cmt_typedtree is_wrapped filename typedtree =
   it.Tast_iterator.structure it typedtree
 ;;
 
+(* A finding of a lint this binary does not list (a plugin, the filesystem check) counts
+   as [Deny], the level its JSON description defaults to. *)
+let level_of lint_id =
+  let find_level lints =
+    List.find_map
+      (fun (module L : LINT.GENERAL) ->
+        if String.equal L.lint_id lint_id then Some L.level else None)
+      lints
+  in
+  let listed =
+    [ (untyped_linters :> (module LINT.GENERAL) list)
+    ; (typed_linters :> (module LINT.GENERAL) list)
+    ; (per_file_linters :> (module LINT.GENERAL) list)
+    ; (Dynamic_plugins.all () :> (module LINT.GENERAL) list)
+    ]
+  in
+  Option.value (List.find_map find_level listed) ~default:LINT.Deny
+;;
+
+(* With [-fail-on], findings at or above the level make the run fail. *)
+let exit_on_findings () =
+  match Config.fail_on () with
+  | Some threshold when Collected_lints.exists_at_least ~level_of threshold -> exit 1
+  | Some _ | None -> ()
+;;
+
 let process_untyped filename =
   if not (Stdlib.Sys.file_exists filename)
   then Format.eprintf "Error: file %s doesn't exist. Continuing\n%!" filename
@@ -293,7 +319,8 @@ let () =
     | File file ->
       process_untyped file;
       Collected_lints.report ();
-      if Config.gen_replacements () then Replacement.Refill.apply_all ()
+      if Config.gen_replacements () then Replacement.Refill.apply_all ();
+      exit_on_findings ()
     | Dir path ->
       Load_dune.analyze_dir
         ~untyped:process_untyped
@@ -307,7 +334,8 @@ let () =
           (fun (lint_id, file) ->
             Format.eprintf ".zanuda: ignore %s %s matched no finding\n%!" lint_id file)
           (Config.unmatched_ignores ());
-      if Config.gen_replacements () then Replacement.Refill.apply_all ()
+      if Config.gen_replacements () then Replacement.Refill.apply_all ();
+      exit_on_findings ()
     | UnusedDecls path ->
       Load_dune.analyze_dir
         ~untyped:process_untyped

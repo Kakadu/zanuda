@@ -13,6 +13,7 @@
 (** {1 Collecting found lints} *)
 
 val clear : unit -> unit
+val exists_at_least : level_of:(string -> LINT.level) -> LINT.level -> bool
 val add : loc:Warnings.loc -> (module LINT.REPORTER) -> unit
 
 (** Report found lints
