@@ -4,6 +4,7 @@ open Crapper_ml
 
 let no_coverage = ref false
 let use_existing_coverage = ref false
+let no_match_cases = ref false
 let threshold = ref None
 let coverage_command = ref None
 let roots = ref []
@@ -22,6 +23,9 @@ let () =
        ; ( "--coverage-command"
          , Arg.String (fun s -> coverage_command := Some s)
          , "CMD replace the default coverage command with one of your own" )
+       ; ( "--no-match-cases"
+         , Arg.Set no_match_cases
+         , " match/function/try cases are not counted as decisions" )
        ; ( "--threshold"
          , Arg.Int (fun i -> threshold := Some i)
          , "N exit 2 when the worst score is higher" )
@@ -41,9 +45,10 @@ let () =
   then print_endline "No .cmt files found. Is the project compiled?"
   else (
     let functions =
+      let count_cases = not !no_match_cases in
       List.concat_map
         (fun cmt_path ->
-          try Crapper_ml.Extract.functions_of_cmt cmt_path with
+          try Crapper_ml.Extract.functions_of_cmt ~count_cases cmt_path with
           | exn ->
             Crapper_ml.Extract.warn_broken_cmt cmt_path exn;
             [])

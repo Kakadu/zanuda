@@ -84,7 +84,8 @@ let span_of_location (loc : Ppxlib.Location.t) =
   , loc.Ppxlib.Location.loc_end.Lexing.pos_cnum )
 ;;
 
-let make_function ~name ~namespace ~loc ~complexity =
+let make_function ~name ~namespace ~loc ~count_cases ~expr =
+  let complexity = Complexity.of_expression ~count_cases expr in
   let start_line, end_line, start_byte, end_byte = span_of_location loc in
   { Model.name
   ; namespace
@@ -98,84 +99,101 @@ let make_function ~name ~namespace ~loc ~complexity =
   }
 ;;
 
-let rec add_structure namespace (str : Ppxlib.Parsetree.structure) acc =
-  List.fold_left (fun acc item -> add_structure_item namespace item acc) acc str
+let rec add_structure namespace ~count_cases (str : Ppxlib.Parsetree.structure) acc =
+  List.fold_left
+    (fun acc item -> add_structure_item namespace ~count_cases item acc)
+    acc
+    str
 
-and add_structure_item namespace (item : Ppxlib.Parsetree.structure_item) acc =
+and add_structure_item namespace ~count_cases (item : Ppxlib.Parsetree.structure_item) acc
+  =
   match item.Ppxlib.Parsetree.pstr_desc with
   | Pstr_value (_, bindings) ->
-    List.fold_left (fun acc vb -> add_value_binding namespace vb acc) acc bindings
+    List.fold_left
+      (fun acc vb -> add_value_binding namespace ~count_cases vb acc)
+      acc
+      bindings
   | Pstr_module mb ->
     (match mb.Ppxlib.Parsetree.pmb_name.Location.txt with
      | Some name when name <> "_" ->
-       add_module_expr (namespace ^ "." ^ name) mb.Ppxlib.Parsetree.pmb_expr acc
+       add_module_expr
+         (namespace ^ "." ^ name)
+         ~count_cases
+         mb.Ppxlib.Parsetree.pmb_expr
+         acc
      | _ -> acc)
   | Pstr_recmodule mbs ->
     List.fold_left
       (fun acc mb ->
         match mb.Ppxlib.Parsetree.pmb_name.Location.txt with
         | Some name when name <> "_" ->
-          add_module_expr (namespace ^ "." ^ name) mb.Ppxlib.Parsetree.pmb_expr acc
+          add_module_expr
+            (namespace ^ "." ^ name)
+            ~count_cases
+            mb.Ppxlib.Parsetree.pmb_expr
+            acc
         | _ -> acc)
       acc
       mbs
   | Pstr_class classes ->
-    List.fold_left (fun acc cd -> add_class namespace cd acc) acc classes
+    List.fold_left (fun acc cd -> add_class namespace ~count_cases cd acc) acc classes
   | _ -> acc
 
-and add_module_expr namespace (me : Ppxlib.Parsetree.module_expr) acc =
+and add_module_expr namespace ~count_cases (me : Ppxlib.Parsetree.module_expr) acc =
   match me.Ppxlib.Parsetree.pmod_desc with
-  | Pmod_structure str -> add_structure namespace str acc
-  | Pmod_functor (_, body) -> add_module_expr namespace body acc
+  | Pmod_structure str -> add_structure namespace ~count_cases str acc
+  | Pmod_functor (_, body) -> add_module_expr namespace ~count_cases body acc
   | _ -> acc
 
-and add_value_binding namespace vb acc =
+and add_value_binding namespace ~count_cases vb acc =
   let expr = vb.Ppxlib.Parsetree.pvb_expr in
   match expr.Ppxlib.Parsetree.pexp_desc with
   | Pexp_function _ | Pexp_fun _ ->
     (match pat_name vb.Ppxlib.Parsetree.pvb_pat with
      | Some name ->
-       make_function
-         ~name
-         ~namespace
-         ~loc:vb.Ppxlib.Parsetree.pvb_loc
-         ~complexity:(Complexity.of_expression expr)
+       make_function ~name ~namespace ~loc:vb.Ppxlib.Parsetree.pvb_loc ~count_cases ~expr
        :: acc
      | None -> acc)
   | _ -> acc
 
-and add_class namespace cd acc =
+and add_class namespace ~count_cases cd acc =
   let namespace = namespace ^ "." ^ cd.Ppxlib.Parsetree.pci_name.Location.txt in
-  add_class_expr namespace cd.Ppxlib.Parsetree.pci_expr acc
+  add_class_expr namespace ~count_cases cd.Ppxlib.Parsetree.pci_expr acc
 
-and add_class_expr namespace (ce : Ppxlib.Parsetree.class_expr) acc =
+and add_class_expr namespace ~count_cases (ce : Ppxlib.Parsetree.class_expr) acc =
   match ce.Ppxlib.Parsetree.pcl_desc with
   | Pcl_structure cs ->
     List.fold_left
-      (fun acc cf -> add_class_field namespace cf acc)
+      (fun acc cf -> add_class_field namespace ~count_cases cf acc)
       acc
       cs.Ppxlib.Parsetree.pcstr_fields
   | Pcl_fun (_, _, _, body)
   | Pcl_apply (body, _)
   | Pcl_let (_, _, body)
   | Pcl_open (_, body)
-  | Pcl_constraint (body, _) -> add_class_expr namespace body acc
+  | Pcl_constraint (body, _) -> add_class_expr namespace ~count_cases body acc
   | _ -> acc
 
-and add_class_field namespace (cf : Ppxlib.Parsetree.class_field) acc =
+and add_class_field namespace ~count_cases (cf : Ppxlib.Parsetree.class_field) acc =
   match cf.Ppxlib.Parsetree.pcf_desc with
   | Pcf_method (name_loc, _, Cfk_concrete (_, expr)) ->
     make_function
       ~name:name_loc.Location.txt
       ~namespace
       ~loc:cf.Ppxlib.Parsetree.pcf_loc
-      ~complexity:(Complexity.of_expression expr)
+      ~count_cases
+      ~expr
     :: acc
   | _ -> acc
 ;;
 
-let functions_of_structure namespace (str : Ppxlib.Parsetree.structure) source =
-  let functions = add_structure namespace str [] in
+let functions_of_structure
+      namespace
+      ~count_cases
+      (str : Ppxlib.Parsetree.structure)
+      source
+  =
+  let functions = add_structure namespace ~count_cases str [] in
   List.rev_map (fun (f : Model.function_) -> { f with Model.path = source }) functions
 ;;
 
@@ -186,7 +204,7 @@ let warn_broken_cmt cmt_path exn =
     (Printexc.to_string exn)
 ;;
 
-let functions_of_cmt cmt_path =
+let functions_of_cmt ~count_cases cmt_path =
   let infos = Cmt_format.read_cmt cmt_path in
   let namespace = namespace_root_of_cmt cmt_path in
   let source = resolve_source cmt_path infos in
@@ -194,5 +212,5 @@ let functions_of_cmt cmt_path =
   (* Translate the parsetree of the current compiler into the parsetree of
      the current version of ppxlib *)
   let str = Ppxlib.Selected_ast.of_ocaml Ppxlib.Selected_ast.Type.Structure str in
-  functions_of_structure namespace str source
+  functions_of_structure namespace ~count_cases str source
 ;;

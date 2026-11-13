@@ -6,6 +6,12 @@
     stay charged to the enclosing function, matching the reference crapper's
     rule for nested functions.
 
+    Counting cases can be switched off with [~count_cases:false] (the
+    [--no-match-cases] command line switch): [match] then contributes only
+    through its guards and its body. This deviates from McCabe's path
+    counting and from every reference implementation; it makes dispatch-heavy
+    OCaml code look simpler than it is.
+
     The traversal uses ppxlib's generated iterator (the analog of
     [Ast_iterator] from the compiler), so it follows the AST shape on its own. *)
 
@@ -15,7 +21,7 @@ let short_circuit (op : Ppxlib.Parsetree.expression) =
   | _ -> false
 ;;
 
-let of_expression (e : Ppxlib.Parsetree.expression) =
+let of_expression ~count_cases (e : Ppxlib.Parsetree.expression) =
   let count = ref 1 in
   let visitor =
     object
@@ -24,7 +30,7 @@ let of_expression (e : Ppxlib.Parsetree.expression) =
       (* every match / function / try case is a branch of its own;
          a [when] guard adds another decision *)
       method! case c =
-        incr count;
+        if count_cases then incr count;
         (match c.Ppxlib.Parsetree.pc_guard with
          | Some _ -> incr count
          | None -> ());
