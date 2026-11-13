@@ -77,11 +77,11 @@ let span_of_location (loc : Ppxlib.Location.t) =
   , loc.Ppxlib.Location.loc_end.Lexing.pos_cnum )
 ;;
 
-let make_function ~name ~namespace ~loc =
+let make_function ~name ~namespace ~loc ~complexity =
   let start_line, end_line, start_byte, end_byte = span_of_location loc in
   { Model.name
   ; namespace
-  ; complexity = 0 (* computed in a later step *)
+  ; complexity
   ; start_line
   ; end_line
   ; start_byte
@@ -123,10 +123,17 @@ and add_module_expr namespace (me : Ppxlib.Parsetree.module_expr) acc =
   | _ -> acc
 
 and add_value_binding namespace vb acc =
-  match vb.Ppxlib.Parsetree.pvb_expr.Ppxlib.Parsetree.pexp_desc with
+  let expr = vb.Ppxlib.Parsetree.pvb_expr in
+  match expr.Ppxlib.Parsetree.pexp_desc with
   | Pexp_function _ | Pexp_fun _ ->
     (match pat_name vb.Ppxlib.Parsetree.pvb_pat with
-     | Some name -> make_function ~name ~namespace ~loc:vb.Ppxlib.Parsetree.pvb_loc :: acc
+     | Some name ->
+       make_function
+         ~name
+         ~namespace
+         ~loc:vb.Ppxlib.Parsetree.pvb_loc
+         ~complexity:(Complexity.of_expression expr)
+       :: acc
      | None -> acc)
   | _ -> acc
 
@@ -150,8 +157,12 @@ and add_class_expr namespace (ce : Ppxlib.Parsetree.class_expr) acc =
 
 and add_class_field namespace (cf : Ppxlib.Parsetree.class_field) acc =
   match cf.Ppxlib.Parsetree.pcf_desc with
-  | Pcf_method (name_loc, _, Cfk_concrete (_, _)) ->
-    make_function ~name:name_loc.Location.txt ~namespace ~loc:cf.Ppxlib.Parsetree.pcf_loc
+  | Pcf_method (name_loc, _, Cfk_concrete (_, expr)) ->
+    make_function
+      ~name:name_loc.Location.txt
+      ~namespace
+      ~loc:cf.Ppxlib.Parsetree.pcf_loc
+      ~complexity:(Complexity.of_expression expr)
     :: acc
   | _ -> acc
 ;;

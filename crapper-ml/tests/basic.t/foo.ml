@@ -17,3 +17,29 @@ class counter = object
   method get = n
   method bump () = n <- n + 1
 end
+
+let complex xs n =
+  let r =
+    match xs with
+    | [] -> None
+    | x :: _ when x = n && n > 0 -> Some x
+    | _ -> None
+  in
+  if r = None || n < 0 then None else r
+
+let guarded f =
+  try f () with
+  | Failure _ -> 0
+  | Exit -> 1
+
+let loops sum =
+  for i = 1 to 10 do sum := !sum + i done;
+  while !sum < 100 do incr sum done;
+  !sum
+
+let andor a b c = a && b || c
+
+let g x =
+  match x with
+  | y when y > 0 -> y
+  | _ -> 0

@@ -51,12 +51,13 @@ let () =
       List.iter
         (fun f ->
           Printf.printf
-            "%s:%d-%d  %s.%s\n"
+            "%s:%d-%d  %s.%s  complexity=%d\n"
             f.Model.path
             f.Model.start_line
             f.Model.end_line
             f.Model.namespace
-            f.Model.name)
+            f.Model.name
+            f.Model.complexity)
         functions;
     (* The worst CRAP score is compared with the threshold once functions and
      their scores are computed. Nothing is scored yet. *)
