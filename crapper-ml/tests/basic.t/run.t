@@ -1,20 +1,28 @@
 A small dune project is compiled in place, so the crapper sees real .cmt files.
 
   $ dune build
+
   $ ../crapper.exe .
-  foo.ml:1-1  Foo.add  complexity=1
-  foo.ml:2-2  Foo.even  complexity=2
-  foo.ml:3-3  Foo.odd  complexity=2
-  foo.ml:9-9  Foo.local  complexity=1
-  foo.ml:12-12  Foo.Inner.twice  complexity=1
-  foo.ml:17-17  Foo.counter.get  complexity=1
-  foo.ml:18-18  Foo.counter.bump  complexity=1
-  foo.ml:21-28  Foo.complex  complexity=8
-  foo.ml:30-33  Foo.guarded  complexity=3
-  foo.ml:35-38  Foo.loops  complexity=3
-  foo.ml:40-40  Foo.andor  complexity=3
-  foo.ml:42-45  Foo.g  complexity=4
-  bar.ml:1-1  Foo.Bar.mul  complexity=1
+  CRAP Report
+  ===========
+  Languages: ocaml
+  
+  Function                       Namespace                             CC    Cov%     CRAP
+  ----------------------------------------------------------------------------------------
+  complex                        Foo                                    8     N/A      N/A
+  g                              Foo                                    4     N/A      N/A
+  andor                          Foo                                    3     N/A      N/A
+  guarded                        Foo                                    3     N/A      N/A
+  loops                          Foo                                    3     N/A      N/A
+  even                           Foo                                    2     N/A      N/A
+  odd                            Foo                                    2     N/A      N/A
+  add                            Foo                                    1     N/A      N/A
+  local                          Foo                                    1     N/A      N/A
+  mul                            Foo.Bar                                1     N/A      N/A
+  twice                          Foo.Inner                              1     N/A      N/A
+  bump                           Foo.counter                            1     N/A      N/A
+  get                            Foo.counter                            1     N/A      N/A
+  
 
 Test code is compiled too, but must not be discovered:
 

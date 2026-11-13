@@ -45,21 +45,17 @@ let () =
             [])
         cmts
     in
-    if functions = []
-    then print_endline "No functions found"
-    else
-      List.iter
-        (fun f ->
-          Printf.printf
-            "%s:%d-%d  %s.%s  complexity=%d\n"
-            f.Model.path
-            f.Model.start_line
-            f.Model.end_line
-            f.Model.namespace
-            f.Model.name
-            f.Model.complexity)
-        functions;
-    (* The worst CRAP score is compared with the threshold once functions and
-     their scores are computed. Nothing is scored yet. *)
-    ())
+    let entries =
+      functions
+      |> List.map (Crapper_ml.Crap.make_entry ~coverage:None)
+      |> Crapper_ml.Crap.sort_entries
+    in
+    print_endline (Crapper_ml.Report.format_report entries);
+    (* exit 2 when the worst score is higher than the threshold *)
+    match !threshold with
+    | Some limit ->
+      (match List.find_opt (fun e -> Option.is_some e.Model.crap) entries with
+       | Some { Model.crap = Some worst; _ } when worst > float_of_int limit -> exit 2
+       | _ -> ())
+    | None -> ())
 ;;

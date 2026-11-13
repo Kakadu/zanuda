@@ -12,3 +12,14 @@ type function_ =
   ; path : string
   ; language : string
   }
+
+(* One row of the CRAP report *)
+type entry =
+  { name : string
+  ; namespace : string
+  ; complexity : int
+  ; coverage : float option (* percent, 0..100 *)
+  ; crap : float option
+  ; path : string
+  ; language : string
+  }

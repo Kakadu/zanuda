@@ -169,7 +169,7 @@ and add_class_field namespace (cf : Ppxlib.Parsetree.class_field) acc =
 
 let functions_of_structure namespace (str : Ppxlib.Parsetree.structure) source =
   let functions = add_structure namespace str [] in
-  List.rev_map (fun f -> { f with Model.path = source }) functions
+  List.rev_map (fun (f : Model.function_) -> { f with Model.path = source }) functions
 ;;
 
 let warn_broken_cmt cmt_path exn =
