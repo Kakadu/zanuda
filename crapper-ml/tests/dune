@@ -1,0 +1,8 @@
+(rule
+ (deps %{project_root}/crapper-ml/main.exe)
+ (target crapper.exe)
+ (action
+  (copy %{deps} %{target})))
+
+(cram
+ (deps ./crapper.exe))
