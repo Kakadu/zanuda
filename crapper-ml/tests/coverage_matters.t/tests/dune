@@ -1,0 +1,6 @@
+(tests
+ (names run)
+ (libraries cm)
+ (modules run)
+ (instrumentation
+  (backend bisect_ppx)))

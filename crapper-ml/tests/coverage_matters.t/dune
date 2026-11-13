@@ -1,0 +1,5 @@
+(library
+ (name cm)
+ (modules cm)
+ (instrumentation
+  (backend bisect_ppx)))
