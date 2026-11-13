@@ -35,8 +35,30 @@ let () =
   let cmts = Discover.discover_cmt roots in
   if cmts = []
   then print_endline "No .cmt files found. Is the project compiled?"
-  else List.iter print_endline cmts;
-  (* The worst CRAP score is compared with the threshold once functions and
+  else (
+    let functions =
+      List.concat_map
+        (fun cmt_path ->
+          try Crapper_ml.Extract.functions_of_cmt cmt_path with
+          | exn ->
+            Crapper_ml.Extract.warn_broken_cmt cmt_path exn;
+            [])
+        cmts
+    in
+    if functions = []
+    then print_endline "No functions found"
+    else
+      List.iter
+        (fun f ->
+          Printf.printf
+            "%s:%d-%d  %s.%s\n"
+            f.Model.path
+            f.Model.start_line
+            f.Model.end_line
+            f.Model.namespace
+            f.Model.name)
+        functions;
+    (* The worst CRAP score is compared with the threshold once functions and
      their scores are computed. Nothing is scored yet. *)
-  ()
+    ())
 ;;

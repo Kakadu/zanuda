@@ -6,7 +6,8 @@
 (library
  (name crapper_ml)
  (synopsis "CRAP metrics for OCaml functions")
- (modules Discover))
+ (libraries compiler-libs.common ppxlib)
+ (modules Discover Model Extract))
 
 (executable
  (name main)
