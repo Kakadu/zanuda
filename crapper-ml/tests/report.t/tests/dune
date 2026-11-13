@@ -1,0 +1,10 @@
+(library
+ (name foo_tests)
+ (modules test_helper))
+
+(tests
+ (names run_foo)
+ (libraries foo)
+ (modules run_foo)
+ (instrumentation
+  (backend bisect_ppx)))

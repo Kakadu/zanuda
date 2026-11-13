@@ -5,6 +5,7 @@ open Crapper_ml
 let no_coverage = ref false
 let use_existing_coverage = ref false
 let threshold = ref None
+let coverage_command = ref None
 let roots = ref []
 let usage = "usage: crapper [options] [files-or-dirs]"
 
@@ -18,6 +19,9 @@ let () =
        ; ( "--use-existing-coverage"
          , Arg.Set use_existing_coverage
          , " read coverage reports already on disk" )
+       ; ( "--coverage-command"
+         , Arg.String (fun s -> coverage_command := Some s)
+         , "CMD replace the default coverage command with one of your own" )
        ; ( "--threshold"
          , Arg.Int (fun i -> threshold := Some i)
          , "N exit 2 when the worst score is higher" )
@@ -46,9 +50,26 @@ let () =
         cmts
     in
     let entries =
+      let coverage =
+        if !no_coverage
+        then None
+        else
+          Some
+            (Coverage.load
+               ~use_existing:!use_existing_coverage
+               ~command:
+                 (match !coverage_command with
+                  | Some cmd -> cmd
+                  | None -> Coverage.default_coverage_command))
+      in
+      let coverage_of f =
+        match coverage with
+        | None -> None
+        | Some data -> Coverage.coverage_of f data
+      in
       functions
-      |> List.map (Crapper_ml.Crap.make_entry ~coverage:None)
-      |> Crapper_ml.Crap.sort_entries
+      |> List.map (fun f -> Crap.make_entry ~coverage:(coverage_of f) f)
+      |> Crap.sort_entries
     in
     print_endline (Crapper_ml.Report.format_report entries);
     (* exit 2 when the worst score is higher than the threshold *)

@@ -7,7 +7,7 @@
  (name crapper_ml)
  (synopsis "CRAP metrics for OCaml functions")
  (libraries compiler-libs.common ppxlib)
- (modules Discover Model Crap Complexity Extract Report))
+ (modules Discover Model Crap Complexity Extract Report Coverage))
 
 (executable
  (name main)

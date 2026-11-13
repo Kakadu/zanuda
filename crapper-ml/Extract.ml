@@ -44,11 +44,18 @@ let source_path_of_cmt cmt_path (infos : Cmt_format.cmt_infos) =
 ;;
 
 (* dune compiles with the build tree as working directory, so the source path
-   recorded in the [.cmt] file may be relative to it *)
+   recorded in the [.cmt] file may be relative to it. Instrumented builds
+   compile [foo.pp.ml], the output of the ppx; the original source is parsed
+   instead, as ppx rewriters keep the positions of the original file. *)
 let resolve_source cmt_path (infos : Cmt_format.cmt_infos) =
   let source = source_path_of_cmt cmt_path infos in
+  let original source =
+    if Filename.check_suffix source ".pp.ml"
+    then String.sub source 0 (String.length source - String.length ".pp.ml") ^ ".ml"
+    else source
+  in
   if Sys.file_exists source
-  then source
+  then original source
   else (
     let candidates =
       [ Filename.concat infos.Cmt_format.cmt_builddir source
@@ -56,8 +63,8 @@ let resolve_source cmt_path (infos : Cmt_format.cmt_infos) =
       ]
     in
     match List.find_opt Sys.file_exists candidates with
-    | Some resolved -> resolved
-    | None -> source)
+    | Some resolved -> original resolved
+    | None -> original source)
 ;;
 
 (* The pattern of a [let] binding names the function: [f] in [let f x = ...],
