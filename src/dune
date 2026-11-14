@@ -28,13 +28,13 @@
  (libraries base compiler-libs.common sexplib unix yojson Tast_pattern)
  (preprocess
   (pps
-   ppx_optcomp
+   ppx_optcomp_nobase
    ppx_sexp_conv
    ppx_expect_nobase
    ;
    ))
  (instrumentation
-  (backend bisect_ppx))
+  (backend bisect_ppx_ng))
  (inline_tests))
 
 (executable
@@ -55,7 +55,7 @@
  (preprocess
   (pps ppx_inline_test_nobase))
  (instrumentation
-  (backend bisect_ppx))
+  (backend bisect_ppx_ng))
  (package zanuda))
 
 (library
@@ -64,4 +64,4 @@
  (modules demo_zanuda_plugin)
  (libraries zanuda_core)
  (instrumentation
-  (backend bisect_ppx)))
+  (backend bisect_ppx_ng)))

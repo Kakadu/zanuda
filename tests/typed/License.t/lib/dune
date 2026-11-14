@@ -3,5 +3,5 @@
  (modules asdf empty)
  (modules_without_implementation empty)
  (preprocess
-  (pps ppx_inline_test))
+  (pps ppx_inline_test_nobase))
  (inline_tests))

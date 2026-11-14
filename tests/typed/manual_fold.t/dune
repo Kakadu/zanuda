@@ -4,7 +4,7 @@
  (modes byte)
  (modules manual_fold)
  (instrumentation
-  (backend bisect_ppx))
+  (backend bisect_ppx_ng))
  (flags
   (:standard
    -warn-error

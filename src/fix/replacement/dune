@@ -3,4 +3,4 @@
  (package zanuda)
  (libraries zanuda_core angstrom unix)
  (instrumentation
-  (backend bisect_ppx)))
+  (backend bisect_ppx_ng)))

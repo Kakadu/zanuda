@@ -5,7 +5,7 @@
  ; (modules stuff)
  (modules_without_implementation ast)
  (instrumentation
-  (backend bisect_ppx))
+  (backend bisect_ppx_ng))
  (flags
   (:standard
    ;

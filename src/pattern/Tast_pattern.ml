@@ -399,15 +399,27 @@ let ebool =
       | _ -> fail loc (sprintf "ebool"))
 ;;
 
+[%%if ocaml_version < (5, 0, 0)]
 let tpat_alias (T fpat) (T fid) (T fname) =
   T
     (fun ctx loc x k ->
       match x.pat_desc with
-      | Typedtree.Tpat_alias (p, id , name, _, _) ->
+      | Typedtree.Tpat_alias (p, id, name) ->
         ctx.matched <- ctx.matched + 1;
-        k |> fpat ctx loc p |> fid  ctx loc id |> fname ctx loc name.txt
+        k |> fpat ctx loc p |> fid ctx loc id |> fname ctx loc name.txt
       | _ -> fail loc "tpat_alias")
-;
+;;
+[%%else]
+let tpat_alias (T fpat) (T fid) (T fname) =
+  T
+    (fun ctx loc (x : Typedtree.pattern) k ->
+      match x.pat_desc with
+      | Typedtree.Tpat_alias (p, id, name, _, _) ->
+        ctx.matched <- ctx.matched + 1;
+        k |> fpat ctx loc p |> fid ctx loc id |> fname ctx loc name.txt
+      | _ -> fail loc "tpat_alias")
+;;
+[%%endif]
 [%%if ocaml_version < (5, 0, 0)]
 
 let tpat_var (T fname)  =

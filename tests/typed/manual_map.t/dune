@@ -4,7 +4,7 @@
  (modes byte)
  (modules manual_map)
  (instrumentation
-  (backend bisect_ppx))
+  (backend bisect_ppx_ng))
  (flags
   (:standard
    ;

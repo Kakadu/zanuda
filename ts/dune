@@ -11,7 +11,7 @@
  (preprocessor_deps
   (file a.ts))
  (preprocess
-  (pps ppx_inline_test ppx_blob ppx_sexp_conv)))
+  (pps ppx_inline_test_nobase ppx_blob ppx_sexp_conv)))
 
 (cram
  (deps ./demo.exe))

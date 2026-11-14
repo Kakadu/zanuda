@@ -38,5 +38,5 @@
  (preprocess
   (pps ppx_inline_test_nobase ppxlib.metaquot))
  (instrumentation
-  (backend bisect_ppx))
+  (backend bisect_ppx_ng))
  (inline_tests))

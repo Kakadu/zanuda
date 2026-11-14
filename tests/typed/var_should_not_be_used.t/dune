@@ -6,7 +6,7 @@
  (preprocess
   (pps ppx_deriving.show))
  (instrumentation
-  (backend bisect_ppx)))
+  (backend bisect_ppx_ng)))
 
 (cram
  (deps %{bin:zanuda.exe}))

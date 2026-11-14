@@ -10,7 +10,7 @@
  (modules main)
  (libraries yojson diff_parser curly dune-build-info)
  (instrumentation
-  (backend bisect_ppx)))
+  (backend bisect_ppx_ng)))
 
 (library
  (name diff_parser)
@@ -20,14 +20,14 @@
  (wrapped false)
  (libraries angstrom)
  (instrumentation
-  (backend bisect_ppx)))
+  (backend bisect_ppx_ng)))
 
 (executable
  (name parser)
  (modules parser)
  (libraries diff_parser)
  (instrumentation
-  (backend bisect_ppx)))
+  (backend bisect_ppx_ng)))
 
 (library
  (name diff_parser_tests)
@@ -38,4 +38,4 @@
  (preprocess
   (pps ppx_inline_test_nobase ppx_expect_nobase))
  (instrumentation
-  (backend bisect_ppx)))
+  (backend bisect_ppx_ng)))

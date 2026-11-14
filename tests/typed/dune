@@ -33,4 +33,4 @@
 
 (cram
  (applies_to License)
- (enabled_if %{lib-available:bisect_ppx}))
+ (enabled_if %{lib-available:bisect_ppx_ng}))

@@ -4,6 +4,6 @@
  (modes byte)
  (preprocessor_deps anonymous.rb)
  (preprocess
-  (pps ppx_blob ppx_optcomp))
+  (pps ppx_blob ppx_optcomp_nobase))
  (modules test_toplevel_eval)
  (wrapped false))

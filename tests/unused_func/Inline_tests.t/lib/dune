@@ -12,4 +12,4 @@
  (libraries wrapped_lib nonwrapped_lib)
  (inline_tests)
  (preprocess
-  (pps ppx_expect ppx_inline_test)))
+  (pps ppx_expect_nobase ppx_inline_test_nobase)))
