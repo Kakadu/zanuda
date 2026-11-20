@@ -54,8 +54,7 @@ coverage:
 	bisect-ppx-report summary $(COVERAGE_OPTS)
 	@echo "Use 'xdg-open _coverage/index.html' to see coverage report"
 
-# CRAP report from the coverage that 'make coverage' produces in $(TEST_COV_D)
+# CRAP report from the coverage that 'make coverage' produced in $(TEST_COV_D);
+# run 'make coverage' yourself first
 crapper:
-	dune exec crapper-ml -- \
-	  --coverage-path $(TEST_COV_D) \
-	  --coverage-command '$(MAKE) coverage'
+	dune exec crapper-ml -- --coverage-path $(TEST_COV_D)
