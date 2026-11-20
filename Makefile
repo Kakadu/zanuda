@@ -46,6 +46,7 @@ COVERAGE_OPTS = --coverage-path $(TEST_COV_D) --expect src/ --expect review/ --e
 .PHONY: test_coverage coverage crapper
 test_coverage: coverage
 coverage:
+	dune clean
 	$(RM) -r $(TEST_COV_D)
 	mkdir -p $(TEST_COV_D)
 	BISECT_FILE=$(TEST_COV_D)/zanuda dune b @runtest @check --no-print-directory \
@@ -57,4 +58,4 @@ coverage:
 # CRAP report from the coverage that 'make coverage' produced in $(TEST_COV_D);
 # run 'make coverage' yourself first
 crapper:
-	dune exec crapper-ml -- --coverage-path $(TEST_COV_D)
+	dune exec crapper-ml -- --coverage-path $(TEST_COV_D) --min-crap 10 --ignore-modules Tast_pattern

@@ -13,10 +13,14 @@ type w =
   | Wrapped of string
   | Non_wrapped
 
+[@@@coverage off]
+
 let pp_w ppf = function
   | Non_wrapped -> Format.fprintf ppf "Non_wrapped"
   | Wrapped s -> Format.fprintf ppf "Wrapped %S" s
 ;;
+
+[@@@coverage on]
 
 let fine_module { impl } =
   match impl with
@@ -44,12 +48,13 @@ let%expect_test _ =
 let discover_wrappness modules =
   let module W = struct
     type w =
-      | W of string * string
+      | Wrapped of string * string
       | NW of string
 
     let pp_w ppf = function
       | NW s -> Format.fprintf ppf "NW %S" s
-      | W (pref, suf) -> Format.fprintf ppf "W (%s __ %s)" pref suf
+      | Wrapped (pref, suf) -> Format.fprintf ppf "W (%s __ %s)" pref suf
+    [@@coverage off]
     ;;
 
     let is_NW = function
@@ -58,8 +63,9 @@ let discover_wrappness modules =
     ;;
 
     let is_W_with name = function
-      | W (s, _) when String.equal s name -> true
+      | Wrapped (s, _) when String.equal s name -> true
       | _ -> false
+    [@@coverage off]
     ;;
   end
   in
@@ -72,7 +78,7 @@ let discover_wrappness modules =
     match Base.String.substr_index name ~pattern:"__" with
     | None -> [ W.NW name ]
     | Some i ->
-      [ W.W
+      [ W.Wrapped
           (Base.String.prefix name i, Base.String.suffix name (String.length name - i - 2))
       ]
   in
@@ -134,7 +140,9 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
     let try_untyped filename =
       try analyze_untyped filename with
       | Syntaxerr.Error _e ->
-        Format.eprintf "Syntaxerr.Error in analysis of '%s'. Skipped.\n%!" filename
+        Format.eprintf
+          "Syntaxerr.Error in analysis of '%s'. Skipped.\n%!"
+          filename [@coverage off]
     in
     Option.iter try_untyped m.impl;
     Option.iter try_untyped m.intf;
@@ -147,8 +155,10 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
         | Cmt_format.Implementation stru -> analyze_cmt is_wrapped source_file stru
         | Interface sign -> analyze_cmti is_wrapped source_file sign
         | Packed _ | Partial_implementation _ | Partial_interface _ ->
-          printfn "%s %d" __FILE__ __LINE__;
-          exit 1)
+          begin [@coverage off]
+            printfn "%s %d" __FILE__ __LINE__;
+            exit 1
+          end)
     in
     ListLabels.iter
       [ m.impl, m.cmt; m.intf, m.cmti ]
@@ -158,9 +168,13 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
           (* Format.printf "%s %d\n%!" __FILE__ __LINE__; *)
           ()
         | Some filename, None ->
-          Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
+          Format.printf
+            "Found ml[i] file '%s' without cmt[i] file\n"
+            filename [@coverage off]
         | None, Some filename ->
-          Format.printf "Found ml[i] file '%s' without cmt[i] file\n" filename
+          Format.printf
+            "Found ml[i] file '%s' without cmt[i] file\n"
+            filename [@coverage off]
         | Some source_filename, Some cmt_filename ->
           let build_dir = "_build/default/" in
           let wrap =
@@ -181,17 +195,17 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
                   Unix.chdir "../..")
               else
                 fun _ ->
-                  Format.eprintf
-                    "File '%s' doesn't exist. Maybe some of source files are not compiled?\n\
-                     %!"
-                    cmt_filename
+                  (Format.eprintf
+                     "File '%s' doesn't exist. Maybe some of source files are not \
+                      compiled?\n\
+                      %!"
+                     cmt_filename [@coverage off])
             else
               fun f ->
                 printfn "Loading CMT %S" cmt_filename;
                 let cmt = Cmt_format.read cmt_filename in
                 f cmt
           in
-          (* Format.printf "%s %d src=%S\n%!" __FILE__ __LINE__ source_filename; *)
           wrap (on_cmti source_filename))
   in
   let loop_database db =
@@ -204,9 +218,11 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
       | Library { Library.modules; name; _ } ->
         let wrappedness = discover_wrappness modules in
         (match wrappedness with
-         | None -> Stdlib.Printf.eprintf "Can't detect wrappedness for a library %S" name
+         | None ->
+           Stdlib.Printf.eprintf
+             "Can't detect wrappedness for a library %S"
+             name [@coverage off]
          | Some wrappedness ->
-           (* printfn "Discovered wrappedness: %a" pp_w wrappedness; *)
            ListLabels.iter modules ~f:(fun m ->
              (* Format.printf "Trying module %a...\n%!" Sexp.pp (Dune_project.sexp_of_module_ m); *)
              if fine_module m
@@ -214,10 +230,12 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
              else if
                (* Usually this happend with 'fake' wrapped modules from dune *)
                not (String.equal name (String.lowercase_ascii m.name))
-             then if Config.verbose () then printfn "module %S is omitted" m.name)))
+             then
+               if Config.verbose ()
+               then printfn "module %S is omitted" m.name [@coverage off])))
   in
+  let cmd = Printf.sprintf "dune describe workspace %s" path in
   let str =
-    let cmd = Printf.sprintf "dune describe workspace %s" path in
     (* let _ = Sys.command (Printf.sprintf "notify-send %S" cmd) in *)
     (* print_endline cmd; *)
     let ch = Unix.open_process_in cmd in
@@ -232,6 +250,9 @@ let analyze_dir ~untyped:analyze_untyped ~cmt:analyze_cmt ~cmti:analyze_cmti pat
     loop_database db
   with
   | Failure s ->
-    Printf.eprintf "%s\n%!" s;
-    exit 1
+    begin [@coverage off]
+      Printf.eprintf "It seems that output of '%s' is malformed\n" cmd;
+      Printf.eprintf "%s\n%!" s;
+      exit 1
+    end
 ;;

@@ -65,24 +65,6 @@ let has_arg x args =
     args
 ;;
 
-let is_fold fun_name tail f args =
-  if String.equal fun_name f && has_arg tail args
-  then Some Fold_left
-  else if
-    List.exists
-      (fun (_, arg) ->
-        match arg.pexp_desc with
-        | Pexp_apply (exp, args) ->
-          (match exp.pexp_desc with
-           | Pexp_ident { txt = Lident f; _ } ->
-             String.equal fun_name f && has_arg tail args
-           | _ -> false)
-        | _ -> false)
-      args
-  then Some Fold_right
-  else None
-;;
-
 let rec fun_body expr =
   Tast_pattern.(parse (texp_function_body drop __))
     expr.Typedtree.exp_loc
