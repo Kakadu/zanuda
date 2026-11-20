@@ -1,0 +1,8 @@
+(library
+ (name loadfix)
+ (modules other))
+
+(executable
+ (name demo)
+ (modules demo)
+ (libraries loadfix))

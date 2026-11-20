@@ -30,6 +30,17 @@ let to_module_name name =
   else String.mapi (fun i c -> if i = 0 then Base.Char.uppercase c else c) name
 ;;
 
+let%expect_test _ =
+  (* an already capitalized name is returned as is *)
+  to_module_name "Already_Capitalized" |> print_endline;
+  to_module_name "snake_case" |> print_endline;
+  [%expect
+    {|
+    Already_Capitalized
+    Snake_case
+    |}]
+;;
+
 let discover_wrappness modules =
   let module W = struct
     type w =

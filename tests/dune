@@ -7,6 +7,18 @@
  (deps untyped/zanuda.exe)
  (package zanuda))
 
+(rule
+ (deps %{project_root}/src/main.exe)
+ (target zanuda.exe)
+ (package zanuda)
+ (action
+  (copy %{deps} %{target})))
+
+(cram
+ (applies_to load_dune)
+ (deps ./zanuda.exe)
+ (package zanuda))
+
 (cram
  (applies_to plugin1)
  (deps

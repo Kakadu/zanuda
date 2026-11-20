@@ -1,4 +1,4 @@
-(dirs :standard \ ts)
+(dirs :standard \ ts ocaml-mcp)
 
 ; (env
 ;  (_
