@@ -43,13 +43,19 @@ odig:
 TEST_COV_D = /tmp/zanudacov
 COVERAGE_OPTS = --coverage-path $(TEST_COV_D) --expect src/ --expect review/ --expect review_tests/
 
-.PHONY: test_coverage coverage
+.PHONY: test_coverage coverage crapper
 test_coverage: coverage
 coverage:
 	$(RM) -r $(TEST_COV_D)
 	mkdir -p $(TEST_COV_D)
-	BISECT_FILE=$(TEST_COV_D)/zanuda dune runtest --no-print-directory \
+	BISECT_FILE=$(TEST_COV_D)/zanuda dune b @runtest @check --no-print-directory \
           --instrument-with bisect_ppx --force
 	bisect-ppx-report html $(COVERAGE_OPTS)
 	bisect-ppx-report summary $(COVERAGE_OPTS)
 	@echo "Use 'xdg-open _coverage/index.html' to see coverage report"
+
+# CRAP report from the coverage that 'make coverage' produces in $(TEST_COV_D)
+crapper:
+	dune exec crapper-ml -- \
+	  --coverage-path $(TEST_COV_D) \
+	  --coverage-command '$(MAKE) coverage'
