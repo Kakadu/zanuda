@@ -46,3 +46,20 @@ Without `-report-stale-ignores` nothing is reported.
   $ zanuda | grep -c '^\.zanuda:'
   0
   [1]
+
+By default findings do not change the exit status.
+  $ rm -f .zanuda
+  $ zanuda > /dev/null
+  $ echo $?
+  0
+
+`-fail-on warn` exits 1 on a finding of level Warn or above.
+  $ zanuda -fail-on warn > /dev/null
+  [1]
+
+`-fail-on deny` ignores Warn findings.
+  $ zanuda -fail-on deny > /dev/null
+
+Findings suppressed by `.zanuda` do not count.
+  $ echo 'ignore A.ml' > .zanuda
+  $ zanuda -fail-on warn > /dev/null

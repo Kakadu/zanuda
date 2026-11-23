@@ -6,6 +6,7 @@
 - #95: `.zanuda`: `ignore <lint_id> <path>[,<path>...]` skips one lint in the listed files, for every lint.
     `forward <lint_id> ignore <paths>` is still accepted, now for every lint, not only `mutability_check` and `physical_equality`.
 - #103: `-report-stale-ignores`: with `-dir`, report on stderr each `.zanuda` `ignore <lint_id> <path>` entry of an enabled lint that suppressed no finding.
+- #104: `-fail-on warn|deny`: exit with status 1 when a finding of at least that level is reported. Without it findings never change the exit status.
 
 ### Changed
 

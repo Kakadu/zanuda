@@ -36,6 +36,21 @@ include struct
     else Queue.add (loc, m) found_Lints
   ;;
 
+  (* Is there a finding whose level, given by [level_of] from its lint id, is at least
+     [threshold]? *)
+  let exists_at_least ~level_of threshold =
+    let rank = function
+      | LINT.Allow | Deprecated -> 0
+      | Warn -> 1
+      | Deny -> 2
+    in
+    Queue.fold
+      (fun acc (_, (module M : LINT.REPORTER)) ->
+        acc || rank (level_of M.lint_id) >= rank threshold)
+      false
+      found_Lints
+  ;;
+
   let loc_lints f = Queue.fold (fun acc x -> f x :: acc) [] found_Lints
 end
 

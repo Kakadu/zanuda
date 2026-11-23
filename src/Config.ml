@@ -29,6 +29,7 @@ type t =
   ; mutable verbose : bool
   ; mutable gen_replacements : bool
   ; mutable report_stale_ignores : bool
+  ; mutable fail_on : LINT.level option
   ; enabled_lints : string Base.Hash_set.t
   ; all_lints : string Base.Hash_set.t
   ; mutable skip_level_allow : bool
@@ -49,6 +50,7 @@ let opts =
   ; verbose = false
   ; gen_replacements = false
   ; report_stale_ignores = false
+  ; fail_on = None
   ; enabled_lints = Base.Hash_set.create (module Base.String)
   ; all_lints = Base.Hash_set.create (module Base.String)
   ; skip_level_allow = true
@@ -92,6 +94,7 @@ let unset_check_filesystem () = opts.check_filesystem <- false
 let verbose () = opts.verbose
 let gen_replacements () = opts.gen_replacements
 let report_stale_ignores () = opts.report_stale_ignores
+let fail_on () = opts.fail_on
 let set_verbose () = opts.verbose <- true
 let set_skip_level_allow b = opts.skip_level_allow <- b
 let set_plugin_name_suffix s = opts.plugin_name_suffix <- Some s
@@ -196,6 +199,11 @@ let parse_args () =
     ; ( "-report-stale-ignores"
       , Arg.Unit (fun () -> opts.report_stale_ignores <- true)
       , " With -dir, report .zanuda ignore entries that matched no finding" )
+    ; ( "-fail-on"
+      , Arg.Symbol
+          ( [ "deny"; "warn" ]
+          , fun s -> opts.fail_on <- Some (if s = "warn" then LINT.Warn else LINT.Deny) )
+      , " Exit with status 1 if a finding of at least this level is reported" )
     ; "-fix", Arg.String set_fix, "Apply all found lints available for correction"
     ]
   in
